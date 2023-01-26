@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour
@@ -49,9 +50,13 @@ public class LevelGenerator : MonoBehaviour
         int east = 0;
         int south = 0;
         int west = 0;
+        int bOrW = 0;
+        int passes = 0;
 
-        while(currentLevelSize < m_levelSize)
+        while (currentLevelSize < m_levelSize)
         {
+           
+
             if(m_floors.Count == 0)
             {
                 m_floors.Add(GameObject.Instantiate(m_floorPrefab, new Vector3(0, 0, 0), Quaternion.identity, m_floorParent));
@@ -64,6 +69,8 @@ public class LevelGenerator : MonoBehaviour
 
                 while(!postionValid)
                 {
+                    passes++;
+
                     newPos = m_floors[m_randomGen.Next(0, m_floors.Count)].transform.position;
                     
                     int direction = m_randomGen.Next(1, 5);
@@ -77,18 +84,21 @@ public class LevelGenerator : MonoBehaviour
                             north++;
                             break;
                         }
+                        //East
                         case 2:
                         {
                             newPos.x += 10;
                             east++;
                             break;
                         }
+                        //South
                         case 3:
                         {
                             newPos.z -= 10;
                             south++;
                             break;
                         }
+                        //West
                         case 4:
                         {
                             newPos.x -= 10;
@@ -101,7 +111,7 @@ public class LevelGenerator : MonoBehaviour
 
                     foreach (GameObject gO in m_floors)
                     {
-                        if(newPos == gO.transform.position) { posFound = true; }
+                        if(newPos == gO.transform.position) { posFound = true; break; }
                     }
 
                     if(posFound) { continue; }
@@ -109,10 +119,18 @@ public class LevelGenerator : MonoBehaviour
                 }
 
                 m_floors.Add(Instantiate(m_floorPrefab, newPos, Quaternion.identity, m_floorParent));
-                m_floors[m_floors.Count - 1].GetComponent<MeshRenderer>().material.color = new Color32((byte)m_randomGen.Next(256), (byte)m_randomGen.Next(256), (byte)m_randomGen.Next(256), 255);
+
+                Color col;
+
+                if(bOrW == 0) { col = Color.white; bOrW = 1; }
+                else { col = Color.black; bOrW = 0; }
+
+                m_floors[m_floors.Count - 1].GetComponent<MeshRenderer>().material.color = col;
                 currentLevelSize++;
             }
         }
+
+        print("Number of Locations Passes: " + passes);
     }
 
     public void ClearLevel()

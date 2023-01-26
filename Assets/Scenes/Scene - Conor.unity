@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40270c4fba0b57f4fb4f1a22d662236b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_levelSeed: 1993101562
+  m_levelSeed: 0
   m_levelSize: 10
   m_floorPrefab: {fileID: 8141540206807185624, guid: 10bf6d631bd8f394bba9e056f5ba56a2,
     type: 3}
