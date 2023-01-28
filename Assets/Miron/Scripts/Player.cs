@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -78,15 +79,23 @@ public class Player : MonoBehaviour
         material.color = color;
     }
 
-    private void UpdatePlayerVelocityXZ()
+    public void OnMove(InputAction.CallbackContext context)
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        // read the value for the "move" action each event call
+        Vector2 moveAmount = context.ReadValue<Vector2>();
 
         //walk
-        Vector3 move = (transform.right * x + transform.forward * z) * speed;
+        Vector3 move = (transform.right * moveAmount.x + transform.forward * moveAmount.y) * speed;
         velocity.x = move.x;
         velocity.z = move.z;
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (controller.isGrounded && CanRoll())
+        {
+            StartRoll();
+        }
     }
 
     private void StartWalk()
@@ -97,17 +106,7 @@ public class Player : MonoBehaviour
 
     private void Walk()
     {
-        UpdatePlayerVelocityXZ();
-
-        if (Input.GetAxis("Jump") > 0 && controller.isGrounded && CanRoll())
-        {
-            StartRoll();
-        }
-        else
-        {
-            //keep controller grounded (playerVelocity.y = 0 doesn't work)
-            velocity.y = gravity;
-        }
+        velocity.y = gravity;
 
         Vector3 movement = velocity * Time.deltaTime;
         if (movement.magnitude >= controller.minMoveDistance)
@@ -127,8 +126,6 @@ public class Player : MonoBehaviour
 
     private void Fall()
     {
-        UpdatePlayerVelocityXZ();
-
         //*-1 to make value positive (gravity is -9.81)
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
