@@ -26,7 +26,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float rollDuration = 0.5f;
 
-    private Vector3 rollVelocity;
+	private Vector3 moveVelocity;
+	private Vector3 rollVelocity;
     private float rollStart;
     private float rollEnd;
 
@@ -37,7 +38,6 @@ public class Player : MonoBehaviour
 
     private enum State
     {
-        WALKING,
         FALLING,
         ROLLING,
     }
@@ -52,10 +52,13 @@ public class Player : MonoBehaviour
         controller.center = new Vector3(0, correctHeight, 0);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         switch (state)
         {
+			case State.IDLE:
+				Idle();
+				break;
             case State.WALKING:
                 Walk();
                 break;
@@ -65,7 +68,10 @@ public class Player : MonoBehaviour
             case State.ROLLING:
                 Roll();
                 break;
-            default:
+			case State.DEAD:
+				Dead();
+				break;
+			default:
                 Debug.LogError("The state is unknown.");
                 break;
         }
@@ -83,11 +89,7 @@ public class Player : MonoBehaviour
     {
         // read the value for the "move" action each event call
         Vector2 moveAmount = context.ReadValue<Vector2>();
-
-        //walk
-        Vector3 move = (transform.right * moveAmount.x + transform.forward * moveAmount.y) * speed;
-        velocity.x = move.x;
-        velocity.z = move.z;
+        moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y) * speed;
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -101,15 +103,20 @@ public class Player : MonoBehaviour
     private void StartWalk()
     {
         state = State.WALKING;
-        velocity.y = 0;
     }
 
     private void Walk()
     {
-        velocity.y = gravity;
+		velocity.x = moveVelocity.x;
+		velocity.z = moveVelocity.z;
+		velocity.y = gravity;
 
         Vector3 movement = velocity * Time.deltaTime;
-        if (movement.magnitude >= controller.minMoveDistance)
+
+		//ignore Gravity for minMoveDistance check
+		Vector3 movementXZ = movement;
+		movementXZ.y = 0;
+		if (movementXZ.magnitude >= controller.minMoveDistance)
         {
             controller.Move(movement);
             if (!controller.isGrounded)
