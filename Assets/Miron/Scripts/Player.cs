@@ -26,6 +26,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float rollDuration = 0.5f;
 
+	[SerializeField]
+	private bool isDead = false;
+	
 	private Vector3 moveVelocity;
 	private Vector3 rollVelocity;
     private float rollStart;
@@ -38,8 +41,11 @@ public class Player : MonoBehaviour
 
     private enum State
     {
+		IDLE,
+		WALKING,
         FALLING,
         ROLLING,
+		DEAD,
     }
     private State state = State.FALLING;
 
@@ -85,6 +91,34 @@ public class Player : MonoBehaviour
         material.color = color;
     }
 
+	void StartIdle()
+	{
+		state = State.IDLE;
+	}
+
+	void Idle()
+	{
+		if (moveVelocity.sqrMagnitude > 0)
+		{
+			StartWalk();
+		}
+		if (isDead == true)
+		{
+			Die();
+		}
+	}
+
+	void Die()
+	{
+		state = State.DEAD;
+	}
+
+	void Dead()
+	{
+		//TODO: do things on reset
+		//Enjoy being dead
+	}
+
     public void OnMove(InputAction.CallbackContext context)
     {
         // read the value for the "move" action each event call
@@ -94,7 +128,7 @@ public class Player : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (controller.isGrounded && CanRoll())
+        if (controller.isGrounded && CanRoll() && state != State.DEAD)
         {
             StartRoll();
         }
@@ -124,6 +158,10 @@ public class Player : MonoBehaviour
                 StartFall();
             }
         }
+		else
+		{
+			StartIdle();
+		}
     }
 
     private void StartFall()
@@ -139,7 +177,7 @@ public class Player : MonoBehaviour
 
         if (controller.isGrounded)
         {
-            StartWalk();
+            StartIdle();
         }
     }
 
