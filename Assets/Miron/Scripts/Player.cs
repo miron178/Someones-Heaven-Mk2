@@ -25,6 +25,8 @@ public class Player : MonoBehaviour
     private float rollCD = 1;
     [SerializeField]
     private float rollDuration = 0.5f;
+	[SerializeField]
+	private bool useGravityOnRoll = false;
 
 	[SerializeField]
 	private bool isDead = false;
@@ -197,7 +199,7 @@ public class Player : MonoBehaviour
         {
             rollVelocity = transform.forward * rollSpeed;
         }
-        rollVelocity.y = gravity;
+		rollVelocity.y = useGravityOnRoll ? gravity : 0;
         rollEnd = Time.time + rollDuration;
         rollStart = rollEnd + rollCD;
 
@@ -219,7 +221,7 @@ public class Player : MonoBehaviour
             velocity = Vector3.zero;
         }
 
-        if (Time.time >= rollEnd || !controller.isGrounded)
+        if (Time.time >= rollEnd || (useGravityOnRoll && !controller.isGrounded))
         {
             StartFall();
         }
