@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2065026128}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -34,7 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2828482584548336035
 MeshFilter:
@@ -106,6 +106,8 @@ MonoBehaviour:
   canRoll: 1
   rollCD: 1
   rollDuration: 0.5
+  useGravityOnRoll: 0
+  isDead: 0
   material: {fileID: 2100000, guid: 5c939248b77a7864fba2f9e4a54c6b3b, type: 2}
 --- !u!143 &2828482584548335709
 CharacterController:
