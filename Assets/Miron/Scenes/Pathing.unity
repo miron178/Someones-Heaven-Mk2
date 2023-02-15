@@ -3642,8 +3642,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destinations:
-  - {fileID: 1371373318}
-  - {fileID: 1856947004}
+  - {fileID: 1371373319}
+  - {fileID: 1856947005}
   speed: 2
 --- !u!65 &2091197719
 BoxCollider:
