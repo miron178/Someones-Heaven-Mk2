@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField]
-    float speed = 0.5f;
+    public NavMeshAgent agent;
 
     private static string SelectedTag = "Player";
 
@@ -34,7 +34,7 @@ public class Enemy : MonoBehaviour
 
     void MoveToClosest()
     {
-        transform.position = Vector3.MoveTowards(transform.position, closest.transform.position, Time.deltaTime * speed);
+        agent.SetDestination(closest.transform.position);
     }
 
     void FixedUpdate()
