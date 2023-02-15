@@ -6,7 +6,7 @@ TagManager:
   tags:
   - Light
   - Shadow
-  - New
+  - Enemy
   layers:
   - Default
   - TransparentFX

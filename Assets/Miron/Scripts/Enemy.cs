@@ -7,10 +7,20 @@ public class Enemy : MonoBehaviour
 {
     public NavMeshAgent agent;
 
+    [SerializeField]
     private static string SelectedTag = "Player";
+    [SerializeField]
+    private float endPushSpeed = 0.1f;
 
     GameObject[] targets;
     GameObject closest;
+
+    Rigidbody rb;
+
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     GameObject ClosestTarget()
     {
@@ -32,6 +42,23 @@ public class Enemy : MonoBehaviour
         return closest;
     }
 
+    bool IsPushActive()
+    {
+        return !agent.enabled;
+    }
+
+    void StartPush()
+    {
+        agent.enabled = false;
+        rb.isKinematic = false;
+    }
+
+    void EndPush()
+    {
+        agent.enabled = true;
+        rb.isKinematic = true;
+    }
+
     void MoveToClosest()
     {
         agent.SetDestination(closest.transform.position);
@@ -39,8 +66,29 @@ public class Enemy : MonoBehaviour
 
     void FixedUpdate()
     {
-        ClosestTarget();
-        MoveToClosest();
+        if (IsPushActive())
+        {
+            Vector3 horiz = rb.velocity;
+            horiz.y = 0;
+
+            //This function can be called before rb.AddForce() actually changes the velocity
+            //hence the > 0 check
+            bool slowedDown = horiz.sqrMagnitude > 0 && horiz.sqrMagnitude < endPushSpeed * endPushSpeed;
+            if (slowedDown)
+            {
+                EndPush();
+            }
+        }
+        else
+        {
+            ClosestTarget();
+            MoveToClosest();
+        }
     }
 
+    public void Push(Vector3 force)
+    {
+        StartPush();
+        rb.AddForce(force);
+    }
 }

@@ -11,6 +11,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float speed = 5f;
 
+    [SerializeField]
+    private float pushForce = 300f;
+
     public float gravity = -9.81f;
 
     [SerializeField]
@@ -128,9 +131,23 @@ public class Player : MonoBehaviour
         moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y) * speed;
     }
 
-    public void OnJump(InputAction.CallbackContext context)
+    public void OnPush(InputAction.CallbackContext context)
     {
-        if (controller.isGrounded && CanRoll() && state != State.DEAD)
+        if (context.performed)
+        {
+            GameObject[] targets = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach (GameObject target in targets)
+            {
+                Enemy tempEnemy = target.GetComponent<Enemy>();
+                Vector3 dir = tempEnemy.transform.position - transform.position;
+                tempEnemy.Push(dir.normalized * pushForce);
+            }
+        }
+    }
+
+    public void OnRoll(InputAction.CallbackContext context)
+    {
+        if (context.performed && controller.isGrounded && CanRoll() && state != State.DEAD)
         {
             StartRoll();
         }
