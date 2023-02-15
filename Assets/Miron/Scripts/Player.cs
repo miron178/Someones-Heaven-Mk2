@@ -44,6 +44,8 @@ public class Player : MonoBehaviour
     
     private Vector3 velocity;
 
+    private Sensor pushSensor;
+
     private enum State
     {
 		IDLE,
@@ -56,6 +58,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        pushSensor = GetComponentInChildren<Sensor>();
         CharacterController controller = GetComponent<CharacterController>();
         // calculate the correct vertical position:
         float correctHeight = controller.center.y + controller.skinWidth;
@@ -135,8 +138,7 @@ public class Player : MonoBehaviour
     {
         if (context.performed)
         {
-            GameObject[] targets = GameObject.FindGameObjectsWithTag("Enemy");
-            foreach (GameObject target in targets)
+            foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
             {
                 Enemy tempEnemy = target.GetComponent<Enemy>();
                 Vector3 dir = tempEnemy.transform.position - transform.position;
