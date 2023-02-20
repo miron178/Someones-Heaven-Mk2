@@ -8,6 +8,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private CharacterController controller;
 
+	[SerializeField]
+	private Animator Animator;
+
     [SerializeField]
     private float speed = 5f;
 
@@ -58,6 +61,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
         CharacterController controller = GetComponent<CharacterController>();
         // calculate the correct vertical position:
@@ -72,10 +76,12 @@ public class Player : MonoBehaviour
         {
 			case State.IDLE:
 				Idle();
+				Animator.SetBool("IsMoving", false);
 				break;
             case State.WALKING:
                 Walk();
-                break;
+				Animator.SetBool("IsMoving", true);
+				break;
             case State.FALLING:
                 Fall();
                 break;
@@ -97,11 +103,15 @@ public class Player : MonoBehaviour
         Color color = CanRoll() ? Color.green : Color.yellow;
         color.a = IsInvincible() ? 0.5f : 1f;
         material.color = color;
+
+		//Object Rotation
+		
     }
 
 	void StartIdle()
 	{
 		state = State.IDLE;
+		
 	}
 
 	void Idle()
