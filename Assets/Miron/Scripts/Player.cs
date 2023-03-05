@@ -31,7 +31,13 @@ public class Player : MonoBehaviour
 	[SerializeField]
 	private bool useGravityOnRoll = false;
 
-	[SerializeField]
+    [SerializeField]
+    private float maxHealth = 100;
+    [SerializeField]
+    private float health = 100;
+    public float Health { get => health / maxHealth; }
+
+    [SerializeField]
 	private bool isDead = false;
 	
 	private Vector3 moveVelocity;
