@@ -12,6 +12,9 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float endPushSpeed = 0.1f;
 
+    [SerializeField]
+    float radiusToTarget = 1.25f;
+
     GameObject[] targets;
     GameObject closest;
 
@@ -61,7 +64,14 @@ public class Enemy : MonoBehaviour
 
     void MoveToClosest()
     {
-        agent.SetDestination(closest.transform.position);
+        //radius round target
+        Vector3 target = transform.position - closest.transform.position;
+        target = target.normalized * radiusToTarget + closest.transform.position;
+        
+        //move to target radius
+        agent.SetDestination(target);
+
+        //Debug.DrawLine(target, transform.position);
     }
 
     void FixedUpdate()
