@@ -35,10 +35,12 @@ public class Player : MonoBehaviour
 	private bool useGravityOnRoll = false;
 
     [SerializeField]
-    private float maxHealth = 100;
+    private int maxHealth = 9;
+    public int MaxHealth { get => maxHealth; }
+
     [SerializeField]
-    private float health = 100;
-    public float Health { get => health / maxHealth; }
+    private int health = 9;
+    public int Health { get => health; }
 
     [SerializeField]
 	private bool isDead = false;
@@ -50,7 +52,10 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     Material material;
-    
+
+    [SerializeField]
+    HealthBar healthBar;
+
     private Vector3 velocity;
 
     private Sensor pushSensor;
@@ -74,6 +79,8 @@ public class Player : MonoBehaviour
         float correctHeight = controller.center.y + controller.skinWidth;
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
+
+        healthBar.UpdateHealth(this);
     }
 
     void FixedUpdate()
@@ -132,7 +139,17 @@ public class Player : MonoBehaviour
 		}
 	}
 
-	void Die()
+    public void TakeDamage(int damage)
+    {
+        health -= damage < health ? damage : health;
+        healthBar.UpdateHealth(this);
+        if (health == 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
 	{
 		state = State.DEAD;
 	}
@@ -142,7 +159,7 @@ public class Player : MonoBehaviour
 		//TODO: do things on reset
 		//Enjoy being dead
 	}
-
+    
     public void OnMove(InputAction.CallbackContext context)
     {
         // read the value for the "move" action each event call
@@ -152,7 +169,7 @@ public class Player : MonoBehaviour
 
     public void OnPush(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && state != State.DEAD)
         {
             foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
             {

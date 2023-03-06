@@ -170,6 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 2828482584548335709}
+  Animator: {fileID: 0}
   speed: 5
   pushForce: 300
   gravity: -9.81
@@ -179,8 +180,11 @@ MonoBehaviour:
   rollCD: 1
   rollDuration: 0.5
   useGravityOnRoll: 0
+  maxHealth: 9
+  health: 4
   isDead: 0
   material: {fileID: 2100000, guid: 5c939248b77a7864fba2f9e4a54c6b3b, type: 2}
+  healthBar: {fileID: 0}
 --- !u!143 &2828482584548335709
 CharacterController:
   m_ObjectHideFlags: 0

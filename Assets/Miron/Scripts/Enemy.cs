@@ -15,6 +15,22 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     float radiusToTarget = 1.25f;
 
+    [SerializeField]
+    private int attackDamage = 1;
+
+    [SerializeField] [Range(0,1)]
+    private float hitChance = 0.5f;
+
+    [SerializeField]
+    private float attackRange = 2;
+
+    [SerializeField]
+    private float attackCD = 1;
+    private float attackTime = 0;
+
+    [SerializeField]
+    Material material;
+
     GameObject[] targets;
     GameObject closest;
 
@@ -67,7 +83,7 @@ public class Enemy : MonoBehaviour
         //radius round target
         Vector3 target = transform.position - closest.transform.position;
         target = target.normalized * radiusToTarget + closest.transform.position;
-        
+
         //move to target radius
         agent.SetDestination(target);
 
@@ -89,11 +105,39 @@ public class Enemy : MonoBehaviour
                 EndPush();
             }
         }
+        else if (CanAttack())
+        {
+            Attack();
+        }
         else
         {
             ClosestTarget();
             MoveToClosest();
         }
+        Color color = Time.time >= attackTime ? Color.red : Color.black;
+        material.color = color;
+    }
+
+    private bool CanAttack()
+    {
+        if (!closest || Time.time < attackTime)
+        {
+            return false;
+        }
+
+        Vector3 distance = transform.position - closest.transform.position;
+        return distance.magnitude <= attackRange;
+    }
+
+    private void Attack()
+    {
+        bool hit = Random.value <= hitChance;
+        if (hit)
+        {
+            Player player = closest.GetComponent<Player>();
+            player.TakeDamage(attackDamage);
+        }
+        attackTime = Time.time + attackCD;
     }
 
     public void Push(Vector3 force)
