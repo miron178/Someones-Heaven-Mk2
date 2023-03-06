@@ -80,7 +80,10 @@ public class Player : MonoBehaviour
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
 
-        healthBar.UpdateHealth(this);
+        if (healthBar)
+        {
+            healthBar.UpdateHealth(this);
+        }
     }
 
     void FixedUpdate()
@@ -142,7 +145,11 @@ public class Player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         health -= damage < health ? damage : health;
-        healthBar.UpdateHealth(this);
+     
+        if(healthBar)
+        {
+            healthBar.UpdateHealth(this);
+        }
         if (health == 0)
         {
             Die();
