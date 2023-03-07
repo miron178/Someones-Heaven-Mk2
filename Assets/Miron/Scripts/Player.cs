@@ -144,7 +144,10 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        health -= damage < health ? damage : health;
+        if (!IsInvincible())
+        {
+            health -= damage < health ? damage : health;
+        }
      
         if(healthBar)
         {
