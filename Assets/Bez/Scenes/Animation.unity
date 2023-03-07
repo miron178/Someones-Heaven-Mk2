@@ -335,6 +335,12 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!1 &854158622 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1117868746077320543, guid: fc2c04543d6007b4fb31b3453b76d34f,
+    type: 3}
+  m_PrefabInstance: {fileID: 2004457953}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &971178319
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,8 +628,13 @@ MonoBehaviour:
   rollCD: 1
   rollDuration: 0.5
   useGravityOnRoll: 0
+  maxHealth: 9
+  health: 9
   isDead: 0
   material: {fileID: 2100000, guid: 5c939248b77a7864fba2f9e4a54c6b3b, type: 2}
+  healthBar: {fileID: 0}
+  smoothRotation: 1
+  model: {fileID: 854158622}
 --- !u!95 &1589914742
 Animator:
   serializedVersion: 5
@@ -711,6 +722,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7527757535787887734, guid: fc2c04543d6007b4fb31b3453b76d34f,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -7527757535787887734, guid: fc2c04543d6007b4fb31b3453b76d34f,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -7527757535787887734, guid: fc2c04543d6007b4fb31b3453b76d34f,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7527757535787887734, guid: fc2c04543d6007b4fb31b3453b76d34f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fc2c04543d6007b4fb31b3453b76d34f,
         type: 3}

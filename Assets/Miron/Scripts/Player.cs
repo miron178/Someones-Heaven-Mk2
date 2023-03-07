@@ -56,9 +56,15 @@ public class Player : MonoBehaviour
     [SerializeField]
     HealthBar healthBar;
 
+    [SerializeField] [Range (0,1)]
+    float smoothRotation = 0.1f;
+
     private Vector3 velocity;
 
     private Sensor pushSensor;
+
+    [SerializeField]
+    GameObject model;
 
     private enum State
     {
@@ -119,9 +125,6 @@ public class Player : MonoBehaviour
         Color color = CanRoll() ? Color.green : Color.yellow;
         color.a = IsInvincible() ? 0.5f : 1f;
         material.color = color;
-
-		//Object Rotation
-		
     }
 
 	void StartIdle()
@@ -214,7 +217,14 @@ public class Player : MonoBehaviour
 		//ignore Gravity for minMoveDistance check
 		Vector3 movementXZ = movement;
 		movementXZ.y = 0;
-		if (movementXZ.magnitude >= controller.minMoveDistance)
+
+        if (model != null)
+        {
+            Quaternion lookAt = Quaternion.LookRotation(movementXZ);
+            model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
+        }
+
+        if (movementXZ.magnitude >= controller.minMoveDistance)
         {
             controller.Move(movement);
             if (!controller.isGrounded)
