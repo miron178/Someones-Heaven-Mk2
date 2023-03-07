@@ -21,12 +21,15 @@ public class HealthBar : MonoBehaviour
 
     private void Start()
     {
-        health = new List<GameObject>();
     }
 
     private void ClearHealth()
     {
-        foreach(GameObject obj in health)
+        if (health == null)
+        {
+            health = new List<GameObject>();
+        }
+        foreach (GameObject obj in health)
         {
             GameObject.Destroy(obj);
         }
