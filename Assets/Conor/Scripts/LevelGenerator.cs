@@ -116,73 +116,50 @@ public class LevelGenerator : MonoBehaviour
         Vector3 baseBranch = new Vector3(0, 0, 0);
         InitFloor(baseBranch);
 
-        int currentBranchSize = 1;
+        int numofBranchesFromBase = m_randomGenerator.Next(1, 5);
+        int currentBranchesFromBase = 0;
 
-        //First Direction
-        Vector3 newPos = Vector3.zero;
-        Direction currentDir = Direction.Up;
-        
-        while(currentBranchSize < m_maxBranchSize)
+        Direction[] pickedDirs = { };
+
+        while(currentBranchesFromBase < numofBranchesFromBase)
         {
-            Direction reverseDir = Direction.Up;
-            
-            switch(currentDir)
+            Vector3 newPos = Vector3.zero;
+            Direction currentDir = Direction.Up;
+
+            int currentBranchSize = 0;
+
+            while (currentBranchSize < m_maxBranchSize)
             {
-                case Direction.Up:
-                    reverseDir = Direction.Down;
-                    break;
-                case Direction.Right:
-                    reverseDir = Direction.Left;
-                    break;
-                case Direction.Down:
-                    reverseDir = Direction.Up;
-                    break;
-                case Direction.Left:
-                    reverseDir = Direction.Right;
-                    break;
+                Direction reverseDir = Direction.Up;
+
+                switch (currentDir)
+                {
+                    case Direction.Up:
+                        reverseDir = Direction.Down;
+                        break;
+                    case Direction.Right:
+                        reverseDir = Direction.Left;
+                        break;
+                    case Direction.Down:
+                        reverseDir = Direction.Up;
+                        break;
+                    case Direction.Left:
+                        reverseDir = Direction.Right;
+                        break;
+                }
+
+                Direction[] avDirs = Array.FindAll(defaultDir, i => i != reverseDir).ToArray();
+
+                PickDirection(ref newPos, avDirs, ref currentDir);
+                InitFloor(newPos);
+                currentBranchSize++;
+
+                PushDirection(ref newPos, currentDir);
+                InitFloor(newPos);
+
+                currentBranchSize++;
             }
-
-            Direction[] avDirs = Array.FindAll(defaultDir, i => i != reverseDir).ToArray();
-
-            PickDirection(ref newPos, avDirs, ref currentDir);
-            InitFloor(newPos);
-            currentBranchSize++;
-
-            PushDirection(ref newPos, currentDir);
-            InitFloor(newPos);
-
-            currentBranchSize++;
         }
-
-        ////First Branch
-        //int currentBranchSize = 1;
-        //Vector3 nextBranch = baseBranch;
-
-        //while (currentBranchSize < m_maxBranchSize)
-        //{
-        //    nextBranch = FindNewPos(nextBranch);
-
-        //    if(nextBranch.x == int.MaxValue)
-        //    {
-        //        Debug.Log("Info From Generate Branchy Level:");
-        //        Debug.Log("Current Branch Size: " + currentBranchSize);
-        //        Debug.Log("Next Branch Pos: " + nextBranch);
-        //        break;
-        //    }
-
-        //    InitFloor(nextBranch, ref bOrW);
-        //    currentBranchSize++;
-
-        //    if (m_randomGenerator.Next(1, 100) > 50)
-        //    {
-        //        OffBranching(1, nextBranch, ref bOrW);
-        //    }
-        //}
-
-        ////for (int i = 0; i < m_randomGenerator.Next(1, 4); i++)
-        ////{
-
-        ////}
     }
 
     public void ClearLevel()
