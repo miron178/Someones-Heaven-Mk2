@@ -13,7 +13,13 @@ public class LevelGeneratorEditor : Editor
         if(Application.isPlaying)
         {
             if(GUILayout.Button("Generate Seed")) { levelGen.GenerateSeed(); }
-            if(GUILayout.Button("Generate Level")) { levelGen.GenerateLevel(); }
+            if(GUILayout.Button("Generate Level")) 
+            {
+                levelGen.ClearLevel();
+
+                if (levelGen.IsBlockyGeneration) { levelGen.GenerateBlockyLevel(); }
+                else if (levelGen.IsBranchyGeneration) { levelGen.GenerateBranchyLevel(); }
+            }
             if(GUILayout.Button("Clear Level")) { levelGen.ClearLevel(); }
         }
     }
