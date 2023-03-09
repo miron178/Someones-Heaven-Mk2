@@ -78,7 +78,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-		//Animator = GetComponent<Animator>();
+		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
         CharacterController controller = GetComponent<CharacterController>();
         // calculate the correct vertical position:
