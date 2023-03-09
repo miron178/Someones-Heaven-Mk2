@@ -10,7 +10,11 @@ public class Traps : MonoBehaviour
 	
 
 	public void OnTriggerEnter(Collider other) {
-		player.TakeDamage(1);
-		Debug.Log("takedamage");
+
+		if (other.tag == "Player") {
+			player.TakeDamage(1);
+			Debug.Log("takedamage");
+		}
+		
 	}
 }

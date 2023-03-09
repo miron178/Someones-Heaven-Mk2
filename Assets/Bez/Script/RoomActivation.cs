@@ -7,6 +7,10 @@ public class RoomActivation : MonoBehaviour
 	[SerializeField]
 	private GameObject EnemyObjects;
 
+	private void Awake() {
+		EnemyObjects.SetActive(false);
+	}
+
 	private void OnTriggerEnter(Collider other) {
 		EnemyObjects.SetActive(true);
 	}
