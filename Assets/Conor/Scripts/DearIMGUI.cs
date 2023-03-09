@@ -98,6 +98,10 @@ public class DearIMGUI : MonoBehaviour
                     levelGen.MaxBranchySize = mBS;
                 }
 
+                bool aC = levelGen.AllowConnections;
+                ImGui.Checkbox("Allow Connections?", ref aC);
+                levelGen.AllowConnections = aC;
+
                 ImGui.End();
             }
         }

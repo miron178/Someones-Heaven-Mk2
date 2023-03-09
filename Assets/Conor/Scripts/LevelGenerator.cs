@@ -48,6 +48,9 @@ public class LevelGenerator : MonoBehaviour
         Left
     }
     Direction[] defaultDir = { Direction.Up, Direction.Right, Direction.Down, Direction.Left };
+    int branchTermination = 0;
+    bool m_allowConnections = false;
+    public bool AllowConnections { get { return m_allowConnections; } set { m_allowConnections = value; } }
 
     #endregion
 
@@ -63,18 +66,19 @@ public class LevelGenerator : MonoBehaviour
         if (m_isBlockyGeneration && m_isBranchyGeneration) { m_isBranchyGeneration = false; }
     }
 
-
     public void GenerateSeed()
     {
         //Generates our Level Seed
         m_levelSeed = new System.Random(System.DateTime.Now.Millisecond).Next();
         m_randomGenerator = new System.Random(m_levelSeed);
     }
+    
     //Blocky Generation
-    public void GenerateBlockyLevel() 
+    /*public void GenerateBlockyLevel() 
     {
         int currentLevelSize = 1;
         int bOrW = 0;
+        branchTermination = 0;
 
         //InitFloor(Vector3.zero, ref bOrW);
 
@@ -107,59 +111,71 @@ public class LevelGenerator : MonoBehaviour
 
             currentLevelSize++;
         }
-    }
+    }*/
 
     //Branchy Generation
     public void GenerateBranchyLevel() 
-    {        
+    {
+        int bOrW = 0;
+
         //Init Floor
         Vector3 baseBranch = new Vector3(0, 0, 0);
-        InitFloor(baseBranch);
+        InitFloor(baseBranch, ref bOrW);
 
-        int numofBranchesFromBase = m_randomGenerator.Next(1, 5);
+        int numofBranchesFromBase = m_randomGenerator.Next(2, 5);
         int currentBranchesFromBase = 0;
 
-        Direction[] pickedDirs = { };
+        List<Direction> pickedDirs = new List<Direction>();
 
         while(currentBranchesFromBase < numofBranchesFromBase)
         {
             Vector3 newPos = Vector3.zero;
+            Direction[] avDirs = defaultDir;
             Direction currentDir = Direction.Up;
-
             int currentBranchSize = 0;
+
+            //Remove Directions Already Gone
+            foreach (Direction dir in pickedDirs) { avDirs = Array.FindAll(avDirs, i => i != dir).ToArray(); }
+
+            //Init 2 Floors
+            PickDirection(ref newPos, avDirs, ref currentDir);
+            InitFloor(newPos, ref bOrW);
+
+            PushDirection(ref newPos, currentDir);
+            InitFloor(newPos, ref bOrW);
+
+            currentBranchSize += 2;
+
+            pickedDirs.Add(currentDir);
 
             while (currentBranchSize < m_maxBranchSize)
             {
-                Direction reverseDir = Direction.Up;
+                avDirs = Array.FindAll(defaultDir, i => i != ReverseDirection(currentDir)).ToArray();
 
-                switch (currentDir)
-                {
-                    case Direction.Up:
-                        reverseDir = Direction.Down;
-                        break;
-                    case Direction.Right:
-                        reverseDir = Direction.Left;
-                        break;
-                    case Direction.Down:
-                        reverseDir = Direction.Up;
-                        break;
-                    case Direction.Left:
-                        reverseDir = Direction.Right;
-                        break;
-                }
-
-                Direction[] avDirs = Array.FindAll(defaultDir, i => i != reverseDir).ToArray();
-
+                //Init 2 Floors in Directions
                 PickDirection(ref newPos, avDirs, ref currentDir);
-                InitFloor(newPos);
-                currentBranchSize++;
+
+                if (newPos.x == int.MaxValue) { branchTermination++; break; }
+
+                InitFloor(newPos, ref bOrW);
 
                 PushDirection(ref newPos, currentDir);
-                InitFloor(newPos);
+                InitFloor(newPos, ref bOrW);
+                
+                currentBranchSize += 2;
 
-                currentBranchSize++;
+                if (m_randomGenerator.Next(0, 100) > 50)
+                {
+                    avDirs = Array.FindAll(defaultDir, i => i != ReverseDirection(currentDir)).ToArray();
+
+                    OffBranching(1, newPos, avDirs, ref bOrW);
+                }
             }
+
+            currentBranchesFromBase++;
         }
+
+        Debug.Log("Number of Branch Terminations: " + branchTermination);
     }
 
     public void ClearLevel()
@@ -175,9 +191,31 @@ public class LevelGenerator : MonoBehaviour
     }
 
     //Utility
+    Direction ReverseDirection(Direction directionToReverse)
+    {
+        switch (directionToReverse)
+        {
+            case Direction.Up:
+                directionToReverse = Direction.Down;
+                break;
+            case Direction.Right:
+                directionToReverse = Direction.Left;
+                break;
+            case Direction.Down:
+                directionToReverse = Direction.Up;
+                break;
+            case Direction.Left:
+                directionToReverse = Direction.Right;
+                break;
+        }
+
+        return directionToReverse;
+    }
+    
     void PickDirection(ref Vector3 lastVector, Direction[] validDirections, ref Direction outDir)
     {
         bool posValid = false;
+        int passes = 0;
 
         while (!posValid)
         {
@@ -210,40 +248,37 @@ public class LevelGenerator : MonoBehaviour
                         }
                 }
 
-                if (m_floorsPos.Contains(newPos)) { continue; }
-                else 
+                if (!m_floorsPos.Contains(newPos))
                 {
-                    lastVector = newPos;
-                    outDir = (Direction)dir;
-                    posValid = true; 
+                    if(!m_allowConnections)
+                    {
+                        Vector3 tempPos = newPos;
+
+                        PushDirection(ref tempPos, (Direction)dir);
+
+                        if (!m_floorsPos.Contains(tempPos))
+                        {
+                            lastVector = newPos;
+                            outDir = (Direction)dir;
+                            posValid = true;
+                        }
+                    }
+                    else
+                    {
+                        lastVector = newPos;
+                        outDir = (Direction)dir;
+                        posValid = true;
+                    }
                 }
             }
-            else { continue; }
-        }
 
-        //switch (m_randomGenerator.Next(0, 4))
-        //{
-        //    case 0:
-        //        {
-        //            lastVector.z += (10 * m_floorPrefab.transform.localScale.z);
-        //            break;
-        //        }
-        //    case 1:
-        //        {
-        //            lastVector.x += (10 * m_floorPrefab.transform.localScale.z);
-        //            break;
-        //        }
-        //    case 2:
-        //        {
-        //            lastVector.z -= (10 * m_floorPrefab.transform.localScale.z);
-        //            break;
-        //        }
-        //    case 3:
-        //        {
-        //            lastVector.x -= (10 * m_floorPrefab.transform.localScale.z);
-        //            break;
-        //        }
-        //}
+            passes++;
+            if (passes > 100)
+            {
+                lastVector.x = int.MaxValue;
+                break;
+            }
+        }
     }
 
     void PushDirection(ref Vector3 lastVector, Direction dir)
@@ -273,72 +308,55 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-    void InitFloor(Vector3 pos)
+    void InitFloor(Vector3 pos, ref int bOrW)
     {
         GameObject obj = Instantiate(m_floorPrefab, pos, Quaternion.identity, m_floorParent);
 
-        //Color col;
+        Color col;
 
-        //if (bOrW == 0) { col = Color.white; bOrW = 1; }
-        //else { col = Color.black; bOrW = 0; }
+        if (bOrW == 0) { col = Color.white; bOrW = 1; }
+        else { col = Color.black; bOrW = 0; }
 
-        //obj.GetComponent<MeshRenderer>().material.color = col;
+        obj.GetComponent<MeshRenderer>().material.color = col;
 
         m_floors.Add(obj);
         m_floorsPos.Add(pos);
     }
 
-    Vector3 FindNewPos(Vector3 pos)
+    void OffBranching(int currentOffBranch, Vector3 lastBranch, Direction[] avDirs, ref int bOrW)
     {
-        int pass = 0;
+        Vector3 newPos = lastBranch;
+        Direction currentDir = Direction.Up;
 
-        Vector3 tempPos = Vector3.zero;
-        bool posValid = false;
+        PickDirection(ref newPos, avDirs, ref currentDir);
 
-        while (!posValid)
+        if (newPos.x == int.MaxValue) { branchTermination++; return; }
+
+        InitFloor(newPos, ref bOrW);
+
+        PushDirection(ref newPos, currentDir);
+        InitFloor(newPos, ref bOrW);
+        int newBranchSize = 2;
+
+        while (newBranchSize < Mathf.FloorToInt(m_maxBranchSize / currentOffBranch))
         {
-            if(pass >= 100) { posValid = true; }
+            avDirs = Array.FindAll(defaultDir, i => i != ReverseDirection(currentDir)).ToArray();
 
-            //tempPos = PickDirection(pos);
-            bool posFound = false;
+            PickDirection(ref newPos, avDirs, ref currentDir);
+            if (newPos.x == int.MaxValue) { branchTermination++; break; }
 
-            foreach (GameObject gO in m_floors) { if (tempPos == gO.transform.position) { posFound = true; break; } }
+            InitFloor(newPos, ref bOrW);
 
-            if (posFound) { pass++;  continue; }
-            else { posValid = true; }
-        }
+            PushDirection(ref newPos, currentDir);
+            InitFloor(newPos, ref bOrW);
 
-        if(pass >= 100) 
-        {
-            Debug.LogError("Passes exceeded in Find New Pos! Logging Info...");
-            return new Vector3(int.MaxValue, int.MaxValue, int.MaxValue); 
-        }
-        else { return tempPos; }
-    }
+            newBranchSize += 2;
 
-    void OffBranching(int currentOffBranch, Vector3 lastBranch, ref int bOrW)
-    {
-        int newBranchSize = 1;
-        Vector3 offBranch = lastBranch;
-
-        while (newBranchSize < Mathf.FloorToInt(m_maxBranchSize / (2 * currentOffBranch)))
-        {
-            offBranch = FindNewPos(lastBranch);
-
-            if(offBranch.x == int.MaxValue) 
+            if (m_randomGenerator.Next(1, 100) > 50)
             {
-                Debug.Log("Info from OffBranching:");
-                Debug.Log("Current off Branch: " + currentOffBranch);
-                Debug.Log("Last Branch: " + lastBranch);
-                break; 
-            }
+                avDirs = Array.FindAll(defaultDir, i => i != ReverseDirection(currentDir)).ToArray();
 
-            //InitFloor(offBranch, ref bOrW);
-            newBranchSize++;
-
-            if (m_randomGenerator.Next(1, 100) > 50) 
-            {
-                OffBranching(currentOffBranch + 1, offBranch, ref bOrW); 
+                OffBranching(currentOffBranch + 1, newPos, avDirs, ref bOrW);
             }
         }
     }
