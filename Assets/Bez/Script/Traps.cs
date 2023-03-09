@@ -20,7 +20,8 @@ public class Traps : MonoBehaviour
         
     }
 
-	private void OnCollisionEnter(Collision collision) {
+	public void OnTriggerEnter(Collider other) {
 		player.TakeDamage(1);
+		Debug.Log("takedamage");
 	}
 }
