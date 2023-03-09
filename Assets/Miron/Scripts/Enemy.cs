@@ -7,6 +7,9 @@ public class Enemy : MonoBehaviour
 {
     public NavMeshAgent agent;
 
+	[SerializeField]
+	private Animator enemyAnimator;
+
     [SerializeField]
     private static string SelectedTag = "Player";
     [SerializeField]
@@ -38,6 +41,8 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
+		enemyAnimator = GetComponent<Animator>();
+
         rb = GetComponent<Rigidbody>();
     }
 
@@ -80,8 +85,9 @@ public class Enemy : MonoBehaviour
 
     void MoveToClosest()
     {
-        //radius round target
-        Vector3 target = transform.position - closest.transform.position;
+		enemyAnimator.SetBool("isMoving", true);
+		//radius round target
+		Vector3 target = transform.position - closest.transform.position;
         target = target.normalized * radiusToTarget + closest.transform.position;
 
         //move to target radius
@@ -131,6 +137,8 @@ public class Enemy : MonoBehaviour
 
     private void Attack()
     {
+
+		enemyAnimator.SetBool("isAttacking", true);
         bool hit = Random.value <= hitChance;
         if (hit)
         {
@@ -138,7 +146,8 @@ public class Enemy : MonoBehaviour
             player.TakeDamage(attackDamage);
         }
         attackTime = Time.time + attackCD;
-    }
+		enemyAnimator.SetBool("isAttacking", false);
+	}
 
     public void Push(Vector3 force)
     {
