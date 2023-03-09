@@ -12,10 +12,16 @@ public class RoomActivation : MonoBehaviour
 	}
 
 	private void OnTriggerEnter(Collider other) {
-		EnemyObjects.SetActive(true);
+
+		if (other.tag == "Player") {
+			EnemyObjects.SetActive(true);
+		}
+		
 	}
 
 	private void OnTriggerExit(Collider other) {
-		EnemyObjects.SetActive(false);
+		if (other.tag == "Player") {
+			EnemyObjects.SetActive(false);
+		}
 	}
 }
