@@ -31,6 +31,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Roll",
+                    "type": "Button",
+                    "id": "ea580ef6-e9c6-46ad-9067-c2db67d4b3d9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -256,12 +265,12 @@
                 },
                 {
                     "name": "",
-                    "id": "b1f92dbd-5e58-4148-b254-03c46b59d4f5",
+                    "id": "12bf8524-8bf2-44d0-9eed-e9990f643427",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Fire",
+                    "action": "Roll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
