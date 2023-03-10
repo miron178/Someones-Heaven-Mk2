@@ -23,15 +23,8 @@ public class LevelGenerator : MonoBehaviour
     private System.Random m_randomGenerator;
 
     [Header("Level Generation Type", order = 2)]
-    [SerializeField] private int m_maxExpandSize = 10;
-    public int MaxBlockySize { get { return m_maxExpandSize; } set { m_maxExpandSize = value; } }
     [SerializeField] private int m_maxBranchSize = 10;
     public int MaxBranchySize { get { return m_maxBranchSize; } set { m_maxBranchSize = value; } }
-
-    [SerializeField] bool m_isBlockyGeneration = true;
-    public bool IsBlockyGeneration { get { return m_isBlockyGeneration; }  set { m_isBlockyGeneration = value; m_isBranchyGeneration = !value; } }
-    [SerializeField] bool m_isBranchyGeneration = false;
-    public bool IsBranchyGeneration { get { return m_isBranchyGeneration; } set { m_isBranchyGeneration = value; m_isBlockyGeneration = !value; } }
 
     [Header("Floor Variables", order = 3)]
     [SerializeField] private GameObject m_floorPrefab;
@@ -54,17 +47,7 @@ public class LevelGenerator : MonoBehaviour
 
     #endregion
 
-    void Awake()
-    {
-        m_instance = this;
-
-        if(m_isBlockyGeneration && m_isBranchyGeneration) { m_isBranchyGeneration = false; }
-    }
-
-    void Update()
-    {
-        if (m_isBlockyGeneration && m_isBranchyGeneration) { m_isBranchyGeneration = false; }
-    }
+    void Awake() { m_instance = this; }
 
     public void GenerateSeed()
     {
@@ -72,46 +55,6 @@ public class LevelGenerator : MonoBehaviour
         m_levelSeed = new System.Random(System.DateTime.Now.Millisecond).Next();
         m_randomGenerator = new System.Random(m_levelSeed);
     }
-    
-    //Blocky Generation
-    /*public void GenerateBlockyLevel() 
-    {
-        int currentLevelSize = 1;
-        int bOrW = 0;
-        branchTermination = 0;
-
-        //InitFloor(Vector3.zero, ref bOrW);
-
-        Vector3 newPos = new Vector3(0, 0, 0);
-        
-        while(currentLevelSize < m_maxExpandSize)
-        {
-            bool postionValid = false;
-
-            while (!postionValid)
-            {
-                newPos = m_floors[m_randomGenerator.Next(0, m_floors.Count)].transform.position;
-
-                int direction = m_randomGenerator.Next(1, 5);
-
-                //newPos = PickDirection(newPos);
-
-                bool posFound = false;
-
-                foreach (GameObject gO in m_floors)
-                {
-                    if (newPos == gO.transform.position) { posFound = true; break; }
-                }
-
-                if (posFound) { continue; }
-                else { postionValid = true; }
-            }
-
-            //InitFloor(newPos, ref bOrW);
-
-            currentLevelSize++;
-        }
-    }*/
 
     //Branchy Generation
     public void GenerateBranchyLevel() 

@@ -50,8 +50,7 @@ public class DearIMGUI : MonoBehaviour
                 {
                     levelGen.ClearLevel();
 
-                    if(levelGen.IsBlockyGeneration) { levelGen.GenerateBlockyLevel(); }
-                    else { levelGen.GenerateBranchyLevel(); }
+                    levelGen.GenerateBranchyLevel();
                 }
 
                 ImGui.SameLine();
@@ -63,40 +62,15 @@ public class DearIMGUI : MonoBehaviour
 
                 ImGui.Spacing();
 
-                bool blG = levelGen.IsBlockyGeneration;
-                bool brG = levelGen.IsBranchyGeneration;
-
-                ImGui.Checkbox("Blocky Generation", ref blG);
-
-                ImGui.SameLine();
-
-                ImGui.Checkbox("Branchy Generation", ref brG);
-
-                levelGen.IsBlockyGeneration = blG;
-                levelGen.IsBranchyGeneration = brG;
-
-                ImGui.Spacing();
-
                 ImGui.Text($"Level Seed: {levelGen.GetLevelSeed}");
 
                 ImGui.Spacing();
 
-                if(blG)
-                {
-                    int mBS = levelGen.MaxBlockySize;
+                int mBS = levelGen.MaxBranchySize;
 
-                    ImGui.InputInt("Max Blocky Size", ref mBS);
+                ImGui.InputInt("Max Branch Size", ref mBS);
 
-                    levelGen.MaxBlockySize = mBS;
-                }
-                else if(brG)
-                {
-                    int mBS = levelGen.MaxBranchySize;
-
-                    ImGui.InputInt("Max Branchy Size", ref mBS);
-
-                    levelGen.MaxBranchySize = mBS;
-                }
+                levelGen.MaxBranchySize = mBS;
 
                 bool aC = levelGen.AllowConnections;
                 ImGui.Checkbox("Allow Connections?", ref aC);

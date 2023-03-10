@@ -16,9 +16,7 @@ public class LevelGeneratorEditor : Editor
             if(GUILayout.Button("Generate Level")) 
             {
                 levelGen.ClearLevel();
-
-                if (levelGen.IsBlockyGeneration) { levelGen.GenerateBlockyLevel(); }
-                else if (levelGen.IsBranchyGeneration){ levelGen.GenerateBranchyLevel(); }
+                levelGen.GenerateBranchyLevel();
             }
             if(GUILayout.Button("Clear Level")) { levelGen.ClearLevel(); }
         }
