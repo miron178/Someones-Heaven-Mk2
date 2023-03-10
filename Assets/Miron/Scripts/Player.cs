@@ -8,8 +8,14 @@ public class Player : MonoBehaviour
     [SerializeField]
     private CharacterController controller;
 
+	[SerializeField]
+	private Animator Animator;
+
     [SerializeField]
     private float speed = 5f;
+
+    [SerializeField]
+    private float pushForce = 300f;
 
     public float gravity = -9.81f;
 
@@ -28,7 +34,15 @@ public class Player : MonoBehaviour
 	[SerializeField]
 	private bool useGravityOnRoll = false;
 
-	[SerializeField]
+    [SerializeField]
+    private int maxHealth = 9;
+    public int MaxHealth { get => maxHealth; }
+
+    [SerializeField]
+    private int health = 9;
+    public int Health { get => health; }
+
+    [SerializeField]
 	private bool isDead = false;
 	
 	private Vector3 moveVelocity;
@@ -38,8 +52,19 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     Material material;
-    
+
+    [SerializeField]
+    HealthBar healthBar;
+
+    [SerializeField] [Range (0,1)]
+    float smoothRotation = 0.1f;
+
     private Vector3 velocity;
+
+    private Sensor pushSensor;
+
+    [SerializeField]
+    GameObject model;
 
     private enum State
     {
@@ -53,11 +78,18 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+		Animator = GetComponent<Animator>();
+        pushSensor = GetComponentInChildren<Sensor>();
         CharacterController controller = GetComponent<CharacterController>();
         // calculate the correct vertical position:
         float correctHeight = controller.center.y + controller.skinWidth;
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
+
+        if (healthBar)
+        {
+            healthBar.UpdateHealth(this);
+        }
     }
 
     void FixedUpdate()
@@ -66,10 +98,12 @@ public class Player : MonoBehaviour
         {
 			case State.IDLE:
 				Idle();
+				Animator.SetBool("IsMoving", false);
 				break;
             case State.WALKING:
                 Walk();
-                break;
+				Animator.SetBool("IsMoving", true);
+				break;
             case State.FALLING:
                 Fall();
                 break;
@@ -96,6 +130,7 @@ public class Player : MonoBehaviour
 	void StartIdle()
 	{
 		state = State.IDLE;
+		
 	}
 
 	void Idle()
@@ -110,7 +145,24 @@ public class Player : MonoBehaviour
 		}
 	}
 
-	void Die()
+    public void TakeDamage(int damage)
+    {
+        if (!IsInvincible())
+        {
+            health -= damage < health ? damage : health;
+        }
+     
+        if(healthBar)
+        {
+            healthBar.UpdateHealth(this);
+        }
+        if (health == 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
 	{
 		state = State.DEAD;
 	}
@@ -120,7 +172,7 @@ public class Player : MonoBehaviour
 		//TODO: do things on reset
 		//Enjoy being dead
 	}
-
+    
     public void OnMove(InputAction.CallbackContext context)
     {
         // read the value for the "move" action each event call
@@ -128,9 +180,22 @@ public class Player : MonoBehaviour
         moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y) * speed;
     }
 
-    public void OnJump(InputAction.CallbackContext context)
+    public void OnPush(InputAction.CallbackContext context)
     {
-        if (controller.isGrounded && CanRoll() && state != State.DEAD)
+        if (context.performed && state != State.DEAD)
+        {
+            foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
+            {
+                Enemy tempEnemy = target.GetComponent<Enemy>();
+                Vector3 dir = tempEnemy.transform.position - transform.position;
+                tempEnemy.Push(dir.normalized * pushForce);
+            }
+        }
+    }
+
+    public void OnRoll(InputAction.CallbackContext context)
+    {
+        if (context.performed && controller.isGrounded && CanRoll() && state != State.DEAD)
         {
             StartRoll();
         }
@@ -152,7 +217,14 @@ public class Player : MonoBehaviour
 		//ignore Gravity for minMoveDistance check
 		Vector3 movementXZ = movement;
 		movementXZ.y = 0;
-		if (movementXZ.magnitude >= controller.minMoveDistance)
+
+        if (model != null)
+        {
+            Quaternion lookAt = Quaternion.LookRotation(movementXZ);
+            model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
+        }
+
+        if (movementXZ.magnitude >= controller.minMoveDistance)
         {
             controller.Move(movement);
             if (!controller.isGrounded)
