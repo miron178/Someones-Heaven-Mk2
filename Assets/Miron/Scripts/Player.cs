@@ -147,7 +147,8 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (!IsInvincible())
+		//Animator.SetBool("TakeDamage", true);
+		if (!IsInvincible())
         {
             health -= damage < health ? damage : health;
         }
@@ -160,7 +161,8 @@ public class Player : MonoBehaviour
         {
             Die();
         }
-    }
+		//Animator.SetBool("TakeDamage", false);
+	}
 
     void Die()
 	{

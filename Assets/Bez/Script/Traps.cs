@@ -8,19 +8,13 @@ public class Traps : MonoBehaviour
 	
 	
 	
-	// Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public void OnTriggerEnter(Collider other) {
 
-	private void OnCollisionEnter(Collision collision) {
-		player.TakeDamage(1);
+		if (other.tag == "Player") {
+			player.TakeDamage(1);
+			Debug.Log("takedamage");
+		}
+		
 	}
 }
