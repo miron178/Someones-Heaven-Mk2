@@ -98,11 +98,13 @@ public class Player : MonoBehaviour
         {
 			case State.IDLE:
 				Idle();
-				Animator.SetBool("IsMoving", false);
+                if(Animator)
+				    Animator.SetBool("IsMoving", false);
 				break;
             case State.WALKING:
                 Walk();
-				Animator.SetBool("IsMoving", true);
+                if(Animator)
+				    Animator.SetBool("IsMoving", true);
 				break;
             case State.FALLING:
                 Fall();
