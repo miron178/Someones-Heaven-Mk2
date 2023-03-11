@@ -38,6 +38,7 @@ public class Enemy : MonoBehaviour
     GameObject closest;
 
     Rigidbody rb;
+	
 
     private void Start()
     {
@@ -137,7 +138,7 @@ public class Enemy : MonoBehaviour
 
     private void Attack()
     {
-
+		
 		enemyAnimator.SetBool("isAttacking", true);
         bool hit = Random.value <= hitChance;
         if (hit)
