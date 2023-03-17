@@ -38,6 +38,7 @@ public class Enemy : MonoBehaviour
     GameObject closest;
 
     Rigidbody rb;
+	
 
     private void Start()
     {
@@ -85,7 +86,10 @@ public class Enemy : MonoBehaviour
 
     void MoveToClosest()
     {
-		enemyAnimator.SetBool("isMoving", true);
+        if (enemyAnimator)
+        {
+            enemyAnimator.SetBool("isMoving", true);
+        }
 		//radius round target
 		Vector3 target = transform.position - closest.transform.position;
         target = target.normalized * radiusToTarget + closest.transform.position;
@@ -120,8 +124,11 @@ public class Enemy : MonoBehaviour
             ClosestTarget();
             MoveToClosest();
         }
-        Color color = Time.time >= attackTime ? Color.red : Color.black;
-        material.color = color;
+        if (material)
+        {
+            Color color = Time.time >= attackTime ? Color.red : Color.black;
+            material.color = color;
+        }
     }
 
     private bool CanAttack()
@@ -137,8 +144,10 @@ public class Enemy : MonoBehaviour
 
     private void Attack()
     {
-
-		enemyAnimator.SetBool("isAttacking", true);
+        if (enemyAnimator)
+        {
+            enemyAnimator.SetBool("isAttacking", true);
+        }
         bool hit = Random.value <= hitChance;
         if (hit)
         {
@@ -146,7 +155,10 @@ public class Enemy : MonoBehaviour
             player.TakeDamage(attackDamage);
         }
         attackTime = Time.time + attackCD;
-		enemyAnimator.SetBool("isAttacking", false);
+		if (enemyAnimator)
+        {
+            enemyAnimator.SetBool("isAttacking", false);
+        }
 	}
 
     public void Push(Vector3 force)

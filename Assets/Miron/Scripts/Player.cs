@@ -98,11 +98,13 @@ public class Player : MonoBehaviour
         {
 			case State.IDLE:
 				Idle();
-				Animator.SetBool("IsMoving", false);
+                if(Animator)
+				    Animator.SetBool("IsMoving", false);
 				break;
             case State.WALKING:
                 Walk();
-				Animator.SetBool("IsMoving", true);
+                if(Animator)
+				    Animator.SetBool("IsMoving", true);
 				break;
             case State.FALLING:
                 Fall();
@@ -147,7 +149,8 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (!IsInvincible())
+		//Animator.SetBool("TakeDamage", true);
+		if (!IsInvincible())
         {
             health -= damage < health ? damage : health;
         }
@@ -160,7 +163,8 @@ public class Player : MonoBehaviour
         {
             Die();
         }
-    }
+		//Animator.SetBool("TakeDamage", false);
+	}
 
     void Die()
 	{
