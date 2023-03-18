@@ -13,9 +13,21 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private float speed = 5f;
+    private float speedBoost = 0f;
+    private float speedBoostEnd = 0f;
+
+    public float Speed
+    {
+        get
+        {
+            UpdateBoostFloat(ref speedBoost, ref speedBoostEnd);
+            return speed + speedBoost;
+        }
+    }
 
     [SerializeField]
     private float pushForce = 300f;
+    public float PushForce { get => pushForce; set => pushForce = value; }
 
     public float gravity = -9.81f;
 
@@ -36,11 +48,32 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private int maxHealth = 9;
-    public int MaxHealth { get => maxHealth; }
+    private int maxHealthBoost = 0;
+    private float maxHealthBoostEnd = 0;
+
+    public int MaxHealth
+    {
+        get
+        {
+            if (Time.time > maxHealthBoostEnd)
+            {
+                maxHealthBoost = 0;
+            }
+            return maxHealth + maxHealthBoost;
+        }
+    }
 
     [SerializeField]
     private int health = 9;
-    public int Health { get => health; }
+
+    public int Health
+    {
+        get
+        {
+            health = Mathf.Min(health, MaxHealth);
+            return health;
+        }
+    }
 
     [SerializeField]
 	private bool isDead = false;
@@ -120,6 +153,11 @@ public class Player : MonoBehaviour
                 break;
         }
 
+        if (healthBar)
+        {
+            healthBar.UpdateHealth(this);
+        }
+
         //cayan when IsInvincible
         //material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
 
@@ -155,10 +193,6 @@ public class Player : MonoBehaviour
             health -= damage < health ? damage : health;
         }
      
-        if(healthBar)
-        {
-            healthBar.UpdateHealth(this);
-        }
         if (health == 0)
         {
             Die();
@@ -181,7 +215,7 @@ public class Player : MonoBehaviour
     {
         // read the value for the "move" action each event call
         Vector2 moveAmount = context.ReadValue<Vector2>();
-        moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y) * speed;
+        moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
     }
 
     public void OnPush(InputAction.CallbackContext context)
@@ -212,8 +246,7 @@ public class Player : MonoBehaviour
 
     private void Walk()
     {
-		velocity.x = moveVelocity.x;
-		velocity.z = moveVelocity.z;
+        velocity = moveVelocity * Speed;
 		velocity.y = gravity;
 
         Vector3 movement = velocity * Time.deltaTime;
@@ -281,7 +314,7 @@ public class Player : MonoBehaviour
 
         state = State.ROLLING;
 
-        invincibiltyEnd = Time.time + invincibiltyDuration;
+        AddInvinciblity(invincibiltyDuration);
     }
 
     private void Roll()
@@ -306,5 +339,50 @@ public class Player : MonoBehaviour
     bool IsInvincible()
     {
         return Time.time < invincibiltyEnd;
+    }
+
+    public void AddInvinciblity(float duration)
+    {
+        float start = Mathf.Max(invincibiltyEnd, Time.time);
+        invincibiltyEnd = start + duration;
+    }
+
+    private void UpdateBoostFloat(ref float paramBoost, ref float paramBoostEnd)
+    {
+        if (Time.time > paramBoostEnd)
+        {
+            paramBoost = 0;
+        }
+    }
+
+    public void SpeedBoost(float boost, float duration)
+    {
+        if (duration == Mathf.Infinity)
+        {
+            speed += boost;
+        }
+        else
+        {
+            speedBoost += boost;
+            speedBoostEnd = Mathf.Max(Time.time, speedBoostEnd) + duration;
+        }
+    }
+
+    public void HealthBoost(int boost)
+    {
+        health = Mathf.Min(health + boost, MaxHealth);
+    }
+
+    public void MaxHealthBoost(int boost, float duration)
+    {
+        if (duration == Mathf.Infinity)
+        {
+            maxHealth += boost;
+        }
+        else
+        {
+            maxHealthBoost += boost;
+            maxHealthBoostEnd = Mathf.Max(Time.time, maxHealthBoostEnd) + duration;
+        }
     }
 }
