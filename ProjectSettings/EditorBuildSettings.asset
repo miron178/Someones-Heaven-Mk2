@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Conor/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Bez/Scenes/Demo.unity
+    guid: 9b77eaea5a3551640b590a0b7dda1d4c
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 9360d3cc50444c949b482094b6d391c2,
       type: 2}

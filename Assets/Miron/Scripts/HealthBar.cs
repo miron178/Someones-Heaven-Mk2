@@ -17,12 +17,30 @@ public class HealthBar : MonoBehaviour
     [SerializeField]
     private float distance = 30;
 
+    private int currentHealth = 0;
+    private int maxHealth = 0;
+
     private List<GameObject> health;
 
     private void Start()
     {
     }
 
+    private bool HealthChange(Player player)
+    {
+        bool changed = false;
+        if (currentHealth != player.Health)
+        {
+            currentHealth = player.Health;
+            changed = true;
+        }
+        if (maxHealth != player.MaxHealth)
+        {
+            maxHealth = player.MaxHealth;
+            changed = true;
+        }
+        return changed;
+    }
     private void ClearHealth()
     {
         if (health == null)
@@ -38,13 +56,16 @@ public class HealthBar : MonoBehaviour
 
     public void UpdateHealth(Player player)
     {
-        ClearHealth();
-        for (int i = 0; i < player.MaxHealth; i++)
+        if (HealthChange(player))
         {
-            bool full = i < player.Health;
-            GameObject obj = GameObject.Instantiate(full ? healthFull : healthEmpty, transform);
-            obj.transform.localPosition = new Vector3(offset + i * distance, 0, 0);
-            health.Add(obj);
+            ClearHealth();
+            for (int i = 0; i < player.MaxHealth; i++)
+            {
+                bool full = i < player.Health;
+                GameObject obj = GameObject.Instantiate(full ? healthFull : healthEmpty, transform);
+                obj.transform.localPosition = new Vector3(offset + i * distance, 0, 0);
+                health.Add(obj);
+            }
         }
     }
 }
