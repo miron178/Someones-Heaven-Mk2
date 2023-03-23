@@ -5,9 +5,9 @@ using UnityEngine;
 public class Traps : MonoBehaviour
 {
 	public Player player;
+
 	
-	
-	
+
 
 	public void OnTriggerEnter(Collider other) {
 
