@@ -127,7 +127,12 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        switch (state)
+
+		if (Animator)
+			Animator.SetBool("IsJumping", false);
+		if (Animator)
+			Animator.SetBool("TakeDamage", false);
+		switch (state)
         {
 			case State.IDLE:
 				Idle();
@@ -143,8 +148,13 @@ public class Player : MonoBehaviour
                 Fall();
                 break;
             case State.ROLLING:
-                Roll();
-                break;
+				if (Animator)
+					Animator.SetBool("IsJumping", true);
+				Roll();
+				
+
+
+				break;
 			case State.DEAD:
 				Dead();
 				break;
@@ -153,7 +163,11 @@ public class Player : MonoBehaviour
                 break;
         }
 
-        if (healthBar)
+		//if (Keyboard.current[Key.Escape].wasReleasedThisFrame) {
+		//	
+		//}
+
+		if (healthBar)
         {
             healthBar.UpdateHealth(this);
         }
@@ -187,17 +201,20 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-		//Animator.SetBool("TakeDamage", true);
+		
 		if (!IsInvincible())
         {
             health -= damage < health ? damage : health;
-        }
+			Animator.SetBool("TakeDamage", true);
+			if (Animator)
+				Animator.SetBool("TakeDamage", true);
+		}
      
         if (health == 0)
         {
             Die();
         }
-		//Animator.SetBool("TakeDamage", false);
+		
 	}
 
     void Die()
@@ -236,7 +253,8 @@ public class Player : MonoBehaviour
         if (context.performed && controller.isGrounded && CanRoll() && state != State.DEAD)
         {
             StartRoll();
-        }
+			
+		}
     }
 
     private void StartWalk()
@@ -299,7 +317,8 @@ public class Player : MonoBehaviour
 
     private void StartRoll()
     {
-        Vector3 horizVelocity = new Vector3(velocity.x, 0, velocity.z);
+		
+		Vector3 horizVelocity = new Vector3(velocity.x, 0, velocity.z);
         if (horizVelocity.sqrMagnitude > 0)
         {
             rollVelocity = horizVelocity.normalized * rollSpeed;
@@ -315,11 +334,13 @@ public class Player : MonoBehaviour
         state = State.ROLLING;
 
         AddInvinciblity(invincibiltyDuration);
+
     }
 
     private void Roll()
     {
-        if (Time.time < rollEnd)
+		
+		if (Time.time < rollEnd)
         {
             velocity = rollVelocity;
             Vector3 movement = velocity * Time.deltaTime;
@@ -332,14 +353,18 @@ public class Player : MonoBehaviour
 
         if (Time.time >= rollEnd || (useGravityOnRoll && !controller.isGrounded))
         {
-            StartFall();
-        }
+			
+			StartFall();
+			
+		}
+		
     }
 
     bool IsInvincible()
     {
-        return Time.time < invincibiltyEnd;
-    }
+		return Time.time < invincibiltyEnd;
+		
+	}
 
     public void AddInvinciblity(float duration)
     {

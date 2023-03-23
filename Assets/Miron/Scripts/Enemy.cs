@@ -129,7 +129,10 @@ public class Enemy : MonoBehaviour
             Color color = Time.time >= attackTime ? Color.red : Color.black;
             material.color = color;
         }
-    }
+		//if (enemyAnimator) {
+		//	enemyAnimator.SetBool("isAttacking", false);
+		//}
+	}
 
     private bool CanAttack()
     {
@@ -155,10 +158,7 @@ public class Enemy : MonoBehaviour
             player.TakeDamage(attackDamage);
         }
         attackTime = Time.time + attackCD;
-		if (enemyAnimator)
-        {
-            enemyAnimator.SetBool("isAttacking", false);
-        }
+		
 	}
 
     public void Push(Vector3 force)
