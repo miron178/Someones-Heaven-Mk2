@@ -156,6 +156,8 @@ public class Player : MonoBehaviour
 
 				break;
 			case State.DEAD:
+				if (Animator)
+					Animator.SetBool("IsDead", true);
 				Dead();
 				break;
 			default:
