@@ -198,7 +198,7 @@ public class LevelGenerator : MonoBehaviour
 
             while(currentBranchSize <= m_maxBranchSize)
             {
-                if(passes == 10) { break; }
+                if(passes == 10) { branchTermination++; break; }
 
                 if (NewPickDir(ref newPos, ref lastPrefab, ref fromBase)) 
                 { 
@@ -214,6 +214,8 @@ public class LevelGenerator : MonoBehaviour
 
             currentBranchesFromBase++;
         }
+
+        Debug.Log($"Number of Branch Terminations: {branchTermination}");
     }
 
     bool NewPickDir(ref Vector3 lastVector, ref GameObject lastPrefab, ref bool fromBase)
