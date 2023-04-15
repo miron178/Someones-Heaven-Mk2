@@ -216,7 +216,6 @@ public class Player : MonoBehaviour
 		if (!IsInvincible())
         {
             health -= damage < health ? damage : health;
-			Animator.SetBool("TakeDamage", true);
 			if (Animator)
 				Animator.SetBool("TakeDamage", true);
 		}
