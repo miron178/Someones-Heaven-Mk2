@@ -44,7 +44,19 @@ public class Enemy : MonoBehaviour
     private bool isPulling = false;
 
     [SerializeField]
+    private GameObject bulletPrefab;
+
+    [SerializeField]
+    bool shoot = false;
+
+    [SerializeField]
+    float shootMaxAngle = 30;
+
+    [SerializeField]
     Material material;
+
+    [SerializeField]
+    Transform gun;
 
     GameObject[] targets;
     GameObject closest;
@@ -111,6 +123,13 @@ public class Enemy : MonoBehaviour
 
         //move to target radius
         agent.SetDestination(target);
+        Debug.DrawLine(transform.position, target);
+
+        //rotate towards target
+        Vector3 forward = closest.transform.position - transform.position;
+        float speed = agent.angularSpeed / 180f * Time.fixedDeltaTime;
+        Quaternion look = Quaternion.LookRotation(forward);
+        agent.transform.rotation = Quaternion.Slerp(transform.rotation, look, speed);
 
         //Debug.DrawLine(target, transform.position);
     }
@@ -153,9 +172,9 @@ public class Enemy : MonoBehaviour
 		//}
 	}
 
-    private bool CanAttack()
+    private bool TargetInRange()
     {
-        if (!closest || Time.time < attackTime)
+        if (!closest)
         {
             return false;
         }
@@ -164,21 +183,49 @@ public class Enemy : MonoBehaviour
         return distance.magnitude <= attackRange;
     }
 
+    private bool ShootAngleInRange()
+    {
+        if (!TargetInRange())
+        {
+            return false;
+        }
+
+        Vector3 direction = closest.transform.position - transform.position;
+        float angle = Vector3.Angle(transform.forward, direction);
+        return angle < shootMaxAngle;
+    }
+
+    private bool CanAttack()
+    {
+        return Time.time >= attackTime && TargetInRange() && (!shoot || ShootAngleInRange());
+    }
+
     private void Attack()
     {
         if (enemyAnimator)
         {
             enemyAnimator.SetBool("isAttacking", true);
         }
+
         bool hit = Random.value <= hitChance;
         if (hit)
         {
-            Player player = closest.GetComponent<Player>();
-            player.TakeDamage(attackDamage);
+            if (shoot)
+            {
+                // Fire a bullet towards the player
+                Vector3 direction = closest.transform.position - transform.position;
+                GameObject bullet = GameObject.Instantiate(bulletPrefab, gun.position, gun.rotation);
+                bullet.GetComponent<Bullet>().Direction = direction;
+                bullet.GetComponent<Bullet>().Damage = attackDamage;
+            }
+            else
+            {
+                Player player = closest.GetComponent<Player>();
+                player.TakeDamage(attackDamage);
+            }
         }
         attackTime = Time.time + attackCD;
-		
-	}
+    }
 
     public void StartPull()
     {
@@ -240,5 +287,15 @@ public class Enemy : MonoBehaviour
     {
         Gizmos.color = CanPull() ? Color.green : Color.red;
         Gizmos.DrawWireSphere(transform.position, pullRange);
+
+
+        if (shoot && TargetInRange())
+        {
+            Gizmos.color = ShootAngleInRange() ? Color.green : Color.red;
+
+            Vector3 direction = closest.transform.position - transform.position;
+            Gizmos.DrawRay(transform.position, direction);
+        }
+
     }
 }
