@@ -6,7 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/aaMAINGAME/Scenes/Demo Clone Clone Clone.unity
+    path: Assets/Scenes/MainMenu.unity
+    guid: 81f748190ed091e4c953da97afeb4160
+  - enabled: 1
+    path: Assets/Scenes/Demo/Demo Clone Clone Clone.unity
     guid: 3dd16f8d01a4cd34a9e4c979f092796e
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 9360d3cc50444c949b482094b6d391c2,
