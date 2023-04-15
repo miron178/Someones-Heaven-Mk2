@@ -32,6 +32,18 @@ public class Enemy : MonoBehaviour
     private float attackTime = 0;
 
     [SerializeField]
+    private float pullRange = 5;
+    [SerializeField]
+    private float pullDuration = Mathf.Infinity;
+    [SerializeField]
+    private float pullCD = 3;
+    [SerializeField]
+    private float pullForce = 1;
+
+    private float pullStart = 0;
+    private bool isPulling = false;
+
+    [SerializeField]
     Material material;
 
     GameObject[] targets;
@@ -76,6 +88,9 @@ public class Enemy : MonoBehaviour
     {
         agent.enabled = false;
         rb.isKinematic = false;
+
+        //interrupt pull, if active
+        StopPull();
     }
 
     void EndPush()
@@ -119,6 +134,10 @@ public class Enemy : MonoBehaviour
         {
             Attack();
         }
+        else if (CanPull())
+        {
+            Pull();
+        }
         else
         {
             ClosestTarget();
@@ -161,9 +180,65 @@ public class Enemy : MonoBehaviour
 		
 	}
 
+    public void StartPull()
+    {
+        if (!isPulling)
+        {
+            isPulling = true;
+            pullStart = Time.time;
+        }
+
+    }
+
+    public void StopPull()
+    {
+        if (isPulling)
+        {
+            isPulling = false;
+            pullStart = Time.time + pullCD;
+        }
+    }
+
+    private bool CanPull()
+    {
+        bool can = true;
+        if (!closest ||
+            Time.time < pullStart ||
+            (isPulling && Time.time > (pullStart + pullDuration)))
+        {
+            can = false;
+        }
+        else
+        {
+            Vector3 distance = transform.position - closest.transform.position;
+            can = distance.magnitude <= pullRange;
+        }
+
+        if (!can)
+        {
+            StopPull();
+        }
+        return can;
+    }
+
+    private void Pull()
+    {
+        StartPull();
+
+        Player player = closest.GetComponent<Player>();
+        Vector3 direction = transform.position - closest.transform.position;
+        player.AddPull(direction.normalized * pullForce);
+    }
+
     public void Push(Vector3 force)
     {
         StartPush();
         rb.AddForce(force);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = CanPull() ? Color.green : Color.red;
+        Gizmos.DrawWireSphere(transform.position, pullRange);
     }
 }

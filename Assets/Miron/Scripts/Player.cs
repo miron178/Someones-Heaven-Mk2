@@ -51,6 +51,8 @@ public class Player : MonoBehaviour
     private int maxHealthBoost = 0;
     private float maxHealthBoostEnd = 0;
 
+    private Vector3 pull = Vector3.zero;
+
     public int MaxHealth
     {
         get
@@ -165,6 +167,9 @@ public class Player : MonoBehaviour
                 break;
         }
 
+        // All pull forces are applied now, reset before the next update
+        pull = Vector3.zero;
+
 		//if (Keyboard.current[Key.Escape].wasReleasedThisFrame) {
 		//	
 		//}
@@ -195,6 +200,10 @@ public class Player : MonoBehaviour
 		{
 			StartWalk();
 		}
+        else
+        {
+            controller.Move(pull * Time.deltaTime);
+        }
 		if (isDead == true)
 		{
 			Die();
@@ -266,7 +275,7 @@ public class Player : MonoBehaviour
 
     private void Walk()
     {
-        velocity = moveVelocity * Speed;
+        velocity = moveVelocity * Speed + pull;
 		velocity.y = gravity;
 
         Vector3 movement = velocity * Time.deltaTime;
@@ -344,7 +353,7 @@ public class Player : MonoBehaviour
 		
 		if (Time.time < rollEnd)
         {
-            velocity = rollVelocity;
+            velocity = rollVelocity + pull;
             Vector3 movement = velocity * Time.deltaTime;
             controller.Move(movement);
         }
@@ -411,5 +420,10 @@ public class Player : MonoBehaviour
             maxHealthBoost += boost;
             maxHealthBoostEnd = Mathf.Max(Time.time, maxHealthBoostEnd) + duration;
         }
+    }
+
+    public void AddPull(Vector3 force)
+    {
+        pull += force;
     }
 }
