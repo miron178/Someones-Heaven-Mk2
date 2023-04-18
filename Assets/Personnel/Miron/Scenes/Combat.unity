@@ -776,6 +776,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2483611562729190532, guid: 752c4b3ff0c8d0147a28c6467b89c6be,
         type: 3}
+      propertyPath: pullCD
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483611562729190532, guid: 752c4b3ff0c8d0147a28c6467b89c6be,
+        type: 3}
       propertyPath: material
       value: 
       objectReference: {fileID: 2100000, guid: c1665856e76cb8b40bd9d216eb0c2b68, type: 2}
@@ -783,6 +788,21 @@ PrefabInstance:
         type: 3}
       propertyPath: hitChance
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483611562729190532, guid: 752c4b3ff0c8d0147a28c6467b89c6be,
+        type: 3}
+      propertyPath: pullForce
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483611562729190532, guid: 752c4b3ff0c8d0147a28c6467b89c6be,
+        type: 3}
+      propertyPath: pullRange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483611562729190532, guid: 752c4b3ff0c8d0147a28c6467b89c6be,
+        type: 3}
+      propertyPath: pullDuration
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2483611562729190532, guid: 752c4b3ff0c8d0147a28c6467b89c6be,
         type: 3}
