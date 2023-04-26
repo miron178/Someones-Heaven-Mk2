@@ -1,610 +1,397 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
+using System.Threading.Tasks;
+
 using UnityEngine;
-using UnityEngine.Analytics;
-using UnityEngine.Assertions.Must;
-using UnityEngine.Rendering.Universal;
 
 public class LevelGenerator : MonoBehaviour
 {
-    #region Variables
-    //Singleton
-    private static LevelGenerator m_instance;
-    public static LevelGenerator Instance { get { return m_instance; } }
+    //Random and Seed
+    System.Random m_randomGenerator;
+    int m_levelSeed = 4444;
 
-    [Header("Level Seed", order = 1)]
+    [Header("Generator Settings", order = 0)]
+    [SerializeField] bool m_randBranches = false;
+    [SerializeField] int m_numofBranches = 1;
+    [SerializeField] int m_branchLength = 4;
+    [SerializeField] bool m_doubleUp = false;
+    [SerializeField] int m_offBranchChance = 50;
+
+    [Header("Floor Settings", order = 1)]
+    [SerializeField] Transform m_floorParent;
+
+    [SerializeField] GameObject[] m_roomPrefabs;
+    [SerializeField] List<GameObject> m_northPrefabs;
+    [SerializeField] List<GameObject> m_eastPrefabs;
+    [SerializeField] List<GameObject> m_southPrefabs;
+    [SerializeField] List<GameObject> m_westPrefabs;
     
-    [SerializeField] private int m_levelSeed = 1;
-    public int GetLevelSeed { get { return m_levelSeed; } }
-
-    private System.Random m_randomGenerator;
-
-    [Header("Level Generation Type", order = 2)]
-    [SerializeField] private int m_maxBranchSize = 10;
-    public int MaxBranchySize { get { return m_maxBranchSize; } set { m_maxBranchSize = value; } }
-    private int m_offBranchChance = 50;
-    public int OffBranchChance { get { return m_offBranchChance; } set { m_offBranchChance = value; } }
-
-    [Header("Floor Variables", order = 3)]
-    [SerializeField] private GameObject m_floorPrefab;
-    [SerializeField] private Transform m_floorParent;
-    private List<GameObject> m_floors = new List<GameObject>();
-    public int GetFloorCount { get { return m_floors.Count; } }
-    private List<Vector3> m_floorsPos = new List<Vector3>();
-
-    //Other
-    //enum Direction
-    //{
-    //    Up,
-    //    Right,
-    //    Down,
-    //    Left
-    //}
-    //Direction[] defaultDir = { Direction.Up, Direction.Right, Direction.Down, Direction.Left };
-    int branchTermination = 0;
-    bool m_allowConnections = false;
-    public bool AllowConnections { get { return m_allowConnections; } set { m_allowConnections = value; } }
-
-    bool m_manualNOBFB = false;
-    public bool ManualNOBFB { get { return m_manualNOBFB; } set { m_manualNOBFB = value; } }
-
-    int m_numberOfBranchesFromBase = 1;
-    public int NumberOfBranchesFromBase { get { return m_numberOfBranchesFromBase; } set { m_numberOfBranchesFromBase = value; } }
-
-    List<GameObject> m_prefabList = new List<GameObject>();
-    List<GameObject> m_northPrefabs = new List<GameObject>();
-    List<GameObject> m_eastPrefabs = new List<GameObject>();
-    List<GameObject> m_southPrefabs = new List<GameObject>();
-    List<GameObject> m_westPrefabs = new List<GameObject>();
-
-    #endregion
+    [Header("Generated Variables", order = 2)]
+    [SerializeField] List<GameObject> m_floors;
+    [SerializeField] List<Vector3> m_floorPositions;
 
     void Awake()
     {
-        m_instance = this;
+        //Load all Prefabs into Generator
+        m_roomPrefabs = Resources.LoadAll<GameObject>("Prefabs/Procedural Rooms/Floor1");
 
-        GenerateSeed();
-    }
-
-    void Start()
-    {
-        m_prefabList = Resources.LoadAll<GameObject>("Prefabs/Rooms").ToList();
-
-        foreach(GameObject prefab in m_prefabList)
+        //Sort into directions
+        foreach(GameObject gO in m_roomPrefabs)
         {
-            RoomInfo locations = prefab.GetComponent<RoomInfo>();
-
-            foreach(DirectionalPosition dirLocal in locations.RoomDirections)
+            foreach(Direction dir in gO.GetComponent<RoomInfo>().GetAllDirections())
             {
-                switch(dirLocal.Direction)
+                switch(dir)
                 {
-                    case RoomInfo.Direction.North:
-                        if(!m_northPrefabs.Contains(prefab)) { m_northPrefabs.Add(prefab); }                        
+                    case Direction.North:
+                    {
+                        m_northPrefabs.Add(gO);
                         break;
-                    case RoomInfo.Direction.East:
-                        if(!m_eastPrefabs.Contains(prefab)) { m_eastPrefabs.Add(prefab); }
+                    }
+                    case Direction.East:
+                    {
+                        m_eastPrefabs.Add(gO);
                         break;
-                    case RoomInfo.Direction.South:
-                        if(!m_southPrefabs.Contains(prefab)) { m_southPrefabs.Add(prefab); }
+                    }
+                    case Direction.South:
+                    {
+                        m_southPrefabs.Add(gO);
                         break;
-                    case RoomInfo.Direction.West:
-                        if(!m_westPrefabs.Contains(prefab)) { m_westPrefabs.Add(prefab); }
+                    }
+                    case Direction.West:
+                    {
+                        m_westPrefabs.Add(gO);
                         break;
+                    }
                 }
             }
         }
+
+        //Generate
+        Debug.Log("Generating Level. Please Wait...");
+        GenerateSeed();
+        
+        int passes = 0;
+        while(m_floors.Count < (m_branchLength * m_numofBranches))
+        {
+            if(passes == 100) { Debug.LogError("Gave up on Generating!"); break; }
+
+            foreach(GameObject gO in m_floors)
+            {
+                Destroy(gO);
+            }
+
+            m_floors.Clear();
+            m_floorPositions.Clear();
+
+            GenerateLevel();
+            passes++;
+        }
     }
 
-    public void GenerateSeed()
+    void GenerateSeed()
     {
-        //Generates our Level Seed
-        m_levelSeed = new System.Random(System.DateTime.Now.Millisecond).Next();
+        //Gets a Seed from Now.Millisecond and Gets a Random Value from it
+        m_levelSeed = new System.Random(DateTime.Now.Millisecond).Next();
+
+        //Init Random Engine using Seed
         m_randomGenerator = new System.Random(m_levelSeed);
     }
 
-    //Branchy Generation
-    //public void GenerateBranchyLevel() 
-    //{
-    //    int bOrW = 0;
-
-    //    //Init Floor
-    //    Vector3 baseBranch = new Vector3(0, 0, 0);
-    //    InitFloor(baseBranch, m_prefabList[0]/*, ref bOrW*/);
-
-    //    int numofBranchesFromBase = m_randomGenerator.Next(2, 5);
-    //    int currentBranchesFromBase = 0;
-
-    //    List<Direction> pickedDirs = new List<Direction>();
-
-    //    while(currentBranchesFromBase < numofBranchesFromBase)
-    //    {
-    //        Vector3 newPos = Vector3.zero;
-    //        Direction[] avDirs = defaultDir;
-    //        Direction currentDir = Direction.Up;
-    //        int currentBranchSize = 0;
-
-    //        //Remove Directions Already Gone
-    //        foreach (Direction dir in pickedDirs) { avDirs = Array.FindAll(avDirs, i => i != dir).ToArray(); }
-
-    //        //Init 2 Floors
-    //        GameObject prefab = PickDirection(ref newPos, avDirs, ref currentDir);
-    //        InitFloor(newPos, prefab/*, ref bOrW*/);
-
-    //        PushDirection(ref newPos, prefab, currentDir);
-    //        InitFloor(newPos, prefab/*, ref bOrW*/);
-
-    //        currentBranchSize += 2;
-
-    //        pickedDirs.Add(currentDir);
-
-    //        while (currentBranchSize < m_maxBranchSize)
-    //        {
-    //            avDirs = Array.FindAll(defaultDir, i => i != ReverseDirection(currentDir)).ToArray();
-
-    //            //Init 2 Floors in Directions
-    //            prefab = PickDirection(ref newPos, avDirs, ref currentDir);
-
-    //            if (newPos.x == int.MaxValue) { branchTermination++; break; }
-
-    //            InitFloor(newPos, prefab/*, ref bOrW*/);
-
-    //            PushDirection(ref newPos, prefab, currentDir);
-    //            InitFloor(newPos, prefab/*, ref bOrW*/);
-                
-    //            currentBranchSize += 2;
-
-    //            if (m_randomGenerator.Next(0, 100) > 50)
-    //            {
-    //                avDirs = Array.FindAll(defaultDir, i => i != ReverseDirection(currentDir)).ToArray();
-
-    //                OffBranching(1, newPos, avDirs/*, ref bOrW*/);
-    //            }
-    //        }
-
-    //        currentBranchesFromBase++;
-    //    }
-
-    //    Debug.Log("Number of Branch Terminations: " + branchTermination);
-    //}
-
-    public void GenerateLevel()
+    //Tasked Generate Level - Async Function
+    void GenerateLevel()
     {
-        //Init Floor
+        //In-Function Variables
+        RoomInfo baseRoom;
+        Vector3 currentPosition = Vector3.zero;
+        int numberOfBranches = 0;
+        List<Direction> branchDirections = new List<Direction>();
+
+        //Create Base - 0, 0, 0
+        baseRoom = SpawnFloor(m_roomPrefabs[0], Vector3.zero);
+
+        //Decide the number of Branches
+        if(m_randBranches == true) { numberOfBranches = m_randomGenerator.Next(1, 5); }
+        else { numberOfBranches = m_numofBranches; }
+
+        Debug.Log("Generating Directions from Base Branch");
         
-        GameObject baseBranch = InitFloor(Vector3.zero, m_prefabList[0]/*, ref bOrW*/);
-
-        int numofBranchesFromBase = 0;
-
-        if (m_manualNOBFB) { numofBranchesFromBase = m_numberOfBranchesFromBase; }
-        else { numofBranchesFromBase = m_randomGenerator.Next(2, 5); }
-
-        int currentBranchesFromBase = 0;
-
-        //List<Direction> avDirsFromBase = new List<Direction>() { Direction.Up, Direction.Right, Direction.Left, Direction.Down};
-        while(currentBranchesFromBase < numofBranchesFromBase)
+        //Decide Branch Directions if less than 4
+        if(numberOfBranches == 4)
         {
-            Vector3 newPos = Vector3.zero;
-            GameObject lastPrefab = baseBranch;
-            bool fromBase = true;
-            int dirIndex = -1;
-            int currentBranchSize = 1;
-
-            int passes = 0;
-
-            while(currentBranchSize <= m_maxBranchSize)
+            branchDirections.Add(Direction.North);
+            branchDirections.Add(Direction.East);
+            branchDirections.Add(Direction.South);
+            branchDirections.Add(Direction.West);
+        }
+        else
+        {
+            //Go through each Branch and give it a Direction
+            for(int i = 0; i < numberOfBranches; i++)
             {
-                if(passes == 10) { branchTermination++; break; }
+                Direction pickedDir = Direction.None;
 
-                if (NewPickDir(ref newPos, ref lastPrefab, ref fromBase)) 
-                { 
-                    currentBranchSize += 2;
+                while(pickedDir == Direction.None)
+                {
+                    Direction temp = (Direction)m_randomGenerator.Next(1, 5);
 
-                    if (m_randomGenerator.Next(1, 100) <= m_offBranchChance)
-                    {
-                        OffBranching(1, newPos, lastPrefab);
-                    }
+                    if(!branchDirections.Contains(temp)) { pickedDir = temp; }
                 }
-                else { passes++; }  
-            }
 
-            currentBranchesFromBase++;
+                branchDirections.Add(pickedDir);
+            }
         }
 
-        Debug.Log($"Number of Branch Terminations: {branchTermination}");
+        //Generate the Branches
+        for(int i = 0; i < numberOfBranches; i++)
+        {
+            Debug.Log($"Generating Branch {i+1}");
+            GenerateBranch(branchDirections[i], baseRoom);
+        }
     }
 
-    bool NewPickDir(ref Vector3 lastVector, ref GameObject lastPrefab, ref bool fromBase)
+    void GenerateBranch(Direction initalDir, RoomInfo baseBranch)
     {
-        bool posValid = false;
-        int passes = 0;
+        //Push out 1 Room First
+        Direction dir = initalDir;
+        Vector3 currentPosition = Vector3.zero;
+        RoomInfo currentRoom = baseBranch;
+        GameObject roomObject = m_roomPrefabs[0];
 
-        while(!posValid)
+        Vector3 newPos = PushDirection(currentPosition, currentRoom, dir);
+        if(newPos == new Vector3(-1, -1, -1)) { Debug.LogWarning("Branch First Terminated from Base!"); return; }
+
+        if(m_doubleUp)
         {
-            if(passes == 100) { branchTermination++;  break; }
+            RoomInfo tempSpawn = SpawnFloor(roomObject, newPos);
+            tempSpawn.RemoveDirection(GetReverseDirection(dir));
 
-            Vector3 newPos = lastVector;
+            Direction tempDir = PickDirection(tempSpawn);
+            GameObject tempObject = PickNextRoom(tempDir);
 
-            int dir = m_randomGenerator.Next(0, 4);
+            Vector3 tempPos = PushDirection(newPos, tempSpawn, tempDir);
+            if(tempPos == new Vector3(-1, -1, -1)) 
+            { 
+                Debug.LogWarning("Branch Second Terminated from Base!");
 
-            GameObject pickedPrefab = null;
-            RoomInfo roomInfo = null;
+                m_floors.Remove(tempSpawn.gameObject);
+                m_floorPositions.Remove(newPos);
 
-            switch(dir)
-            {
-                case 0:
-                    pickedPrefab = m_northPrefabs[m_randomGenerator.Next(0, m_northPrefabs.Count)];
-                    roomInfo = pickedPrefab.GetComponent<RoomInfo>();
+                Destroy(tempSpawn.gameObject);
 
-                    if(roomInfo.AvaliableDirections().Contains(RoomInfo.Direction.North))  
-                    {
-                        Vector3 posfromLast = lastPrefab.GetComponent<RoomInfo>().GetDirectionPosition(RoomInfo.Direction.North);
-                        Vector3 posFromPre = roomInfo.GetDirectionPosition(RoomInfo.Direction.North);
-
-                        Vector3 preCalc = posfromLast + posFromPre;
-
-                        newPos += preCalc;
-                    }
-                    break;
-                case 1:
-                    pickedPrefab = m_eastPrefabs[m_randomGenerator.Next(0, m_eastPrefabs.Count)];
-                    roomInfo = pickedPrefab.GetComponent<RoomInfo>();
-
-                    if (roomInfo.AvaliableDirections().Contains(RoomInfo.Direction.East)) 
-                    {
-                        Vector3 posfromLast = lastPrefab.GetComponent<RoomInfo>().GetDirectionPosition(RoomInfo.Direction.East);
-                        Vector3 posFromPre = roomInfo.GetDirectionPosition(RoomInfo.Direction.East);
-
-                        Vector3 preCalc = posfromLast + posFromPre;
-
-                        newPos += preCalc;
-                    }
-                    break;
-                case 2:
-                    pickedPrefab = m_southPrefabs[m_randomGenerator.Next(0, m_southPrefabs.Count)];
-                    roomInfo = pickedPrefab.GetComponent<RoomInfo>();
-
-                    if (roomInfo.AvaliableDirections().Contains(RoomInfo.Direction.South)) 
-                    {
-                        Vector3 posfromLast = lastPrefab.GetComponent<RoomInfo>().GetDirectionPosition(RoomInfo.Direction.South);
-                        Vector3 posFromPre = roomInfo.GetDirectionPosition(RoomInfo.Direction.South);
-
-                        Vector3 preCalc = posfromLast + posFromPre;
-
-                        newPos += preCalc;
-                    }
-                    break;
-                case 3:
-                    pickedPrefab = m_westPrefabs[m_randomGenerator.Next(0, m_westPrefabs.Count)];
-                    roomInfo = pickedPrefab.GetComponent<RoomInfo>();
-
-                    if (roomInfo.AvaliableDirections().Contains(RoomInfo.Direction.West)) 
-                    {
-                        Vector3 posfromLast = lastPrefab.GetComponent<RoomInfo>().GetDirectionPosition(RoomInfo.Direction.West);
-                        Vector3 posFromPre = roomInfo.GetDirectionPosition(RoomInfo.Direction.West);
-
-                        Vector3 preCalc = posfromLast + posFromPre;
-
-                        newPos += preCalc;
-                    }
-                    break;
+                return;
             }
 
-            if (!m_floorsPos.Contains(newPos))
+            roomObject = tempObject;
+            newPos = tempPos;
+            dir = tempDir;
+        }
+
+        currentRoom = SpawnFloor(roomObject, newPos);
+        currentRoom.RemoveDirection(dir);
+
+        currentPosition = newPos;
+
+        int passes = 0;
+        for(int i = 1; i < m_branchLength; i++)
+        {
+            bool posFound = false;
+
+            while(!posFound)
             {
-                if(!m_allowConnections)
+                if(passes == 10) { break; }
+
+                dir = PickDirection(currentRoom);
+                roomObject = PickNextRoom(dir);
+
+                newPos = PushDirection(currentPosition, currentRoom, dir);
+                if(newPos == new Vector3(-1, -1, -1)) { passes++; continue; }
+
+                if(m_doubleUp)
                 {
-                    Vector3 tempPos = newPos;
+                    RoomInfo tempSpawn = SpawnFloor(roomObject, newPos);
+                    tempSpawn.RemoveDirection(GetReverseDirection(dir));
 
-                    PushDirection(ref tempPos, pickedPrefab, (RoomInfo.Direction)dir);
+                    Direction tempDir = PickDirection(tempSpawn);
+                    GameObject tempObject = PickNextRoom(tempDir);
 
-                    if (!m_floorsPos.Contains(tempPos))
+                    Vector3 tempPos = PushDirection(newPos, tempSpawn, tempDir);
+                    if(tempPos == new Vector3(-1, -1, -1)) 
                     {
-                        if (fromBase)
-                        {
-                            lastPrefab.GetComponent<RoomInfo>().RemoveDirectionNonRev((RoomInfo.Direction)dir);
-                            fromBase = false;
-                        }
+                        m_floors.Remove(tempSpawn.gameObject);
+                        m_floorPositions.Remove(newPos);
 
-                        lastPrefab = InitFloor(newPos, pickedPrefab);
-                        lastPrefab.GetComponent<RoomInfo>().RemoveDirection((RoomInfo.Direction)dir);
-                        lastPrefab.GetComponent<RoomInfo>().DirectionComingFrom = (RoomInfo.Direction)dir;
+                        Destroy(tempSpawn.gameObject);
 
-
-                        GameObject pushedObj = InitFloor(tempPos, pickedPrefab);
-                        pushedObj.GetComponent<RoomInfo>().RemoveDirection((RoomInfo.Direction)dir);
-                        pushedObj.GetComponent<RoomInfo>().DirectionComingFrom = (RoomInfo.Direction)dir;
-
-                        lastVector = tempPos;
-
-                        posValid = true;
+                        passes++;
 
                         continue;
                     }
-                }
-                else
-                {
-                    if (fromBase)
-                    {
-                        lastPrefab.GetComponent<RoomInfo>().RemoveDirectionNonRev((RoomInfo.Direction)dir);
-                        fromBase = false;
-                    }
 
-                    lastPrefab = InitFloor(newPos, pickedPrefab);
-                    lastPrefab.GetComponent<RoomInfo>().RemoveDirection((RoomInfo.Direction)dir);
-                    lastPrefab.GetComponent<RoomInfo>().DirectionComingFrom = (RoomInfo.Direction)dir;
-
-                    lastVector = newPos;
-
-                    posValid = true;
-
-                    continue;
-                }
-            } 
-
-            passes++;
-        }
-
-        if(passes == 100) { return false; }
-        else { return true; }
-    }
-
-    public void ClearLevel()
-    {
-        for (int i = 0; i < m_floors.Count;)
-        {
-            if (Application.isPlaying) { Destroy(m_floors[i]); }
-            else if (Application.isEditor) { DestroyImmediate(m_floors[i]); }
-            m_floors.RemoveAt(i);
-        }
-
-        m_floorsPos.Clear();
-    }
-
-    ////Utility
-    //Direction ReverseDirection(Direction directionToReverse)
-    //{
-    //    switch (directionToReverse)
-    //    {
-    //        case Direction.Up:
-    //            directionToReverse = Direction.Down;
-    //            break;
-    //        case Direction.Right:
-    //            directionToReverse = Direction.Left;
-    //            break;
-    //        case Direction.Down:
-    //            directionToReverse = Direction.Up;
-    //            break;
-    //        case Direction.Left:
-    //            directionToReverse = Direction.Right;
-    //            break;
-    //    }
-
-    //    return directionToReverse;
-    //}
-
-    /*GameObject PickDirection(ref Vector3 lastVector, Direction[] validDirections, ref Direction outDir)
-    {
-        bool posValid = false;
-        int passes = 0;
-
-        while (!posValid)
-        {
-            Vector3 newPos = lastVector;
-            int dir = m_randomGenerator.Next(0, 4);
-            int randPrefab = 0;
-            GameObject chosenPrefab = null;
-
-            if (validDirections.Contains((Direction)dir))
-            {
-                switch (dir)
-                {
-                    case 0:
-                        {
-                            randPrefab = m_randomGenerator.Next(0, m_southPrefabs.Count);
-
-                            foreach(DirectionalLocation dirLocation in m_southPrefabs[randPrefab].GetComponent<EntryLocations>().GetEntryLocations)
-                            {
-                                if(dirLocation.PositionDirection == DirectionalLocation.Direction.South)
-                                {
-                                    newPos += dirLocation.Position;
-                                    chosenPrefab = m_southPrefabs[randPrefab];
-                                    break;
-                                }
-                            }
-
-                            break;
-                        }
-                    case 1:
-                        {
-                            randPrefab = m_randomGenerator.Next(0, m_westPrefabs.Count);
-
-                            foreach (DirectionalLocation dirLocation in m_westPrefabs[randPrefab].GetComponent<EntryLocations>().GetEntryLocations)
-                            {
-                                if(dirLocation.PositionDirection == DirectionalLocation.Direction.West)
-                                {
-                                    newPos += dirLocation.Position;
-                                    chosenPrefab = m_westPrefabs[randPrefab];
-                                    break;
-                                }
-                            }
-
-                            break;
-                        }
-                    case 2:
-                        {
-                            randPrefab = m_randomGenerator.Next(0, m_northPrefabs.Count);
-
-                            foreach(DirectionalLocation dirLocation in m_northPrefabs[randPrefab].GetComponent<EntryLocations>().GetEntryLocations)
-                            {
-                                if(dirLocation.PositionDirection == DirectionalLocation.Direction.North)
-                                {
-                                    newPos += dirLocation.Position;
-                                    chosenPrefab = m_northPrefabs[randPrefab];
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    case 3:
-                        {
-                            randPrefab = m_randomGenerator.Next(0, m_eastPrefabs.Count);
-
-                            foreach(DirectionalLocation dirLocation in m_eastPrefabs[randPrefab].GetComponent<EntryLocations>().GetEntryLocations)
-                            {
-                                if(dirLocation.PositionDirection == DirectionalLocation.Direction.East)
-                                {
-                                    newPos += dirLocation.Position;
-                                    chosenPrefab = m_eastPrefabs[randPrefab];
-                                    break;
-                                }
-                            }
-                            break;
-                        }
+                    roomObject = tempObject;
+                    newPos = tempPos;
+                    dir = tempDir;
                 }
 
-                if (!m_floorsPos.Contains(newPos))
-                {
-                    if(!m_allowConnections)
-                    {
-                        Vector3 tempPos = newPos;
+                currentRoom = SpawnFloor(roomObject, newPos);
+                currentRoom.RemoveDirection(GetReverseDirection(dir));
 
-                        PushDirection(ref tempPos, chosenPrefab, (Direction)dir);
+                currentPosition = newPos;
 
-                        if (!m_floorsPos.Contains(tempPos))
-                        {
-                            lastVector = newPos;
-                            outDir = (Direction)dir;
-                            posValid = true;
-                        }
-                    }
-                    else
-                    {
-                        lastVector = newPos;
-                        outDir = (Direction)dir;
-                        posValid = true;
-                    }
-                }
+                posFound = true;
             }
 
-            passes++;
-            if (passes > 100)
+            if(!posFound) { Debug.LogWarning($"Branch Terminated at {i}!"); break; }
+            else { }
+        }
+
+        if(passes < 10) { Debug.Log("Branch Complete"); }
+    }
+
+    void OffBranching(int currentOffBranchCount, Vector3 currentPos, RoomInfo currentRoom)
+    {
+        Vector3 currentOffPos = currentPos;
+        Direction dir = Direction.None;
+        GameObject gO = null;
+        RoomInfo rI = currentRoom;
+        Vector3 newPos = currentOffPos;
+
+        int passes = 0;
+        for(int i = 0; i < Mathf.FloorToInt(m_branchLength / currentOffBranchCount); i++)
+        {
+            bool posFound = false;
+
+            while(!posFound)
             {
-                lastVector.x = int.MaxValue;
+                if(passes == 10) { break; }
+
+                dir = PickDirection(rI);
+
+                gO = PickNextRoom(dir);
+
+                newPos = PushDirection(currentOffPos, rI, dir);
+                if(newPos == new Vector3(-1, -1, -1)) { passes++; continue; }
+
+                if(m_doubleUp)
+                {
+                    RoomInfo tempSpawn = SpawnFloor(gO, newPos);
+                    tempSpawn.RemoveDirection(GetReverseDirection(dir));
+
+                    Direction newNewDir = PickDirection(tempSpawn);
+                    GameObject newNextRoom = m_roomPrefabs[0];
+                    Vector3 newNewPos = PushDirection(newPos, tempSpawn, newNewDir);
+                    if(newNewPos == new Vector3(-1, -1, -1)) { passes++; m_floorPositions.Remove(newPos); m_floors.Remove(tempSpawn.gameObject); Destroy(tempSpawn.gameObject); continue; }
+
+                    dir = newNewDir;
+                    gO = newNextRoom;
+                    newPos = newNewPos;
+                }
+
+                rI = SpawnFloor(gO, newPos);
+                rI.RemoveDirection(dir);
+
+                currentOffPos = newPos;
+
+                posFound = true;
+            }
+
+            if(!posFound) { Debug.LogWarning("Off-Branch Terminated!"); return; }
+            else
+            {
+                if(m_randomGenerator.Next(1, 101) > (100 - m_offBranchChance))
+                {
+                    OffBranching(currentOffBranchCount + 1, currentOffPos, rI);
+                }
+            }
+        }
+        
+        Debug.Log($"Off-Branch {currentOffBranchCount} Complete");
+    }
+
+    GameObject PickNextRoom(Direction dir)
+    {
+        GameObject nextRoom = null;
+        
+        switch(dir)
+        {
+            case Direction.North:
+            {
+                int index = m_randomGenerator.Next(0, m_southPrefabs.Count);
+
+                nextRoom = m_southPrefabs[index];
+
                 break;
             }
+            case Direction.East:
+            {
+                int index = m_randomGenerator.Next(0, m_westPrefabs.Count);
 
-            return chosenPrefab;
+                nextRoom = m_westPrefabs[index];
+
+                break;
+            }
+            case Direction.South:
+            {
+                int index = m_randomGenerator.Next(0, m_northPrefabs.Count);
+
+                nextRoom = m_northPrefabs[index];
+
+                break;
+            }
+            case Direction.West:
+            {
+                int index = m_randomGenerator.Next(0, m_eastPrefabs.Count);
+
+                nextRoom = m_eastPrefabs[index];
+
+                break;
+            }
         }
 
-        return null;
-    }*/
+        return nextRoom;
+    }
 
-    void PushDirection(ref Vector3 pos, GameObject lastObject, RoomInfo.Direction dir)
+    Vector3 PushDirection(Vector3 currentPos, RoomInfo lastRoom, Direction dir)
+    {
+        Vector3 newPos = currentPos + (lastRoom.GetDirectionalOffset(dir) * 2);
+
+        if(m_floorPositions.Contains(newPos)) { newPos = new Vector3(-1, -1, -1); }
+    
+        return newPos;
+    }
+
+    Direction PickDirection(RoomInfo currentRoom)
+    {
+        List<Direction> avDir = currentRoom.GetAvailableDirections;
+
+        if(avDir.Count == 1) { return avDir[0]; }
+        else
+        {
+            int index = m_randomGenerator.Next(0, avDir.Count);
+
+            return avDir[index];
+        }
+    }
+
+    RoomInfo SpawnFloor(GameObject gO, Vector3 pos)
+    {
+        GameObject newObject = Instantiate(gO, pos, Quaternion.identity, m_floorParent);
+
+        m_floors.Add(newObject);
+        m_floorPositions.Add(pos);
+
+        return newObject.GetComponent<RoomInfo>();
+    }
+
+    Direction GetReverseDirection(Direction dir)
     {
         switch(dir)
         {
-            case RoomInfo.Direction.North:
-                pos += (lastObject.GetComponent<RoomInfo>().GetDirectionPosition(RoomInfo.Direction.North) * 2);
-                break;
-            case RoomInfo.Direction.East:
-                pos += (lastObject.GetComponent<RoomInfo>().GetDirectionPosition(RoomInfo.Direction.East) * 2);
-                break;
-            case RoomInfo.Direction.South:
-                pos += (lastObject.GetComponent<RoomInfo>().GetDirectionPosition(RoomInfo.Direction.South) * 2);
-                break;
-            case RoomInfo.Direction.West:
-                pos += (lastObject.GetComponent<RoomInfo>().GetDirectionPosition(RoomInfo.Direction.West) * 2);
-                break;
+            case Direction.North: { return Direction.South; }
+            case Direction.East: { return Direction.West; }
+            case Direction.South: { return Direction.North; }
+            case Direction.West: { return Direction.East; }
         }
+
+        return Direction.None;
     }
-
-    GameObject InitFloor(Vector3 pos, GameObject selectedPrefab/*, ref int bOrW*/)
-    {
-        GameObject obj = Instantiate(selectedPrefab, pos, Quaternion.identity, m_floorParent);
-
-        /*Color col;
-
-        if (bOrW == 0) { col = Color.white; bOrW = 1; }
-        else { col = Color.black; bOrW = 0; }
-
-        obj.GetComponent<MeshRenderer>().material.color = col;*/
-
-        m_floors.Add(obj);
-        m_floorsPos.Add(pos);
-
-        return obj;
-    }
-
-    void OffBranching(int currentOffBranch, Vector3 lastPos, GameObject lastPrefab)
-    {
-        Vector3 newPos = lastPos;
-        GameObject newObj = lastPrefab;
-        bool fromBase = true;
-
-        int newBranchSize = 1;
-        int passes = 0;
-
-        while(newBranchSize <= Mathf.FloorToInt(m_maxBranchSize / currentOffBranch))
-        {
-            if(passes == 10) { branchTermination++; break; }
-
-            if(NewPickDir(ref newPos, ref newObj, ref fromBase)) 
-            { 
-                newBranchSize += 2;
-
-                if (m_randomGenerator.Next(1, 101) >= m_offBranchChance && m_offBranchChance != 0)
-                {
-                    OffBranching(currentOffBranch + 1, newPos, newObj);
-                }
-            }
-            else { passes++; }
-
-        }
-    }
-
-    /*void OffBranching(int currentOffBranch, Vector3 lastBranch, Direction[] avDirs*//*, ref int bOrW*//*)
-    {
-        Vector3 newPos = lastBranch;
-        Direction currentDir = Direction.Up;
-
-        GameObject prefab = PickDirection(ref newPos, avDirs, ref currentDir);
-
-        if (newPos.x == int.MaxValue) { branchTermination++; return; }
-
-        InitFloor(newPos, prefab*//*, ref bOrW*//*);
-
-        PushDirection(ref newPos, prefab, currentDir);
-        InitFloor(newPos, prefab*//*, ref bOrW*//*);
-        int newBranchSize = 2;
-
-        while (newBranchSize < Mathf.FloorToInt(m_maxBranchSize / currentOffBranch))
-        {
-            avDirs = Array.FindAll(defaultDir, i => i != ReverseDirection(currentDir)).ToArray();
-
-            prefab = PickDirection(ref newPos, avDirs, ref currentDir);
-            if (newPos.x == int.MaxValue) { branchTermination++; break; }
-
-            InitFloor(newPos, prefab*//*, ref bOrW*//*);
-
-            PushDirection(ref newPos, prefab, currentDir);
-            InitFloor(newPos, prefab*//*, ref bOrW*//*);
-
-            newBranchSize += 2;
-
-            if (m_randomGenerator.Next(1, 100) > 50)
-            {
-                avDirs = Array.FindAll(defaultDir, i => i != ReverseDirection(currentDir)).ToArray();
-
-                OffBranching(currentOffBranch + 1, newPos, avDirs*//*, ref bOrW*//*);
-            }
-        }
-    }*/
-
-    //2116218693
-    //2017
 }
