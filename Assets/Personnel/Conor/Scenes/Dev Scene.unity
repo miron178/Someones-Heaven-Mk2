@@ -169,17 +169,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_randBranches: 0
   m_numofBranches: 4
-  m_branchLength: 4
+  m_branchLength: 10
   m_doubleUp: 1
-  m_offBranchChance: 0
+  m_offBranchChance: 50
   m_floorParent: {fileID: 16156029}
   m_roomPrefabs: []
   m_northPrefabs: []
   m_eastPrefabs: []
   m_southPrefabs: []
   m_westPrefabs: []
-  m_floors: []
-  m_floorPositions: []
+  m_rooms: []
+  m_roomPositions: []
 --- !u!1 &172008953
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,7 +451,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1542913689}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de0a790823ac32549a322ad22ff1ec3d, type: 3}
   m_Name: 
@@ -478,7 +478,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1542913689}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fa779297770e0849864f782007007e3, type: 3}
   m_Name: 
@@ -490,7 +490,7 @@ MonoBehaviour:
   _rendererType: 0
   _platformType: 1
   _initialConfiguration:
-    KeyboardNavigation: 0
+    KeyboardNavigation: 1
     GamepadNavigation: 0
     NavSetMousePos: 0
     NavNoCaptureKeyboard: 0

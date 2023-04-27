@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using ImGuiNET;
 using UnityEngine.InputSystem;
-using UnityEditor.ShaderGraph.Drawing.Inspector.PropertyDrawers;
-using Unity.Collections.LowLevel.Unsafe;
 
 public class DearIMGUI : MonoBehaviour
 {
@@ -38,68 +34,68 @@ public class DearIMGUI : MonoBehaviour
         {
             if(ImGui.Begin("Level Generator", ref levelGenWindowOpen))
             {
-            //     LevelGenerator levelGen = LevelGenerator.Instance;
+                LevelGenerator levelGen = LevelGenerator.Instance;
 
-            //     if (ImGui.Button("Generate Level Seed"))
-            //     {
-            //         levelGen.GenerateSeed();
-            //     }
+                if (ImGui.Button("Generate Level Seed"))
+                {
+                    levelGen.GenerateSeed();
+                }
 
-            //     ImGui.SameLine();
+                ImGui.SameLine();
 
-            //     if(ImGui.Button("Generate Level"))
-            //     {
-            //         levelGen.ClearLevel();
+                if(ImGui.Button("Generate Level"))
+                {
+                    levelGen.ClearLevel();
 
-            //         levelGen.GenerateLevel();
-            //     }
+                    levelGen.GenerateLevel();
+                }
 
-            //     ImGui.SameLine();
+                ImGui.SameLine();
 
-            //     if(ImGui.Button("Clear Level"))
-            //     {
-            //         levelGen.ClearLevel();
-            //     }
+                if(ImGui.Button("Clear Level"))
+                {
+                    levelGen.ClearLevel();
+                }
 
-            //     ImGui.Spacing();
+                ImGui.Spacing();
 
-            //     if(ImGui.CollapsingHeader("Settings"))
-            //     {
-            //         bool mNOBFB = levelGen.ManualNOBFB;
-            //         ImGui.Checkbox("Set Number of Branches from Base?", ref mNOBFB);
-            //         levelGen.ManualNOBFB = mNOBFB;
+                if(ImGui.CollapsingHeader("Settings"))
+                {
+                    bool randNumBranches = levelGen.RandomNumOfBranches;
+                    ImGui.Checkbox("Set Number of Branches?", ref randNumBranches);
+                    levelGen.RandomNumOfBranches = randNumBranches;
 
-            //         if(mNOBFB)
-            //         {
-            //             int nOBFB = levelGen.NumberOfBranchesFromBase;
-            //             ImGui.SliderInt("Number of Branches from Base", ref nOBFB, 1, 4);
-            //             levelGen.NumberOfBranchesFromBase = nOBFB;
-            //         }
+                    if(randNumBranches)
+                    {
+                        int numOfBranches = levelGen.NumberOfBranches;
+                        ImGui.SliderInt("Number of Branches", ref numOfBranches, 1, 4);
+                        levelGen.NumberOfBranches = numOfBranches;
+                    }
 
-            //         int mBS = levelGen.MaxBranchySize;
-            //         ImGui.InputInt("Max Branch Size", ref mBS);
-            //         levelGen.MaxBranchySize = mBS;
+                    int branchSize = levelGen.BranchLength;
+                    ImGui.InputInt("Branch Length", ref branchSize);
+                    levelGen.BranchLength = branchSize;
 
-            //         ImGui.Spacing();
+                    ImGui.Spacing();
 
-            //         int oBC = levelGen.OffBranchChance;
-            //         ImGui.SliderInt("Off Branching Chance", ref oBC, 0, 100);
-            //         levelGen.OffBranchChance = oBC;
+                    int offBranchChance = levelGen.OffBranchChance;
+                    ImGui.SliderInt("Off Branching Chnace", ref offBranchChance, 0, 100);
+                    levelGen.OffBranchChance = offBranchChance;
 
-            //         ImGui.Spacing();
+                    ImGui.Spacing();
 
-            //         bool aC = levelGen.AllowConnections;
-            //         ImGui.Checkbox("Allow Connections?", ref aC);
-            //         levelGen.AllowConnections = aC;
-            //     }
+                    bool doubleUp = levelGen.DoubleUpRooms;
+                    ImGui.Checkbox("Double Up Rooms?", ref doubleUp);
+                    levelGen.DoubleUpRooms = doubleUp;
+                }
 
-            //     ImGui.Spacing();
+                ImGui.Spacing();
 
-            //     if(ImGui.CollapsingHeader("Infomation"))
-            //     {
-            //         ImGui.Text($"Level Seed: {levelGen.GetLevelSeed}");
-            //         ImGui.Text($"Number of Rooms Generated: {levelGen.GetFloorCount}");
-            //     }
+                if(ImGui.CollapsingHeader("Infomation"))
+                {
+                    ImGui.Text($"Level Seed: {levelGen.LevelSeed}");
+                    ImGui.Text($"Number of Rooms Generated: {levelGen.RoomCount}");
+                }
 
                 
 
