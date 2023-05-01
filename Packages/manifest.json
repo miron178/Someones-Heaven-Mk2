@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.realgames.dear-imgui": "https://github.com/mattmanj17/dear-imgui-unity.git#matthewd",
+    "com.unity.ai.navigation": "1.0.0-exp.4",
     "com.unity.collab-proxy": "1.17.7",
     "com.unity.ide.rider": "3.0.18",
     "com.unity.ide.visualstudio": "2.0.17",
