@@ -36,10 +36,7 @@ public class DearIMGUI : MonoBehaviour
             {
                 LevelGenerator levelGen = LevelGenerator.Instance;
 
-                if (ImGui.Button("Generate Level Seed"))
-                {
-                    levelGen.GenerateSeed();
-                }
+                if (ImGui.Button("Generate Level Seed")) { levelGen.GenerateSeed(); }
 
                 ImGui.SameLine();
 
@@ -50,22 +47,26 @@ public class DearIMGUI : MonoBehaviour
                     levelGen.GenerateLevel();
                 }
 
-                ImGui.SameLine();
-
-                if(ImGui.Button("Clear Level"))
+                if(levelGen.RoomCount > 1)
                 {
-                    levelGen.ClearLevel();
+                    ImGui.SameLine();
+
+                    if(ImGui.Button("Generate Nav Mesh")) { levelGen.GenerateNavMesh(); }
+
+                    ImGui.SameLine();
+
+                    if(ImGui.Button("Clear Level")) { levelGen.ClearLevel(); }
                 }
 
                 ImGui.Spacing();
 
                 if(ImGui.CollapsingHeader("Settings"))
                 {
-                    bool randNumBranches = levelGen.RandomNumOfBranches;
-                    ImGui.Checkbox("Set Number of Branches?", ref randNumBranches);
-                    levelGen.RandomNumOfBranches = randNumBranches;
+                    bool manualBranches = levelGen.ManualNumOfBranches;
+                    ImGui.Checkbox("Set Number of Branches?", ref manualBranches);
+                    levelGen.ManualNumOfBranches = manualBranches;
 
-                    if(randNumBranches)
+                    if(manualBranches)
                     {
                         int numOfBranches = levelGen.NumberOfBranches;
                         ImGui.SliderInt("Number of Branches", ref numOfBranches, 1, 4);

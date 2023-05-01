@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 16156029}
   - component: {fileID: 16156030}
+  - component: {fileID: 16156031}
   m_Layer: 0
   m_Name: Level Generator
   m_TagString: Untagged
@@ -167,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67c88dbe53727cd49bad3d0582bff8a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_randBranches: 0
+  m_manualBranches: 0
   m_numofBranches: 4
   m_branchLength: 10
   m_doubleUp: 1
@@ -178,8 +179,39 @@ MonoBehaviour:
   m_eastPrefabs: []
   m_southPrefabs: []
   m_westPrefabs: []
+  m_navMeshSurface: {fileID: 16156031}
   m_rooms: []
   m_roomPositions: []
+--- !u!114 &16156031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 16156027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 2147483647
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 0}
+  m_BuildHeightMesh: 0
 --- !u!1 &172008953
 GameObject:
   m_ObjectHideFlags: 0
