@@ -13,6 +13,8 @@ public class LevelGenerator : MonoBehaviour
 
     //Random and Seed
     System.Random m_randomGenerator;
+    public System.Random RandomGenerator { get { return m_randomGenerator; } }
+
     int m_levelSeed = 4444;
     public int LevelSeed { get { return m_levelSeed; } }
 
@@ -51,6 +53,7 @@ public class LevelGenerator : MonoBehaviour
     [Header("Generated Variables", order = 2)]
     [SerializeField] List<GameObject> m_rooms;
     public int RoomCount { get { return m_rooms.Count; } }
+    public List<GameObject> Rooms { get { return m_rooms; } }
 
     [SerializeField] List<Vector3> m_roomPositions;
     [SerializeField] GameObject m_player = null;

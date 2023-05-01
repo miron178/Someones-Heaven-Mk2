@@ -7,6 +7,7 @@ public class DearIMGUI : MonoBehaviour
     bool uiOpen = false;
 
     bool levelGenWindowOpen = false;
+    bool roomGenWindowOpen = false;
 
     void Update()
     {
@@ -19,12 +20,23 @@ public class DearIMGUI : MonoBehaviour
 
     void OnLayout()
     {
+        LevelGenerator levelGen = LevelGenerator.Instance;
+        RoomGeneration roomGen = RoomGeneration.Instance;
+
         if (!ImGui.BeginMainMenuBar()) return;
         else
         {
             if(ImGui.Button("Level Generator"))
             {
                 levelGenWindowOpen = true;
+            }
+
+            if(levelGen.RoomCount > 1)
+            {
+                if(ImGui.Button("Room Generator"))
+                {
+                    roomGenWindowOpen = true;
+                }
             }
 
             ImGui.EndMainMenuBar();
@@ -34,8 +46,6 @@ public class DearIMGUI : MonoBehaviour
         {
             if(ImGui.Begin("Level Generator", ref levelGenWindowOpen))
             {
-                LevelGenerator levelGen = LevelGenerator.Instance;
-
                 if (ImGui.Button("Generate Level Seed")) { levelGen.GenerateSeed(); }
 
                 ImGui.SameLine();
@@ -108,6 +118,78 @@ public class DearIMGUI : MonoBehaviour
                 }
 
                 
+
+                ImGui.End();
+            }
+        }
+
+        if(roomGenWindowOpen)
+        {
+            if(ImGui.Begin("Room Generator", ref roomGenWindowOpen))
+            {
+                if(ImGui.Button("Generate Rooms"))
+                {
+                    roomGen.GenerateRooms();
+                }
+
+                ImGui.Spacing();
+
+                if(ImGui.CollapsingHeader("Settings"))
+                {
+                    if(ImGui.CollapsingHeader("Traps"))
+                    {
+                        bool setTrapAmount = roomGen.SetTrapAmount;
+                        ImGui.Checkbox("Set Trap Count?", ref setTrapAmount);
+                        roomGen.SetTrapAmount = setTrapAmount;
+
+                        if(setTrapAmount)
+                        {
+                            int trapAmount = roomGen.TrapAmount;
+                            ImGui.InputInt("Number of Traps", ref trapAmount);
+                            roomGen.TrapAmount = trapAmount;
+                        }
+                        else
+                        {
+                            int minTrapAmount = roomGen.MinTrapAmount;
+                            ImGui.InputInt("Minimum Number of Traps", ref minTrapAmount);
+                            roomGen.MinTrapAmount = minTrapAmount;
+
+                            int maxTrapAmount = roomGen.MaxTrapAmount;
+                            ImGui.InputInt("Maximum Number of Traps", ref maxTrapAmount);
+                            roomGen.MaxTrapAmount = maxTrapAmount;
+                        }
+                    }
+
+                    if(ImGui.CollapsingHeader("Enemies"))
+                    {
+                        bool setEnemyAmount = roomGen.SetEnemyAmount;
+                        ImGui.Checkbox("Set Enemy Count?", ref setEnemyAmount);
+                        roomGen.SetEnemyAmount = setEnemyAmount;
+
+                        if(setEnemyAmount)
+                        {
+                            int enemyAmount = roomGen.EnemyAmount;
+                            ImGui.InputInt("Number of Enemies", ref enemyAmount);
+                            roomGen.EnemyAmount = enemyAmount;
+                        }
+                        else
+                        {
+                            int minEnemyAmount = roomGen.MinEnemyAmount;
+                            ImGui.InputInt("Minimum Number of Enemies", ref minEnemyAmount);
+                            roomGen.MinEnemyAmount = minEnemyAmount;
+
+                            int maxEnemyAmount = roomGen.MaxEnemyAmount;
+                            ImGui.InputInt("Maximum Number of Enemies", ref maxEnemyAmount);
+                            roomGen.MaxEnemyAmount = maxEnemyAmount;
+                        }
+                    }
+                }
+
+                if(ImGui.CollapsingHeader("Infomation"))
+                {
+                    ImGui.Text($"Number of Traps: {roomGen.TrapCount}");
+                    ImGui.Text($"Number of Enemies: {roomGen.EnemyCount}");
+                }
 
                 ImGui.End();
             }
