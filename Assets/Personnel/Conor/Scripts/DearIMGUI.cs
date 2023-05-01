@@ -51,11 +51,20 @@ public class DearIMGUI : MonoBehaviour
                 {
                     ImGui.SameLine();
 
+                    if(ImGui.Button("Clear Level")) { levelGen.ClearLevel(); }
+
                     if(ImGui.Button("Generate Nav Mesh")) { levelGen.GenerateNavMesh(); }
 
                     ImGui.SameLine();
 
-                    if(ImGui.Button("Clear Level")) { levelGen.ClearLevel(); }
+                    if(levelGen.Player == null) 
+                    { 
+                        if(ImGui.Button("Spawn Player")) { levelGen.SpawnPlayer(); }
+                    }
+                    else
+                    {
+                        if(ImGui.Button("Delete Player")) { levelGen.DeletePlayer(); }
+                    }
                 }
 
                 ImGui.Spacing();
