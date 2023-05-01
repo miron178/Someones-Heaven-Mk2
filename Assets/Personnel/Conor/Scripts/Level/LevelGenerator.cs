@@ -40,14 +40,21 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] List<GameObject> m_eastPrefabs;
     [SerializeField] List<GameObject> m_southPrefabs;
     [SerializeField] List<GameObject> m_westPrefabs;
+    
     [SerializeField] NavMeshSurface m_navMeshSurface;
-    public void GenerateNavMesh() { Debug.Log("Building Nav Mesh!");  m_navMeshSurface.BuildNavMesh(); m_navMeshSurface.AddData(); }
+    public void GenerateNavMesh() { Debug.Log("Building Nav Mesh!");  m_navMeshSurface.BuildNavMesh(); /*m_navMeshSurface.AddData();*/ }
+
+    [SerializeField] GameObject m_playerPrefab;
+    public void SpawnPlayer() { m_player = Instantiate(m_playerPrefab, new Vector3(0,0,0), Quaternion.identity); }
+    public void DeletePlayer() { Destroy(m_player); m_player = null; }
 
     [Header("Generated Variables", order = 2)]
     [SerializeField] List<GameObject> m_rooms;
     public int RoomCount { get { return m_rooms.Count; } }
 
     [SerializeField] List<Vector3> m_roomPositions;
+    [SerializeField] GameObject m_player = null;
+    public GameObject Player { get { return m_player; } }
 
     void Awake()
     {
@@ -103,6 +110,8 @@ public class LevelGenerator : MonoBehaviour
 
     public void ClearLevel() 
     {
+        if(m_player != null) { DeletePlayer(); }
+
         foreach(GameObject gO in m_rooms)
         {
             Destroy(gO);
