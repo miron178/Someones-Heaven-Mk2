@@ -546,7 +546,7 @@ MonoBehaviour:
   maxHealth: 9
   health: 9
   isDead: 0
-  material: {fileID: 2100000, guid: 5c939248b77a7864fba2f9e4a54c6b3b, type: 2}
+  material: {fileID: 2100000, guid: 8849ece3c68df064099e9e49b6d428ab, type: 2}
   healthBar: {fileID: 0}
   smoothRotation: 0.364
   model: {fileID: 6539644201045393960}
