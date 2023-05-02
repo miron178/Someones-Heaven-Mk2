@@ -13,7 +13,16 @@ public class LevelGenerator : MonoBehaviour
 
     //Random and Seed
     System.Random m_randomGenerator;
-    public System.Random RandomGenerator { get { return m_randomGenerator; } }
+    public System.Random RandomGenerator 
+    { 
+        get 
+        {
+            //Init Random Engine using Seed
+            m_randomGenerator = new System.Random(m_levelSeed); 
+            return m_randomGenerator;
+        } 
+    }
+    public System.Random RandomGeneratorSame { get { return m_randomGenerator; } }
 
     int m_levelSeed = 4444;
     public int LevelSeed { get { return m_levelSeed; } }
@@ -106,9 +115,6 @@ public class LevelGenerator : MonoBehaviour
     {
         //Gets a Seed from Now.Millisecond and Gets a Random Value from it
         m_levelSeed = new System.Random(DateTime.Now.Millisecond).Next();
-
-        //Init Random Engine using Seed
-        m_randomGenerator = new System.Random(m_levelSeed);
     }
 
     public void ClearLevel() 
@@ -124,9 +130,11 @@ public class LevelGenerator : MonoBehaviour
         m_roomPositions.Clear();
     }
 
-    //Tasked Generate Level - Async Function
-    public void GenerateLevel()
+    //Generate Level
+    public void GenerateLevel(bool nextLevel = false)
     {
+        if(!nextLevel) { m_randomGenerator = new System.Random(m_levelSeed); }
+
         //In-Function Variables
         RoomInfo baseRoom;
         Vector3 currentPosition = Vector3.zero;
@@ -413,7 +421,6 @@ public class LevelGenerator : MonoBehaviour
         else
         {
             int index = m_randomGenerator.Next(0, avDir.Count);
-            print(index);
             return avDir[index];
         }
     }

@@ -583,7 +583,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1542913689}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 58.149254, y: -34.88385, z: -15.690813}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -643,13 +643,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_trapParent: {fileID: 262982240}
-  m_setTrapsAmount: 0
+  m_setTrapsAmount: 1
   m_trapAmount: 1
   m_minTrapAmount: 1
   m_maxTrapAmount: 3
   m_enemyParent: {fileID: 700040254}
-  m_setEnemyAmount: 0
-  m_enemyAmount: 1
+  m_setEnemyAmount: 1
+  m_enemyAmount: 0
   m_minEnemyAmount: 1
   m_maxEnemyAmount: 3
   m_trapPrefab: {fileID: 4035551911747403428, guid: 94b8c738b9f84fdf096c585a30a7b88e,

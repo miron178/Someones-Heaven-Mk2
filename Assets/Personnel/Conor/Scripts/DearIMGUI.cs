@@ -8,6 +8,7 @@ public class DearIMGUI : MonoBehaviour
 
     bool levelGenWindowOpen = false;
     bool roomGenWindowOpen = false;
+    bool allInOneGenWindowOpen = false;
 
     void Update()
     {
@@ -21,47 +22,241 @@ public class DearIMGUI : MonoBehaviour
     void OnLayout()
     {
         LevelGenerator levelGen = LevelGenerator.Instance;
-        RoomGeneration roomGen = RoomGeneration.Instance;
+        RoomGenerator roomGen = RoomGenerator.Instance;
+
+        ImGui.SetWindowSize(new Vector2(400, 400));
 
         if (!ImGui.BeginMainMenuBar()) return;
         else
         {
-            if(ImGui.Button("Level Generator"))
+            if(!levelGenWindowOpen)
             {
-                levelGenWindowOpen = true;
-            }
-
-            if(levelGen.RoomCount > 1)
-            {
-                if(ImGui.Button("Room Generator"))
+                if(!roomGenWindowOpen)
                 {
-                    roomGenWindowOpen = true;
+                    if(ImGui.Button("All-In-One-Generator"))
+                    {
+                        if(!allInOneGenWindowOpen) { allInOneGenWindowOpen = true; }
+                        else { allInOneGenWindowOpen = false; }
+                    }
                 }
             }
 
+            if(!allInOneGenWindowOpen)
+            {
+                if(ImGui.Button("Level Generator"))
+                {
+                    if(!levelGenWindowOpen) { levelGenWindowOpen = true; }
+                    else { levelGenWindowOpen = false; } 
+                }
+
+                if(levelGen.RoomCount > 1)
+                {
+                    if(ImGui.Button("Room Generator"))
+                    {
+                        if(!roomGenWindowOpen) { roomGenWindowOpen = true; }
+                        else { roomGenWindowOpen = false; }
+                    }
+                }
+                else { if(roomGenWindowOpen) { roomGenWindowOpen = false; } }
+            }
+
             ImGui.EndMainMenuBar();
+        }
+
+        if(allInOneGenWindowOpen)
+        {
+            if(ImGui.Begin("All-in-One Generator", ref allInOneGenWindowOpen))
+            {
+                if(levelGen.RoomCount == 0)
+                {
+                    if(ImGui.Button("Generate"))
+                    {
+                        levelGen.GenerateLevel();
+                        roomGen.GenerateTraps();
+                        levelGen.GenerateNavMesh();
+                        roomGen.GenerateEnemies();
+                        levelGen.SpawnPlayer();
+                    }
+
+                    ImGui.Spacing();
+                    ImGui.Text("Settings");
+
+                    if(ImGui.CollapsingHeader("Level Settings"))
+                    {
+                        bool manualBranches = levelGen.ManualNumOfBranches;
+                        ImGui.Checkbox("Set Number of Branches?", ref manualBranches);
+                        levelGen.ManualNumOfBranches = manualBranches;
+
+                        if(manualBranches)
+                        {
+                            int numOfBranches = levelGen.NumberOfBranches;
+                            ImGui.SliderInt("Number of Branches", ref numOfBranches, 1, 4);
+                            levelGen.NumberOfBranches = numOfBranches;
+                        }
+
+                        int branchSize = levelGen.BranchLength;
+                        ImGui.InputInt("Branch Length", ref branchSize);
+                        levelGen.BranchLength = branchSize;
+
+                        ImGui.Spacing();
+
+                        int offBranchChance = levelGen.OffBranchChance;
+                        ImGui.SliderInt("Off Branching Chnace", ref offBranchChance, 0, 100);
+                        levelGen.OffBranchChance = offBranchChance;
+
+                        ImGui.Spacing();
+
+                        bool doubleUp = levelGen.DoubleUpRooms;
+                        ImGui.Checkbox("Double Up Rooms?", ref doubleUp);
+                        levelGen.DoubleUpRooms = doubleUp;
+                    }
+
+                    if(ImGui.CollapsingHeader("Room Settings"))
+                    {
+                        ImGui.Text("Traps");
+
+                        bool setTrapAmount = roomGen.SetTrapAmount;
+                        ImGui.Checkbox("Set Trap Count?", ref setTrapAmount);
+                        roomGen.SetTrapAmount = setTrapAmount;
+
+                        if(setTrapAmount)
+                        {
+                            int trapAmount = roomGen.TrapAmount;
+                            ImGui.InputInt("Number of Traps", ref trapAmount);
+                            roomGen.TrapAmount = trapAmount;
+                        }
+                        else
+                        {
+                            int minTrapAmount = roomGen.MinTrapAmount;
+                            ImGui.InputInt("Minimum Number of Traps", ref minTrapAmount);
+                            roomGen.MinTrapAmount = minTrapAmount;
+
+                            int maxTrapAmount = roomGen.MaxTrapAmount;
+                            ImGui.InputInt("Maximum Number of Traps", ref maxTrapAmount);
+                            roomGen.MaxTrapAmount = maxTrapAmount;
+                        }
+
+                        ImGui.Spacing();
+                        ImGui.Text("Enemies");
+
+                        bool setEnemyAmount = roomGen.SetEnemyAmount;
+                        ImGui.Checkbox("Set Enemy Count?", ref setEnemyAmount);
+                        roomGen.SetEnemyAmount = setEnemyAmount;
+
+                        if(setEnemyAmount)
+                        {
+                            int enemyAmount = roomGen.EnemyAmount;
+                            ImGui.InputInt("Number of Enemies", ref enemyAmount);
+                            roomGen.EnemyAmount = enemyAmount;
+                        }
+                        else
+                        {
+                            int minEnemyAmount = roomGen.MinEnemyAmount;
+                            ImGui.InputInt("Minimum Number of Enemies", ref minEnemyAmount);
+                            roomGen.MinEnemyAmount = minEnemyAmount;
+
+                            int maxEnemyAmount = roomGen.MaxEnemyAmount;
+                            ImGui.InputInt("Maximum Number of Enemies", ref maxEnemyAmount);
+                            roomGen.MaxEnemyAmount = maxEnemyAmount;
+                        }
+                    }                
+                }
+                else
+                {
+                    if(ImGui.Button("Next Level"))
+                    {
+                        roomGen.ClearRoom();
+                        levelGen.ClearLevel();
+
+                        levelGen.GenerateLevel(true);
+                        roomGen.GenerateTraps(true);
+                        levelGen.GenerateNavMesh();
+                        roomGen.GenerateEnemies(true);
+                        levelGen.SpawnPlayer();
+                    }
+
+                    ImGui.SameLine();
+
+                    if(ImGui.Button("Clear Level"))
+                    {
+                        roomGen.ClearRoom();
+                        levelGen.ClearLevel();
+                    }
+
+                    ImGui.Spacing();
+
+                    if(ImGui.CollapsingHeader("Infomation"))
+                    {
+                        ImGui.Text($"Number of Rooms: {levelGen.RoomCount}");
+                        ImGui.Text($"Number of Traps: {roomGen.TrapCount}");
+                        ImGui.Text($"Number of Enemies: {roomGen.EnemyCount}");
+                    }
+                }
+            
+                ImGui.End();
+            }
         }
 
         if(levelGenWindowOpen)
         {
             if(ImGui.Begin("Level Generator", ref levelGenWindowOpen))
             {
-                if (ImGui.Button("Generate Level Seed")) { levelGen.GenerateSeed(); }
-
-                ImGui.SameLine();
-
-                if(ImGui.Button("Generate Level"))
+                if(levelGen.RoomCount == 0)
                 {
-                    levelGen.ClearLevel();
+                    if (ImGui.Button("Generate Level Seed")) { levelGen.GenerateSeed(); }
 
-                    levelGen.GenerateLevel();
-                }
-
-                if(levelGen.RoomCount > 1)
-                {
                     ImGui.SameLine();
 
+                    if(ImGui.Button("Generate Level")) { levelGen.GenerateLevel(); }
+
+                    ImGui.Spacing();
+
+                    if(ImGui.CollapsingHeader("Settings"))
+                    {
+                        bool manualBranches = levelGen.ManualNumOfBranches;
+                        ImGui.Checkbox("Set Number of Branches?", ref manualBranches);
+                        levelGen.ManualNumOfBranches = manualBranches;
+
+                        if(manualBranches)
+                        {
+                            int numOfBranches = levelGen.NumberOfBranches;
+                            ImGui.SliderInt("Number of Branches", ref numOfBranches, 1, 4);
+                            levelGen.NumberOfBranches = numOfBranches;
+                        }
+
+                        int branchSize = levelGen.BranchLength;
+                        ImGui.InputInt("Branch Length", ref branchSize);
+                        levelGen.BranchLength = branchSize;
+
+                        ImGui.Spacing();
+
+                        int offBranchChance = levelGen.OffBranchChance;
+                        ImGui.SliderInt("Off Branching Chnace", ref offBranchChance, 0, 100);
+                        levelGen.OffBranchChance = offBranchChance;
+
+                        ImGui.Spacing();
+
+                        bool doubleUp = levelGen.DoubleUpRooms;
+                        ImGui.Checkbox("Double Up Rooms?", ref doubleUp);
+                        levelGen.DoubleUpRooms = doubleUp;
+                    }
+
+                }
+                else if(levelGen.RoomCount > 1)
+                {
+
+                    if(ImGui.Button("Next Level")) 
+                    { 
+                        levelGen.ClearLevel();
+
+                        if(roomGen.TrapCount > 0 || roomGen.EnemyCount > 0) { roomGen.ClearRoom(); }
+
+                        levelGen.GenerateLevel(true);
+                    }
+
                     if(ImGui.Button("Clear Level")) { levelGen.ClearLevel(); }
+
+                    ImGui.SameLine();
 
                     if(ImGui.Button("Generate Nav Mesh")) { levelGen.GenerateNavMesh(); }
 
@@ -75,49 +270,15 @@ public class DearIMGUI : MonoBehaviour
                     {
                         if(ImGui.Button("Delete Player")) { levelGen.DeletePlayer(); }
                     }
-                }
 
-                ImGui.Spacing();
+                    ImGui.Spacing();
 
-                if(ImGui.CollapsingHeader("Settings"))
-                {
-                    bool manualBranches = levelGen.ManualNumOfBranches;
-                    ImGui.Checkbox("Set Number of Branches?", ref manualBranches);
-                    levelGen.ManualNumOfBranches = manualBranches;
-
-                    if(manualBranches)
+                    if(ImGui.CollapsingHeader("Infomation"))
                     {
-                        int numOfBranches = levelGen.NumberOfBranches;
-                        ImGui.SliderInt("Number of Branches", ref numOfBranches, 1, 4);
-                        levelGen.NumberOfBranches = numOfBranches;
+                        ImGui.Text($"Level Seed: {levelGen.LevelSeed}");
+                        ImGui.Text($"Number of Rooms Generated: {levelGen.RoomCount}");
                     }
-
-                    int branchSize = levelGen.BranchLength;
-                    ImGui.InputInt("Branch Length", ref branchSize);
-                    levelGen.BranchLength = branchSize;
-
-                    ImGui.Spacing();
-
-                    int offBranchChance = levelGen.OffBranchChance;
-                    ImGui.SliderInt("Off Branching Chnace", ref offBranchChance, 0, 100);
-                    levelGen.OffBranchChance = offBranchChance;
-
-                    ImGui.Spacing();
-
-                    bool doubleUp = levelGen.DoubleUpRooms;
-                    ImGui.Checkbox("Double Up Rooms?", ref doubleUp);
-                    levelGen.DoubleUpRooms = doubleUp;
                 }
-
-                ImGui.Spacing();
-
-                if(ImGui.CollapsingHeader("Infomation"))
-                {
-                    ImGui.Text($"Level Seed: {levelGen.LevelSeed}");
-                    ImGui.Text($"Number of Rooms Generated: {levelGen.RoomCount}");
-                }
-
-                
 
                 ImGui.End();
             }
@@ -127,16 +288,19 @@ public class DearIMGUI : MonoBehaviour
         {
             if(ImGui.Begin("Room Generator", ref roomGenWindowOpen))
             {
-                if(ImGui.Button("Generate Rooms"))
-                {
-                    roomGen.GenerateRooms();
-                }
+                if(roomGen.TrapCount == 0) { if(ImGui.Button("Generate Traps")) { roomGen.GenerateTraps(); } }
+                else { if(ImGui.Button("Clear Traps")) { roomGen.ClearTraps(); } }
 
-                ImGui.Spacing();
+                ImGui.SameLine();
 
-                if(ImGui.CollapsingHeader("Settings"))
+                if(roomGen.EnemyCount == 0) { if(ImGui.Button("Generate Enemies")) { roomGen.GenerateEnemies(); } }
+                else { if(ImGui.Button("Clear Enemies")) { roomGen.ClearEnemies(); } }
+                
+                if(roomGen.TrapCount == 0)
                 {
-                    if(ImGui.CollapsingHeader("Traps"))
+                    ImGui.Spacing();
+
+                    if(ImGui.CollapsingHeader("Trap Settings"))
                     {
                         bool setTrapAmount = roomGen.SetTrapAmount;
                         ImGui.Checkbox("Set Trap Count?", ref setTrapAmount);
@@ -159,8 +323,13 @@ public class DearIMGUI : MonoBehaviour
                             roomGen.MaxTrapAmount = maxTrapAmount;
                         }
                     }
+                }
 
-                    if(ImGui.CollapsingHeader("Enemies"))
+                if(roomGen.EnemyCount == 0)
+                {
+                    ImGui.Spacing();
+
+                    if(ImGui.CollapsingHeader("Enemy Settings"))
                     {
                         bool setEnemyAmount = roomGen.SetEnemyAmount;
                         ImGui.Checkbox("Set Enemy Count?", ref setEnemyAmount);
@@ -185,10 +354,15 @@ public class DearIMGUI : MonoBehaviour
                     }
                 }
 
-                if(ImGui.CollapsingHeader("Infomation"))
-                {
-                    ImGui.Text($"Number of Traps: {roomGen.TrapCount}");
-                    ImGui.Text($"Number of Enemies: {roomGen.EnemyCount}");
+                if(roomGen.TrapCount > 1 || roomGen.EnemyCount > 1) 
+                { 
+                    ImGui.Spacing();
+
+                    if(ImGui.CollapsingHeader("Infomation"))
+                    {
+                        if(roomGen.TrapCount > 1) { ImGui.Text($"Number of Traps: {roomGen.TrapCount}"); }
+                        if(roomGen.EnemyCount > 1) { ImGui.Text($"Number of Enemies: {roomGen.EnemyCount}"); }
+                    }
                 }
 
                 ImGui.End();

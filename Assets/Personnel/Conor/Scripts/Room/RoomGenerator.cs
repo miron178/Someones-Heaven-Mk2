@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RoomGeneration : MonoBehaviour
+public class RoomGenerator : MonoBehaviour
 {
-    private static RoomGeneration m_instance;
-    public static RoomGeneration Instance { get { return m_instance; } }
+    private static RoomGenerator m_instance;
+    public static RoomGenerator Instance { get { return m_instance; } }
 
     [Header("Generation Setting", order = 1)]
     //Traps
@@ -45,9 +45,19 @@ public class RoomGeneration : MonoBehaviour
     [Header("Generated Variables", order = 3)]
     [SerializeField] List<GameObject> m_traps;
     public int TrapCount { get { return m_traps.Count; } }
+    public void ClearTraps()
+    {
+        foreach(GameObject gO in m_traps) { Destroy(gO); }
+        m_traps.Clear();
+    }
 
     [SerializeField] List<GameObject> m_enemies;
     public int EnemyCount { get { return m_enemies.Count; } }
+    public void ClearEnemies()
+    {
+        foreach(GameObject gO in m_enemies) { Destroy(gO); }
+        m_enemies.Clear();
+    }
 
     void Awake()
     {
@@ -57,15 +67,31 @@ public class RoomGeneration : MonoBehaviour
         m_enemyPrefabs = Resources.LoadAll<GameObject>("Prefabs/Enemies");
     }
 
-    public void GenerateRooms()
+    public void ClearRoom()
+    {
+        foreach(GameObject gO in m_traps) { Destroy(gO); }
+        foreach(GameObject gO in m_enemies) { Destroy(gO); }
+
+        m_traps.Clear();
+        m_enemies.Clear();
+    }
+
+    public void GenerateTraps(bool nextRoom = false)
     {
         LevelGenerator levelGen = LevelGenerator.Instance;
+        System.Random randomGen;
 
-        if(!m_setTrapsAmount) { m_trapAmount = levelGen.RandomGenerator.Next(m_minTrapAmount, m_maxEnemyAmount + 1); }
-        if(!m_setEnemyAmount) { m_enemyAmount = levelGen.RandomGenerator.Next(m_minEnemyAmount, m_maxEnemyAmount + 1); }
+        if(!nextRoom) {  randomGen = levelGen.RandomGenerator;}
+        else { randomGen = levelGen.RandomGeneratorSame; }
+
+        if(!m_setTrapsAmount) { m_trapAmount = randomGen.Next(m_minTrapAmount, m_maxEnemyAmount + 1); }
+
+        bool skipFirstRoom = true;
 
         foreach(GameObject gO in levelGen.Rooms)
         {
+            if(skipFirstRoom) { skipFirstRoom = false; continue; }
+
             List<GameObject> floors = Utilities.FindRoomFloors(gO);
             List<int> pickedIndex = new List<int>();
 
@@ -78,18 +104,47 @@ public class RoomGeneration : MonoBehaviour
                 {
                     if(passes == 10) { break; }
 
-                    int index = levelGen.RandomGenerator.Next(0, floors.Count);
+                    int index = randomGen.Next(0, floors.Count);
                     if(pickedIndex.Contains(index)) { passes++; continue; }
 
                     Transform floorTransform = floors[index].transform;
 
-                    m_traps.Add(Instantiate(m_trapPrefab, new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z), Quaternion.identity, m_trapParent.transform));
+                    Vector3 trapPlacement = new Vector3(
+                        floorTransform.position.x + 2,
+                        floorTransform.position.y,
+                        floorTransform.position.z - 3.5f
+                    );
+
+                    GameObject trap = Instantiate(m_trapPrefab, trapPlacement, Quaternion.identity, floorTransform.parent);
+
+                    m_traps.Add(trap);
 
                     trapPlaced = true;
                 }
-            }
+            }  
+        }
+    }
 
-            for(int i = 0; i < m_trapAmount; i++)
+    public void GenerateEnemies(bool nextRoom = false)
+    {
+        LevelGenerator levelGen = LevelGenerator.Instance;
+        System.Random randomGen;
+
+        if(!nextRoom) {  randomGen = levelGen.RandomGenerator; }
+        else { randomGen = levelGen.RandomGeneratorSame; }
+
+        if(!m_setEnemyAmount) { m_enemyAmount = randomGen.Next(m_minEnemyAmount, m_maxEnemyAmount + 1); }
+
+        bool skipFirstRoom = true;
+
+        foreach(GameObject gO in levelGen.Rooms)
+        {
+            if(skipFirstRoom) { skipFirstRoom = false; continue; }
+
+            List<GameObject> floors = Utilities.FindRoomFloors(gO);
+            List<int> pickedIndex = new List<int>();
+
+            for(int i = 0; i < m_enemyAmount; i++)
             {
                 bool enemyPlaced = false;
                 int passes = 0;
@@ -98,12 +153,12 @@ public class RoomGeneration : MonoBehaviour
                 {
                     if(passes == 10) { break; }
 
-                    int index = levelGen.RandomGenerator.Next(0, floors.Count);
+                    int index = randomGen.Next(0, floors.Count);
                     if(pickedIndex.Contains(index)) { passes++; continue; }
 
                     Transform floorTransform = floors[index].transform;
 
-                    m_enemies.Add(Instantiate(m_enemyPrefabs[levelGen.RandomGenerator.Next(0, m_enemyPrefabs.Length)], new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z), Quaternion.identity, m_enemyParent.transform));
+                    m_enemies.Add(Instantiate(m_enemyPrefabs[randomGen.Next(0, m_enemyPrefabs.Length)], new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z), Quaternion.identity, m_enemyParent.transform));
 
                     enemyPlaced = true;
                 }
