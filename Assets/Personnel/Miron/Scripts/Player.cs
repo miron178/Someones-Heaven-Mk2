@@ -183,9 +183,12 @@ public class Player : MonoBehaviour
         //material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
 
         //transparant when IsInvincible
-        Color color = CanRoll() ? Color.green : Color.yellow;
-        color.a = IsInvincible() ? 0.5f : 1f;
-        material.color = color;
+        if (material != null)
+        {
+            Color color = CanRoll() ? Color.green : Color.yellow;
+            color.a = IsInvincible() ? 0.5f : 1f;
+            material.color = color;
+        }
     }
 
 	void StartIdle()
@@ -237,7 +240,7 @@ public class Player : MonoBehaviour
 		//TODO: do things on reset
 		//Enjoy being dead
 	}
-    
+
     public void OnMove(InputAction.CallbackContext context)
     {
         // read the value for the "move" action each event call
