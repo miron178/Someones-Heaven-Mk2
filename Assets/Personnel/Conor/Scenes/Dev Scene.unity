@@ -267,7 +267,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &700040254
 GameObject:
@@ -298,7 +298,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &722239580
 GameObject:
@@ -708,7 +708,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1542913689}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f279374617413ee01a1fd9e2d33ac206, type: 3}
+  m_Script: {fileID: 11500000, guid: ada4334490d3a45eab308bcc56f942fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_trapParent: {fileID: 262982240}
@@ -718,7 +718,7 @@ MonoBehaviour:
   m_maxTrapAmount: 3
   m_enemyParent: {fileID: 700040254}
   m_setEnemyAmount: 1
-  m_enemyAmount: 0
+  m_enemyAmount: 1
   m_minEnemyAmount: 1
   m_maxEnemyAmount: 3
   m_trapPrefab: {fileID: 4035551911747403428, guid: 94b8c738b9f84fdf096c585a30a7b88e,
