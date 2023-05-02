@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Pushable
 {
     public NavMeshAgent agent;
 
@@ -277,7 +277,7 @@ public class Enemy : MonoBehaviour
         player.AddPull(direction.normalized * pullForce);
     }
 
-    public void Push(Vector3 force)
+    public override void Push(Vector3 force)
     {
         StartPush();
         rb.AddForce(force);

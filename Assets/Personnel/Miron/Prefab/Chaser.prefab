@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2483611562729190532}
   - component: {fileID: 1935717906}
   - component: {fileID: 1831387268}
+  - component: {fileID: 5169364250816653347}
   m_Layer: 6
   m_Name: Chaser
   m_TagString: Untagged
@@ -127,7 +128,9 @@ MonoBehaviour:
   pullForce: 1
   bulletPrefab: {fileID: 0}
   shoot: 0
+  shootMaxAngle: 30
   material: {fileID: 0}
+  gun: {fileID: 0}
 --- !u!195 &1935717906
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -166,6 +169,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5169364250816653347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2483611562729190654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7abf65cdd792d4448ae0fbd3badb7a89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8770053092227469502
 GameObject:
   m_ObjectHideFlags: 0
