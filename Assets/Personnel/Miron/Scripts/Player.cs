@@ -254,9 +254,21 @@ public class Player : MonoBehaviour
         {
             foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
             {
-                Enemy tempEnemy = target.GetComponent<Enemy>();
-                Vector3 dir = tempEnemy.transform.position - transform.position;
-                tempEnemy.Push(dir.normalized * pushForce);
+                Vector3 dir = target.transform.position - transform.position;
+                Vector3 force = dir.normalized * pushForce;
+                Pushable pushable = target.GetComponent<Pushable>();
+                if (pushable)
+                {
+                    pushable.Push(force);
+                }
+                else
+                {
+                    Rigidbody rb = target.GetComponent<Rigidbody>();
+                    if (rb)
+                    {
+                        rb.AddForce(force);
+                    }
+                }
             }
         }
     }
