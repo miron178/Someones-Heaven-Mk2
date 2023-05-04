@@ -120,6 +120,7 @@ public class Player : MonoBehaviour
         float correctHeight = controller.center.y + controller.skinWidth;
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
+        healthBar = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<HealthBar>();
 
         if (healthBar)
         {

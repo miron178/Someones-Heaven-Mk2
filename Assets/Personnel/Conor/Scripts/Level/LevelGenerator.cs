@@ -117,7 +117,14 @@ public class LevelGenerator : MonoBehaviour
     //Generate Level
     public void GenerateLevel(bool nextLevel = false)
     {
-        m_floorParent = Instantiate(new GameObject(), new Vector3(0, 0, 0), Quaternion.identity).transform;
+        GameObject m_floorParentObj = new GameObject();
+        m_floorParentObj.name = "Rooms";
+        m_floorParentObj.AddComponent<DeathField>();
+        BoxCollider bC = m_floorParentObj.AddComponent<BoxCollider>();
+        bC.isTrigger = true;
+        bC.center = new Vector3(0, -5, 0);
+        bC.size = new Vector3(1000, 1, 1000);
+        m_floorParent = m_floorParentObj.transform;
 
         if(!nextLevel) { m_random = m_gameManager.RandomGenerator; }
         else { m_random = m_gameManager.RandomGeneratorSame; }

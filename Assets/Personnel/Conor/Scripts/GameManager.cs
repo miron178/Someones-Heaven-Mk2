@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        GenerateSeed();
         m_levelGenerator.GenerateLevel();
         m_roomGenerator.GenerateTraps();
         m_levelGenerator.GenerateNavMesh();
