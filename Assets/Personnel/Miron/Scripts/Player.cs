@@ -13,7 +13,9 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private float speed = 5f;
-    private float speedBoost = 0f;
+	[SerializeField]
+	private float runSpeed = 10f;
+	private float speedBoost = 0f;
     private float speedBoostEnd = 0f;
 
     public float Speed
@@ -45,8 +47,18 @@ public class Player : MonoBehaviour
     private float rollDuration = 0.5f;
 	[SerializeField]
 	private bool useGravityOnRoll = false;
+	[SerializeField]
+	private float jumpSpeed = 10;
+	[SerializeField]
+	private bool canJump = true;
+	[SerializeField]
+	private float JumpCD = 1;
+	[SerializeField]
+	private float jumpDuration = 0.5f;
+	[SerializeField]
+	private bool useGravityOnJump = false;
 
-    [SerializeField]
+	[SerializeField]
     private int maxHealth = 9;
     private int maxHealthBoost = 0;
     private float maxHealthBoostEnd = 0;
@@ -84,8 +96,11 @@ public class Player : MonoBehaviour
 	private Vector3 rollVelocity;
     private float rollStart;
     private float rollEnd;
+	private Vector3 jumpVelocity;
+	private float jumpStart;
+	private float jumpEnd;
 
-    [SerializeField]
+	[SerializeField]
     Material material;
 
     [SerializeField]
@@ -98,6 +113,8 @@ public class Player : MonoBehaviour
 
     private Sensor pushSensor;
 
+	public float animationSwitchTime = 0.2f;
+
     [SerializeField]
     GameObject model;
 
@@ -105,8 +122,10 @@ public class Player : MonoBehaviour
     {
 		IDLE,
 		WALKING,
+		RUNNING,
         FALLING,
         ROLLING,
+		JUMPING,
 		DEAD,
     }
     private State state = State.FALLING;
@@ -129,11 +148,21 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-
-		if (Animator)
-			Animator.SetBool("IsJumping", false);
-		if (Animator)
-			Animator.SetBool("TakeDamage", false);
+		if (Keyboard.current[Key.LeftShift].wasPressedThisFrame && moveVelocity.sqrMagnitude >= 0) {
+			StartRun();
+		}
+		if (Keyboard.current[Key.LeftShift].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
+			StartWalk();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
+		}
+		if (Keyboard.current[Key.LeftCtrl].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
+			StartWalk();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
+		}
+		if (Keyboard.current[Key.X].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
+			StartJump();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
+		}
 		switch (state)
         {
 			case State.IDLE:
@@ -146,16 +175,23 @@ public class Player : MonoBehaviour
                 if(Animator)
 				    Animator.SetBool("IsMoving", true);
 				break;
-            case State.FALLING:
+			case State.RUNNING:
+				Run();
+				if (Animator)
+					Animator.SetBool("IsRunning", true);
+				break;
+			case State.FALLING:
                 Fall();
                 break;
             case State.ROLLING:
+				Roll();
+				if (Animator)
+					Animator.SetBool("IsRolling", true);
+				break;
+			case State.JUMPING:
 				if (Animator)
 					Animator.SetBool("IsJumping", true);
-				Roll();
-				
-
-
+				Jump();
 				break;
 			case State.DEAD:
 				if (Animator)
@@ -189,6 +225,7 @@ public class Player : MonoBehaviour
             color.a = IsInvincible() ? 0.5f : 1f;
             material.color = color;
         }
+
     }
 
 	void StartIdle()
@@ -219,8 +256,6 @@ public class Player : MonoBehaviour
 		if (!IsInvincible())
         {
             health -= damage < health ? damage : health;
-			if (Animator)
-				Animator.SetBool("TakeDamage", true);
 		}
      
         if (health == 0)
@@ -246,9 +281,11 @@ public class Player : MonoBehaviour
         // read the value for the "move" action each event call
         Vector2 moveAmount = context.ReadValue<Vector2>();
         moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
-    }
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+	}
+	
 
-    public void OnPush(InputAction.CallbackContext context)
+	public void OnPush(InputAction.CallbackContext context)
     {
         if (context.performed && state != State.DEAD)
         {
@@ -271,18 +308,26 @@ public class Player : MonoBehaviour
                 }
             }
         }
-    }
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+	}
 
     public void OnRoll(InputAction.CallbackContext context)
     {
         if (context.performed && controller.isGrounded && CanRoll() && state != State.DEAD)
         {
             StartRoll();
-			
+			Invoke("SwitchAnimationBools", animationSwitchTime);
 		}
     }
 
-    private void StartWalk()
+	public void OnJump(InputAction.CallbackContext context) {
+		if (context.performed && controller.isGrounded && CanJump() && state != State.DEAD) {
+			StartJump();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
+		}
+	}
+
+	private void StartWalk()
     {
         state = State.WALKING;
     }
@@ -318,7 +363,36 @@ public class Player : MonoBehaviour
 		}
     }
 
-    private void StartFall()
+	private void StartRun() {
+		state = State.RUNNING;
+	}
+
+	private void Run() {
+		velocity = moveVelocity * runSpeed + pull;
+		velocity.y = gravity;
+
+		Vector3 movement = velocity * Time.deltaTime;
+
+		//ignore Gravity for minMoveDistance check
+		Vector3 movementXZ = movement;
+		movementXZ.y = 0;
+
+		if (model != null) {
+			Quaternion lookAt = Quaternion.LookRotation(movementXZ);
+			model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
+		}
+
+		if (movementXZ.magnitude >= controller.minMoveDistance) {
+			controller.Move(movement);
+			if (!controller.isGrounded) {
+				StartFall();
+			}
+		} else {
+			StartIdle();
+		}
+	}
+
+	private void StartFall()
     {
         state = State.FALLING;
     }
@@ -385,7 +459,47 @@ public class Player : MonoBehaviour
 		
     }
 
-    bool IsInvincible()
+	private bool CanJump() {
+		return canJump && Time.time >= jumpStart;
+	}
+
+	private void StartJump() {
+
+		Vector3 horizVelocity = new Vector3(velocity.x, 0, velocity.z);
+		if (horizVelocity.sqrMagnitude > 0) {
+			jumpVelocity = horizVelocity.normalized * jumpSpeed;
+		} else {
+			jumpVelocity = transform.forward * jumpSpeed;
+		}
+		jumpVelocity.y = useGravityOnJump ? gravity : 0;
+		jumpEnd = Time.time + jumpDuration;
+		jumpStart = jumpEnd + JumpCD;
+
+		state = State.JUMPING;
+
+		AddInvinciblity(invincibiltyDuration);
+
+	}
+
+	private void Jump() {
+
+		if (Time.time < jumpEnd) {
+			velocity = jumpVelocity + pull;
+			Vector3 movement = velocity * Time.deltaTime;
+			controller.Move(movement);
+		} else {
+			velocity = Vector3.zero;
+		}
+
+		if (Time.time >= jumpEnd || (useGravityOnJump && !controller.isGrounded)) {
+
+			StartFall();
+
+		}
+		
+	}
+
+	bool IsInvincible()
     {
 		return Time.time < invincibiltyEnd;
 		
@@ -440,4 +554,15 @@ public class Player : MonoBehaviour
     {
         pull += force;
     }
+
+	private void SwitchAnimationBools() {
+		if (Animator)
+			Animator.SetBool("IsJumping", false);
+		if (Animator)
+			Animator.SetBool("IsRolling", false);
+		if (Animator)
+			Animator.SetBool("IsRunning", false);
+		if (Animator)
+			Animator.SetBool("TakeDamage", true);
+	}
 }

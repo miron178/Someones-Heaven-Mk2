@@ -43,6 +43,8 @@ public class Enemy : Pushable
     private float pullStart = 0;
     private bool isPulling = false;
 
+	public bool isScared;
+
     [SerializeField]
     private GameObject bulletPrefab;
 
@@ -62,10 +64,14 @@ public class Enemy : Pushable
     GameObject closest;
 
     Rigidbody rb;
+
 	
 
+	//public int speed;
+	
     private void Start()
     {
+
 		enemyAnimator = GetComponent<Animator>();
 
         rb = GetComponent<Rigidbody>();
@@ -140,7 +146,11 @@ public class Enemy : Pushable
 
     void FixedUpdate()
     {
-        if (IsPushActive())
+		
+		if (isScared) {
+			EnemyScared();
+		}
+        else if (IsPushActive())
         {
             Vector3 horiz = rb.velocity;
             horiz.y = 0;
@@ -204,7 +214,11 @@ public class Enemy : Pushable
         return Time.time >= attackTime && TargetInRange() && (!shoot || ShootAngleInRange());
     }
 
-    private void Attack()
+	private void Idle() {
+
+	}
+
+	private void Attack()
     {
         if (enemyAnimator)
         {
@@ -302,4 +316,39 @@ public class Enemy : Pushable
         }
 
     }
+
+	private void OnTriggerEnter(Collider other) {
+		if (other.tag == "Torch") {
+			EnemyScared();
+			isScared = true;
+		}
+	}
+
+	private void OnTriggerExit(Collider other) {
+		if (other.tag == "Torch") {
+			NotScared();
+		}
+	}
+
+	public void EnemyScared() {
+		agent.speed.Equals(0);
+		agent.angularSpeed.Equals(0);
+		agent.acceleration.Equals(0);
+		isScared = true;
+		agent.isStopped = true;
+
+		//if (enemyAnimator) {
+		//	enemyAnimator.SetBool("isScared", true);
+		//}
+
+		//Destroy(gameObject);
+	}
+
+	public void NotScared() {
+		agent.speed.Equals(3);
+		agent.angularSpeed.Equals(120);
+		agent.acceleration.Equals(8);
+		isScared = false;
+		agent.isStopped = false;
+	}
 }
