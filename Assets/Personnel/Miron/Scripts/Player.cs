@@ -113,6 +113,8 @@ public class Player : MonoBehaviour
 
     private Sensor pushSensor;
 
+	public float animationSwitchTime = 0.2f;
+
     [SerializeField]
     GameObject model;
 
@@ -146,19 +148,20 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-
-		
-		
-
-		
 		if (Keyboard.current[Key.LeftShift].wasPressedThisFrame && moveVelocity.sqrMagnitude >= 0) {
 			StartRun();
 		}
 		if (Keyboard.current[Key.LeftShift].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
 			StartWalk();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
+		}
+		if (Keyboard.current[Key.LeftCtrl].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
+			StartWalk();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
 		}
 		if (Keyboard.current[Key.X].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
 			StartJump();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
 		}
 		switch (state)
         {
@@ -181,9 +184,9 @@ public class Player : MonoBehaviour
                 Fall();
                 break;
             case State.ROLLING:
+				Roll();
 				if (Animator)
 					Animator.SetBool("IsRolling", true);
-				Roll();
 				break;
 			case State.JUMPING:
 				if (Animator)
@@ -222,6 +225,7 @@ public class Player : MonoBehaviour
             color.a = IsInvincible() ? 0.5f : 1f;
             material.color = color;
         }
+
     }
 
 	void StartIdle()
@@ -277,7 +281,8 @@ public class Player : MonoBehaviour
         // read the value for the "move" action each event call
         Vector2 moveAmount = context.ReadValue<Vector2>();
         moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
-    }
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+	}
 	
 
 	public void OnPush(InputAction.CallbackContext context)
@@ -303,19 +308,22 @@ public class Player : MonoBehaviour
                 }
             }
         }
-    }
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+	}
 
     public void OnRoll(InputAction.CallbackContext context)
     {
         if (context.performed && controller.isGrounded && CanRoll() && state != State.DEAD)
         {
             StartRoll();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
 		}
     }
 
 	public void OnJump(InputAction.CallbackContext context) {
 		if (context.performed && controller.isGrounded && CanJump() && state != State.DEAD) {
 			StartJump();
+			Invoke("SwitchAnimationBools", animationSwitchTime);
 		}
 	}
 
@@ -488,8 +496,7 @@ public class Player : MonoBehaviour
 			StartFall();
 
 		}
-		if (Animator)
-			Animator.SetBool("IsJumping", false);
+		
 	}
 
 	bool IsInvincible()
