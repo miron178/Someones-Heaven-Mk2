@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Light
   - Shadow
+  - Torch
   layers:
   - Default
   - TransparentFX
