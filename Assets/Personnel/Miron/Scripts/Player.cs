@@ -252,18 +252,15 @@ public class Player : MonoBehaviour
 	}
 
     public void TakeDamage(int damage)
-    {
-		
+    {	
 		if (!IsInvincible())
         {
             health -= damage < health ? damage : health;
-		}
-     
+		} 
         if (health == 0)
         {
             Die();
         }
-		
 	}
 
     void Die()
