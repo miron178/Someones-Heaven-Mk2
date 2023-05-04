@@ -738,11 +738,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67c88dbe53727cd49bad3d0582bff8a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_manualBranches: 0
-  m_numofBranches: 4
-  m_branchLength: 10
-  m_doubleUp: 1
-  m_offBranchChance: 50
+  m_manualBranches: 1
+  m_numofBranches: 3
+  m_branchLength: 5
+  m_doubleUp: 0
+  m_offBranchChance: 0
   m_floorParent: {fileID: 722239584}
   m_roomPrefabs: []
   m_northPrefabs: []
