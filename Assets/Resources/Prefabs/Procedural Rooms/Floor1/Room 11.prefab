@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8564515517842151143}
   - component: {fileID: 6789617522520858159}
+  - component: {fileID: 8924511199647109209}
+  - component: {fileID: -547456972413933472}
   m_Layer: 0
   m_Name: Room 11
   m_TagString: Untagged
@@ -68,6 +70,32 @@ MonoBehaviour:
   - Direction: 3
     Offset: {x: 0, y: 0, z: -24.5}
   m_availableDirections: 
+--- !u!114 &8924511199647109209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2958496465699043014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cecf2d2d010b2b54185abddd0e53dfae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_enemies: []
+--- !u!65 &-547456972413933472
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2958496465699043014}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 50, y: 2, z: 50}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &3753600887313145946
 GameObject:
   m_ObjectHideFlags: 0
