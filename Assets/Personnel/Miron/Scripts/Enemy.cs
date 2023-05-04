@@ -80,6 +80,10 @@ public class Enemy : Pushable
 
         foreach (GameObject target in targets)
         {
+            Player player = target.GetComponent<Player>();
+            if (!player)
+                continue;
+
             Vector3 difference = target.transform.position - pos;
             float currentDistance = difference.sqrMagnitude;
             if (currentDistance < distance)
