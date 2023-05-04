@@ -8,6 +8,8 @@ TagManager:
   - Shadow
   - Floor
   - FloorParent
+  - MainCharacter
+  - HealthBar
   layers:
   - Default
   - TransparentFX

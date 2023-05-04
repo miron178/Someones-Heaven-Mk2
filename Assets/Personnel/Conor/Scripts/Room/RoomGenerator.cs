@@ -7,10 +7,11 @@ public class RoomGenerator : MonoBehaviour
     private static RoomGenerator m_instance;
     public static RoomGenerator Instance { get { return m_instance; } }
 
+    GameManager m_gameManager;
+    System.Random m_random;
+
     [Header("Generation Setting", order = 1)]
     //Traps
-    [SerializeField] GameObject m_trapParent;
-
     [SerializeField] bool m_setTrapsAmount = false;
     public bool SetTrapAmount { get { return m_setTrapsAmount; } set { m_setTrapsAmount = value; } }
 
@@ -24,7 +25,7 @@ public class RoomGenerator : MonoBehaviour
     public int MaxTrapAmount { get { return m_maxTrapAmount; } set { m_maxTrapAmount = value; } }
 
     //Enemies
-    [SerializeField] GameObject m_enemyParent;
+    GameObject m_enemyParent;
 
     [SerializeField] bool m_setEnemyAmount = false;
     public bool SetEnemyAmount { get { return m_setEnemyAmount; } set { m_setEnemyAmount = value; } }
@@ -67,10 +68,14 @@ public class RoomGenerator : MonoBehaviour
         m_enemyPrefabs = Resources.LoadAll<GameObject>("Prefabs/Enemies");
     }
 
+    void Start() { m_gameManager = GameManager.Instance; }
+
     public void ClearRoom()
     {
         foreach(GameObject gO in m_traps) { Destroy(gO); }
         foreach(GameObject gO in m_enemies) { Destroy(gO); }
+
+        Destroy(m_enemyParent);
 
         m_traps.Clear();
         m_enemies.Clear();
@@ -79,12 +84,11 @@ public class RoomGenerator : MonoBehaviour
     public void GenerateTraps(bool nextRoom = false)
     {
         LevelGenerator levelGen = LevelGenerator.Instance;
-        System.Random randomGen;
 
-        if(!nextRoom) {  randomGen = levelGen.RandomGenerator;}
-        else { randomGen = levelGen.RandomGeneratorSame; }
+        if(!nextRoom) {  m_random = m_gameManager.RandomGenerator;}
+        else { m_random = m_gameManager.RandomGeneratorSame; }
 
-        if(!m_setTrapsAmount) { m_trapAmount = randomGen.Next(m_minTrapAmount, m_maxEnemyAmount + 1); }
+        if(!m_setTrapsAmount) { m_trapAmount = m_random.Next(m_minTrapAmount, m_maxEnemyAmount + 1); }
 
         bool skipFirstRoom = true;
 
@@ -104,7 +108,7 @@ public class RoomGenerator : MonoBehaviour
                 {
                     if(passes == 10) { break; }
 
-                    int index = randomGen.Next(0, floors.Count);
+                    int index = m_random.Next(0, floors.Count);
                     if(pickedIndex.Contains(index)) { passes++; continue; }
 
                     Transform floorTransform = floors[index].transform;
@@ -127,13 +131,14 @@ public class RoomGenerator : MonoBehaviour
 
     public void GenerateEnemies(bool nextRoom = false)
     {
+        m_enemyParent = new GameObject();
+        m_enemyParent.name = "Enemies";
         LevelGenerator levelGen = LevelGenerator.Instance;
-        System.Random randomGen;
 
-        if(!nextRoom) {  randomGen = levelGen.RandomGenerator; }
-        else { randomGen = levelGen.RandomGeneratorSame; }
+        if(!nextRoom) {  m_random = m_gameManager.RandomGenerator; }
+        else { m_random = m_gameManager.RandomGeneratorSame; }
 
-        if(!m_setEnemyAmount) { m_enemyAmount = randomGen.Next(m_minEnemyAmount, m_maxEnemyAmount + 1); }
+        if(!m_setEnemyAmount) { m_enemyAmount = m_random.Next(m_minEnemyAmount, m_maxEnemyAmount + 1); }
 
         bool skipFirstRoom = true;
 
@@ -153,16 +158,15 @@ public class RoomGenerator : MonoBehaviour
                 {
                     if(passes == 10) { break; }
 
-                    int index = randomGen.Next(0, floors.Count);
+                    int index = m_random.Next(0, floors.Count);
                     if(pickedIndex.Contains(index)) { passes++; continue; }
 
                     Transform floorTransform = floors[index].transform;
                     Vector3 pos = new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z);
 
-                    GameObject enemy = Instantiate(m_enemyPrefabs[randomGen.Next(0, m_enemyPrefabs.Length)], pos, Quaternion.identity, m_enemyParent.transform);
+                    GameObject enemy = Instantiate(m_enemyPrefabs[m_random.Next(0, m_enemyPrefabs.Length)], pos, Quaternion.identity, m_enemyParent.transform);
 
                     m_enemies.Add(enemy);
-                    print(gO.name);
                     gO.GetComponent<RoomActivation>().AddEnemy(enemy);
                     gO.GetComponent<RoomActivation>().AddEnemyPosition(pos);
 
