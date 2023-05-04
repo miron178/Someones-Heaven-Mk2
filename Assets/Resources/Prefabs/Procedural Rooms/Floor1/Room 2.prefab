@@ -320,6 +320,8 @@ GameObject:
   m_Component:
   - component: {fileID: 9148790722135767343}
   - component: {fileID: 4561483412786460980}
+  - component: {fileID: -5956789135697982869}
+  - component: {fileID: 6526536592853457231}
   m_Layer: 0
   m_Name: Room 2
   m_TagString: Untagged
@@ -365,6 +367,32 @@ MonoBehaviour:
   - Direction: 4
     Offset: {x: -24.5, y: 0, z: 0}
   m_availableDirections: 
+--- !u!114 &-5956789135697982869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5855222272320271008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cecf2d2d010b2b54185abddd0e53dfae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_enemies: []
+--- !u!65 &6526536592853457231
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5855222272320271008}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 50, y: 2, z: 50}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1001 &334071648141046093
 PrefabInstance:
   m_ObjectHideFlags: 0

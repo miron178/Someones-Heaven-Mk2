@@ -157,12 +157,20 @@ public class RoomGenerator : MonoBehaviour
                     if(pickedIndex.Contains(index)) { passes++; continue; }
 
                     Transform floorTransform = floors[index].transform;
+                    Vector3 pos = new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z);
 
-                    m_enemies.Add(Instantiate(m_enemyPrefabs[randomGen.Next(0, m_enemyPrefabs.Length)], new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z), Quaternion.identity, m_enemyParent.transform));
+                    GameObject enemy = Instantiate(m_enemyPrefabs[randomGen.Next(0, m_enemyPrefabs.Length)], pos, Quaternion.identity, m_enemyParent.transform);
+
+                    m_enemies.Add(enemy);
+                    print(gO.name);
+                    gO.GetComponent<RoomActivation>().AddEnemy(enemy);
+                    gO.GetComponent<RoomActivation>().AddEnemyPosition(pos);
 
                     enemyPlaced = true;
                 }
             }
+
+            gO.GetComponent<RoomActivation>().DisableEnemies();
         }
     }
 }
