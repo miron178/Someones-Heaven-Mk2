@@ -12,7 +12,7 @@ public class DeathField : MonoBehaviour
         if (other.GetComponent<CharacterController>() != null)
         {
             other.GetComponent<CharacterController>().enabled = false;
-            other.gameObject.transform.position = m_destination.position;
+            other.gameObject.transform.position = new Vector3(0, 1, 0);
             other.GetComponent<CharacterController>().enabled = true;
         }
         else

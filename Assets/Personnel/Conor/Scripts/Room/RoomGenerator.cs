@@ -131,8 +131,8 @@ public class RoomGenerator : MonoBehaviour
 
     public void GenerateEnemies(bool nextRoom = false)
     {
-        m_enemyParent = Instantiate(new GameObject(), new Vector3(0, 0, 0), Quaternion.identity);
-
+        m_enemyParent = new GameObject();
+        m_enemyParent.name = "Enemies";
         LevelGenerator levelGen = LevelGenerator.Instance;
 
         if(!nextRoom) {  m_random = m_gameManager.RandomGenerator; }
@@ -167,7 +167,6 @@ public class RoomGenerator : MonoBehaviour
                     GameObject enemy = Instantiate(m_enemyPrefabs[m_random.Next(0, m_enemyPrefabs.Length)], pos, Quaternion.identity, m_enemyParent.transform);
 
                     m_enemies.Add(enemy);
-                    print(gO.name);
                     gO.GetComponent<RoomActivation>().AddEnemy(enemy);
                     gO.GetComponent<RoomActivation>().AddEnemyPosition(pos);
 
