@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7023532678817199451}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -703,7 +703,7 @@ GameObject:
   - component: {fileID: 6539644201237462098}
   m_Layer: 0
   m_Name: Character Mesh 1 Body
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

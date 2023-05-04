@@ -179,6 +179,7 @@ public class DearIMGUI : MonoBehaviour
 
                     if(ImGui.Button("Clear Level"))
                     {
+                        levelGen.DeletePlayer();
                         roomGen.ClearRoom();
                         levelGen.ClearLevel();
                     }
