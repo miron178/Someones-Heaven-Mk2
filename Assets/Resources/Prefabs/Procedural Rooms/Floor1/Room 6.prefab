@@ -497,6 +497,8 @@ MonoBehaviour:
     Offset: {x: 0, y: 0, z: -24.5}
   - Direction: 4
     Offset: {x: -24.5, y: 0, z: 0}
+  - Direction: 2
+    Offset: {x: 24.5, y: 0, z: 0}
   m_availableDirections: 
 --- !u!1 &6824748956142935033
 GameObject:
