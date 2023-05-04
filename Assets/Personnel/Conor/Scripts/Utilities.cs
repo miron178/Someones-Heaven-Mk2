@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Rendering;
+using UnityEngine;
 
 public static class Utilities
 {
@@ -44,5 +43,29 @@ public static class Utilities
         }
 
         return newArray;
+    }
+
+    public static List<GameObject> FindRoomFloors(GameObject room)
+    {
+        List<GameObject> childrenMatched = new List<GameObject>();
+        Transform t = room.transform;
+
+        for(int i = 0; i < t.childCount; i++)
+        {
+            if(t.GetChild(i).gameObject.tag == "FloorParent") 
+            { 
+                Transform cT = t.GetChild(i);
+
+                for(int j = 0; j < cT.childCount; j++)
+                {
+                    if(cT.GetChild(j).gameObject.tag == "Floor")
+                    {
+                        childrenMatched.Add(cT.GetChild(j).gameObject);
+                    }
+                }
+            }
+        }
+
+        return childrenMatched;
     }
 }

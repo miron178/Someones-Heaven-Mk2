@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Pushable
 {
     public NavMeshAgent agent;
 
@@ -86,6 +86,10 @@ public class Enemy : MonoBehaviour
 
         foreach (GameObject target in targets)
         {
+            Player player = target.GetComponent<Player>();
+            if (!player)
+                continue;
+
             Vector3 difference = target.transform.position - pos;
             float currentDistance = difference.sqrMagnitude;
             if (currentDistance < distance)
@@ -291,7 +295,7 @@ public class Enemy : MonoBehaviour
         player.AddPull(direction.normalized * pullForce);
     }
 
-    public void Push(Vector3 force)
+    public override void Push(Vector3 force)
     {
         StartPush();
         rb.AddForce(force);

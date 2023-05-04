@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using UnityEngine;
+using Unity.AI.Navigation;
 
 public class LevelGenerator : MonoBehaviour
 {
@@ -12,12 +13,23 @@ public class LevelGenerator : MonoBehaviour
 
     //Random and Seed
     System.Random m_randomGenerator;
+    public System.Random RandomGenerator 
+    { 
+        get 
+        {
+            //Init Random Engine using Seed
+            m_randomGenerator = new System.Random(m_levelSeed); 
+            return m_randomGenerator;
+        } 
+    }
+    public System.Random RandomGeneratorSame { get { return m_randomGenerator; } }
+
     int m_levelSeed = 4444;
     public int LevelSeed { get { return m_levelSeed; } }
 
     [Header("Generator Settings", order = 0)]
-    [SerializeField] bool m_randBranches = false;
-    public bool RandomNumOfBranches { get { return m_randBranches; } set { m_randBranches = value; }}
+    [SerializeField] bool m_manualBranches = false;
+    public bool ManualNumOfBranches { get { return m_manualBranches; } set { m_manualBranches = value; }}
 
     [SerializeField] int m_numofBranches = 1;
     public int NumberOfBranches { get { return m_numofBranches; } set { m_numofBranches = value; } }
@@ -40,11 +52,21 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] List<GameObject> m_southPrefabs;
     [SerializeField] List<GameObject> m_westPrefabs;
     
+    [SerializeField] NavMeshSurface m_navMeshSurface;
+    public void GenerateNavMesh() { Debug.Log("Building Nav Mesh!");  m_navMeshSurface.BuildNavMesh(); /*m_navMeshSurface.AddData();*/ }
+
+    [SerializeField] GameObject m_playerPrefab;
+    public void SpawnPlayer() { m_player = Instantiate(m_playerPrefab, new Vector3(0,0,0), Quaternion.identity); }
+    public void DeletePlayer() { Destroy(m_player); m_player = null; }
+
     [Header("Generated Variables", order = 2)]
     [SerializeField] List<GameObject> m_rooms;
     public int RoomCount { get { return m_rooms.Count; } }
+    public List<GameObject> Rooms { get { return m_rooms; } }
 
     [SerializeField] List<Vector3> m_roomPositions;
+    [SerializeField] GameObject m_player = null;
+    public GameObject Player { get { return m_player; } }
 
     void Awake()
     {
@@ -85,19 +107,20 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
         }
+
+        GenerateSeed();
     }
 
     public void GenerateSeed()
     {
         //Gets a Seed from Now.Millisecond and Gets a Random Value from it
         m_levelSeed = new System.Random(DateTime.Now.Millisecond).Next();
-
-        //Init Random Engine using Seed
-        m_randomGenerator = new System.Random(m_levelSeed);
     }
 
     public void ClearLevel() 
     {
+        if(m_player != null) { DeletePlayer(); }
+
         foreach(GameObject gO in m_rooms)
         {
             Destroy(gO);
@@ -107,9 +130,11 @@ public class LevelGenerator : MonoBehaviour
         m_roomPositions.Clear();
     }
 
-    //Tasked Generate Level - Async Function
-    public void GenerateLevel()
+    //Generate Level
+    public void GenerateLevel(bool nextLevel = false)
     {
+        if(!nextLevel) { m_randomGenerator = new System.Random(m_levelSeed); }
+
         //In-Function Variables
         RoomInfo baseRoom;
         Vector3 currentPosition = Vector3.zero;
@@ -120,7 +145,7 @@ public class LevelGenerator : MonoBehaviour
         baseRoom = SpawnFloor(m_roomPrefabs[0], Vector3.zero);
 
         //Decide the number of Branches
-        if(m_randBranches == true) { numberOfBranches = m_randomGenerator.Next(1, 5); }
+        if(m_manualBranches == false) { numberOfBranches = m_randomGenerator.Next(1, 5); }
         else { numberOfBranches = m_numofBranches; }
 
         Debug.Log("Generating Directions from Base Branch");
@@ -197,7 +222,7 @@ public class LevelGenerator : MonoBehaviour
         }
 
         currentRoom = SpawnFloor(roomObject, newPos);
-        currentRoom.RemoveDirection(dir);
+        currentRoom.RemoveDirection(GetReverseDirection(dir));
 
         currentPosition = newPos;
 
@@ -211,6 +236,9 @@ public class LevelGenerator : MonoBehaviour
                 if(passes == 10) { break; }
 
                 dir = PickDirection(currentRoom);
+
+                if(dir == Direction.None) { break; }
+
                 roomObject = PickNextRoom(dir);
 
                 newPos = PushDirection(currentPosition, currentRoom, dir);
@@ -234,14 +262,20 @@ public class LevelGenerator : MonoBehaviour
 
                         passes++;
 
+                        currentRoom.RemoveDirection(dir);
+
                         continue;
                     }
+
+                    currentRoom.RemoveDirection(dir);
 
                     roomObject = tempObject;
                     newPos = tempPos;
                     dir = tempDir;
+                    currentRoom = tempSpawn;
                 }
 
+                currentRoom.RemoveDirection(dir);
                 currentRoom = SpawnFloor(roomObject, newPos);
                 currentRoom.RemoveDirection(GetReverseDirection(dir));
 
@@ -279,6 +313,8 @@ public class LevelGenerator : MonoBehaviour
 
                 dir = PickDirection(rI);
 
+                if(dir == Direction.None) { break; }
+
                 gO = PickNextRoom(dir);
 
                 newPos = PushDirection(currentOffPos, rI, dir);
@@ -294,13 +330,17 @@ public class LevelGenerator : MonoBehaviour
                     Vector3 newNewPos = PushDirection(newPos, tempSpawn, newNewDir);
                     if(newNewPos == new Vector3(-1, -1, -1)) { passes++; m_roomPositions.Remove(newPos); m_rooms.Remove(tempSpawn.gameObject); Destroy(tempSpawn.gameObject); continue; }
 
+                    rI.RemoveDirection(dir);
+
                     dir = newNewDir;
                     gO = newNextRoom;
                     newPos = newNewPos;
+                    rI = tempSpawn;
                 }
 
-                rI = SpawnFloor(gO, newPos);
                 rI.RemoveDirection(dir);
+                rI = SpawnFloor(gO, newPos);
+                rI.RemoveDirection(GetReverseDirection(dir));
 
                 currentOffPos = newPos;
 
@@ -310,7 +350,7 @@ public class LevelGenerator : MonoBehaviour
             if(!posFound) { Debug.LogWarning("Off-Branch Terminated!"); return; }
             else
             {
-                if(m_randomGenerator.Next(1, 101) < m_offBranchChance)
+                if(m_randomGenerator.Next(1, 101) < Mathf.FloorToInt(m_offBranchChance / currentOffBranchCount))
                 {
                     OffBranching(currentOffBranchCount + 1, currentOffPos, rI);
                 }
@@ -375,12 +415,12 @@ public class LevelGenerator : MonoBehaviour
     Direction PickDirection(RoomInfo currentRoom)
     {
         List<Direction> avDir = currentRoom.GetAvailableDirections;
-
-        if(avDir.Count == 1) { return avDir[0]; }
+        
+        if(avDir.Count == 0) { return Direction.None; }
+        else if(avDir.Count == 1) { return avDir[0]; }
         else
         {
             int index = m_randomGenerator.Next(0, avDir.Count);
-
             return avDir[index];
         }
     }

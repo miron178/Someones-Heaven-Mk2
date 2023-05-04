@@ -216,9 +216,12 @@ public class Player : MonoBehaviour
         //material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
 
         //transparant when IsInvincible
-        Color color = CanRoll() ? Color.green : Color.yellow;
-        color.a = IsInvincible() ? 0.5f : 1f;
-        material.color = color;
+        if (material != null)
+        {
+            Color color = CanRoll() ? Color.green : Color.yellow;
+            color.a = IsInvincible() ? 0.5f : 1f;
+            material.color = color;
+        }
     }
 
 	void StartIdle()
@@ -268,7 +271,7 @@ public class Player : MonoBehaviour
 		//TODO: do things on reset
 		//Enjoy being dead
 	}
-    
+
     public void OnMove(InputAction.CallbackContext context)
     {
         // read the value for the "move" action each event call
@@ -283,9 +286,21 @@ public class Player : MonoBehaviour
         {
             foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
             {
-                Enemy tempEnemy = target.GetComponent<Enemy>();
-                Vector3 dir = tempEnemy.transform.position - transform.position;
-                tempEnemy.Push(dir.normalized * pushForce);
+                Vector3 dir = target.transform.position - transform.position;
+                Vector3 force = dir.normalized * pushForce;
+                Pushable pushable = target.GetComponent<Pushable>();
+                if (pushable)
+                {
+                    pushable.Push(force);
+                }
+                else
+                {
+                    Rigidbody rb = target.GetComponent<Rigidbody>();
+                    if (rb)
+                    {
+                        rb.AddForce(force);
+                    }
+                }
             }
         }
     }
