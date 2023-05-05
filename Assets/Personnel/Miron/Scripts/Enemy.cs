@@ -330,6 +330,10 @@ public class Enemy : Pushable
 		}
 	}
 
+	private void EnemyWander() {
+
+	}
+
 	public void EnemyScared() {
 		agent.speed.Equals(0);
 		agent.angularSpeed.Equals(0);
@@ -360,4 +364,6 @@ public class Enemy : Pushable
 			enemyAnimator.SetBool("isMoving", false);
 		}
 	}
+
+	
 }

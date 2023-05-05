@@ -281,7 +281,15 @@ public class Player : MonoBehaviour
         moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
 		Invoke("SwitchAnimationBools", animationSwitchTime);
 	}
-	
+
+	public void OnRun(InputAction.CallbackContext context) {
+		// read the value for the "move" action each event call
+		StartRun();
+		Vector2 moveAmount = context.ReadValue<Vector2>();
+		moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+	}
+
 
 	public void OnPush(InputAction.CallbackContext context)
     {
