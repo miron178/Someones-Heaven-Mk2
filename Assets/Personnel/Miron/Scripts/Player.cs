@@ -278,7 +278,7 @@ public class Player : MonoBehaviour
     {
         // read the value for the "move" action each event call
         Vector2 moveAmount = context.ReadValue<Vector2>();
-        moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
+        moveVelocity = (Vector3.right * moveAmount.x + Vector3.forward * moveAmount.y);
 		Invoke("SwitchAnimationBools", animationSwitchTime);
 	}
 
