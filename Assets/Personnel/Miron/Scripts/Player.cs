@@ -118,6 +118,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     GameObject model;
 
+    private FollowMouse followMouse = null;
+
     private enum State
     {
 		IDLE,
@@ -134,6 +136,7 @@ public class Player : MonoBehaviour
     {
 		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
+        followMouse = GetComponent<FollowMouse>();
         CharacterController controller = GetComponent<CharacterController>();
         // calculate the correct vertical position:
         float correctHeight = controller.center.y + controller.skinWidth;
@@ -349,7 +352,7 @@ public class Player : MonoBehaviour
 		Vector3 movementXZ = movement;
 		movementXZ.y = 0;
 
-        if (model != null)
+        if (model != null && !followMouse.enabled)
         {
             Quaternion lookAt = Quaternion.LookRotation(movementXZ);
             model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
@@ -458,9 +461,7 @@ public class Player : MonoBehaviour
 
         if (Time.time >= rollEnd || (useGravityOnRoll && !controller.isGrounded))
         {
-			
 			StartFall();
-			
 		}
 		
     }
