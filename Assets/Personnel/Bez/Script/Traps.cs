@@ -37,4 +37,22 @@ public class Traps : MonoBehaviour
 		Vector3 pull = cp.normal * force * -1;
 		player.AddPull(pull);
 	}
+
+    private void OnTriggerEnter(Collider other)
+    {
+		if (other.tag != "Player") { return; }
+		else
+		{
+			if (player == null)
+			{
+				player = other.gameObject.GetComponent<Player>();
+			}
+
+			if (Time.time > damageCDEnd)
+			{
+				player.TakeDamage(damage);
+				damageCDEnd = Time.time + damageCD;
+			}
+		}
+	}
 }
