@@ -12083,21 +12083,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 496769281210133808, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
         type: 3}
-      propertyPath: m_LocalScale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 496769281210133808, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 496769281210133808, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 496769281210133808, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
-        type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.5
       objectReference: {fileID: 0}
@@ -12150,11 +12135,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Spinning Spike Wall (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 7400926084518620558, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
-        type: 3}
-      propertyPath: rotationspeed
-      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7a0e38c7d1a81846b5c3531fe2f3a51, type: 3}
@@ -13683,21 +13663,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 496769281210133808, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
         type: 3}
-      propertyPath: m_LocalScale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 496769281210133808, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 496769281210133808, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 496769281210133808, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
-        type: 3}
       propertyPath: m_LocalPosition.x
       value: -10
       objectReference: {fileID: 0}
@@ -13750,11 +13715,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Spinning Spike Wall
-      objectReference: {fileID: 0}
-    - target: {fileID: 7400926084518620558, guid: d7a0e38c7d1a81846b5c3531fe2f3a51,
-        type: 3}
-      propertyPath: rotationspeed
-      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7a0e38c7d1a81846b5c3531fe2f3a51, type: 3}
