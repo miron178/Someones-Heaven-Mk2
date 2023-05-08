@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -2583547378338668839}
   - component: {fileID: 7400926084518620558}
   - component: {fileID: 6288192901132532539}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spinning Spike Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec529b565df5c4f41bfc74455140bb4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  force: 10
+  force: 20
   damage: 1
   damageCD: 2
 --- !u!114 &7400926084518620558
