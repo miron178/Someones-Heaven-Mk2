@@ -760,7 +760,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ee7941251cd9364fb0f0753ce8f07dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerPrefab: {fileID: 5662382525852154502, guid: 3f6114d1251fff8da99f4ece9cf2bc98,
+  m_playerPrefab: {fileID: 8587251080209003147, guid: 8222c577b21a5754e9533917daa4040d,
     type: 3}
 --- !u!114 &745702768
 MonoBehaviour:
