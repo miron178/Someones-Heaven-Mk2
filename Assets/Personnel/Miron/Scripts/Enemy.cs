@@ -224,7 +224,6 @@ public class Enemy : Pushable
         {
             enemyAnimator.SetBool("isAttacking", true);
         }
-
         bool hit = Random.value <= hitChance;
         if (hit)
         {
@@ -243,6 +242,7 @@ public class Enemy : Pushable
             }
         }
         attackTime = Time.time + attackCD;
+		Invoke("SwitchAnimationBools", 0.2f);
     }
 
     public void StartPull()
@@ -330,6 +330,10 @@ public class Enemy : Pushable
 		}
 	}
 
+	private void EnemyWander() {
+
+	}
+
 	public void EnemyScared() {
 		agent.speed.Equals(0);
 		agent.angularSpeed.Equals(0);
@@ -351,4 +355,15 @@ public class Enemy : Pushable
 		isScared = false;
 		agent.isStopped = false;
 	}
+
+	private void SwitchAnimationBools() {
+		if (enemyAnimator) {
+			enemyAnimator.SetBool("isAttacking", false);
+		}
+		if (enemyAnimator) {
+			enemyAnimator.SetBool("isMoving", false);
+		}
+	}
+
+	
 }

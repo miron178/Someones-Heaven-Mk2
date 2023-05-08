@@ -63,7 +63,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 660211180}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e3dc5aae80d64042aaec5e5f360516f, type: 3}
   m_Name: 
@@ -84,6 +84,7 @@ GameObject:
   - component: {fileID: 2828482584548335709}
   - component: {fileID: 2065026128}
   - component: {fileID: 278456333}
+  - component: {fileID: 215725602596234441}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -185,6 +186,9 @@ MonoBehaviour:
   isDead: 0
   material: {fileID: 2100000, guid: 5c939248b77a7864fba2f9e4a54c6b3b, type: 2}
   healthBar: {fileID: 0}
+  smoothRotation: 0.1
+  model: {fileID: 0}
+  followMouse: 0
 --- !u!143 &2828482584548335709
 CharacterController:
   m_ObjectHideFlags: 0
@@ -339,3 +343,16 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &215725602596234441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2828482584548336039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e3dc5aae80d64042aaec5e5f360516f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useCamera: {fileID: 0}

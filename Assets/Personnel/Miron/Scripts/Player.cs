@@ -120,6 +120,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     GameObject model;
 
+    private FollowMouse followMouse = null;
+
     private enum State
     {
 		IDLE,
@@ -142,6 +144,7 @@ public class Player : MonoBehaviour
     {
 		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
+        followMouse = GetComponent<FollowMouse>();
         CharacterController controller = GetComponent<CharacterController>();
         // calculate the correct vertical position:
         float correctHeight = controller.center.y + controller.skinWidth;
@@ -260,18 +263,15 @@ public class Player : MonoBehaviour
 	}
 
     public void TakeDamage(int damage)
-    {
-		
+    {	
 		if (!IsInvincible())
         {
             health -= damage < health ? damage : health;
-		}
-     
+		} 
         if (health == 0)
         {
             Die();
         }
-		
 	}
 
     void Die()
@@ -292,10 +292,18 @@ public class Player : MonoBehaviour
     {
         // read the value for the "move" action each event call
         Vector2 moveAmount = context.ReadValue<Vector2>();
-        moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
+        moveVelocity = (Vector3.right * moveAmount.x + Vector3.forward * moveAmount.y);
 		Invoke("SwitchAnimationBools", animationSwitchTime);
 	}
-	
+
+	public void OnRun(InputAction.CallbackContext context) {
+		// read the value for the "move" action each event call
+		StartRun();
+		Vector2 moveAmount = context.ReadValue<Vector2>();
+		moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+	}
+
 
 	public void OnPush(InputAction.CallbackContext context)
     {
@@ -355,7 +363,7 @@ public class Player : MonoBehaviour
 		Vector3 movementXZ = movement;
 		movementXZ.y = 0;
 
-        if (model != null)
+        if (model != null && !followMouse.enabled)
         {
             Quaternion lookAt = Quaternion.LookRotation(movementXZ);
             model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
@@ -464,9 +472,7 @@ public class Player : MonoBehaviour
 
         if (Time.time >= rollEnd || (useGravityOnRoll && !controller.isGrounded))
         {
-			
 			StartFall();
-			
 		}
 		
     }
