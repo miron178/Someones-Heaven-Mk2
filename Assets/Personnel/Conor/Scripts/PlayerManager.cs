@@ -8,7 +8,7 @@ public class PlayerManager : MonoBehaviour
 
     [SerializeField] GameObject m_playerPrefab;
     GameObject m_player;
-    public void SpawnPlayer() { m_player = Instantiate(m_playerPrefab, new Vector3(0,0,0), Quaternion.identity); }
+    public void SpawnPlayer() { m_player = Instantiate(m_playerPrefab, new Vector3(0,1,0), Quaternion.identity); }
     public void DeletePlayer() { Destroy(m_player); m_player = null; }
 
     void Awake()
