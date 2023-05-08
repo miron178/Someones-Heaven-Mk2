@@ -32,9 +32,9 @@ public class Traps : MonoBehaviour
 			}
 		}
 
-		//ContactPoint cp = collision.contacts[0];
+		ContactPoint cp = collision.contacts[0];
 
-		//Vector3 pull = cp.normal * force * -1;
-		//player.AddPull(pull);
+		Vector3 pull = cp.normal * force * -1;
+		player.AddPull(pull);
 	}
 }
