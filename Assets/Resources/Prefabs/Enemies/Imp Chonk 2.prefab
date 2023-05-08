@@ -144,6 +144,7 @@ GameObject:
   - component: {fileID: 4353641316808009520}
   - component: {fileID: 4353641316808009535}
   - component: {fileID: 4353641316808009534}
+  - component: {fileID: -2959532852121040670}
   m_Layer: 6
   m_Name: Imp Chonk 2
   m_TagString: Untagged
@@ -205,6 +206,7 @@ MonoBehaviour:
   pullDuration: Infinity
   pullCD: 3
   pullForce: 1
+  isScared: 0
   bulletPrefab: {fileID: 0}
   shoot: 0
   shootMaxAngle: 30
@@ -268,6 +270,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+--- !u!114 &-2959532852121040670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4353641316808009532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7abf65cdd792d4448ae0fbd3badb7a89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4353641316812715739
 GameObject:
   m_ObjectHideFlags: 0
