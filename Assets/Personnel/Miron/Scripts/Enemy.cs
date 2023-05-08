@@ -90,7 +90,9 @@ public class Enemy : Pushable
 
     void FixedUpdate()
     {
-        EnemyWander();
+		if (isIdle) {
+			EnemyWander();
+		}
         //if (isScared)
         //{
         //    EnemyScared();
@@ -131,36 +133,42 @@ public class Enemy : Pushable
 
     private void Idle()
     {
-        //if (isIdle == true && agent.speed >= 0)
-        //{
-        //    agent.speed.Equals(0);
-        //    agent.angularSpeed.Equals(0);
-        //    agent.acceleration.Equals(0);
-        //    agent.isStopped = true;
-        //    agent.SetDestination(this.gameObject.transform.position);
-        //    if (enemyAnimator)
-        //    {
-        //        enemyAnimator.SetBool("isIdle", true);
-        //    }
-        //    Invoke("IdleOff", 10);
-        //    Debug.Log("Idle");
-        //}
-    }
+
+		if (enemyAnimator) {
+			enemyAnimator.SetBool("isMoving", false);
+		}
+		isIdle = true;
+		//if (isIdle == true && agent.speed >= 0)
+		//{
+		//    agent.speed.Equals(0);
+		//    agent.angularSpeed.Equals(0);
+		//    agent.acceleration.Equals(0);
+		//    agent.isStopped = true;
+		//    agent.SetDestination(this.gameObject.transform.position);
+		//    if (enemyAnimator)
+		//    {
+		//        enemyAnimator.SetBool("isIdle", true);
+		//    }
+		//    Invoke("IdleOff", 10);
+		//    Debug.Log("Idle");
+		//}
+	}
 
     private void EnemyWander()
     {
-        //if (isIdle == true && agent.speed != 0)
-        //{
-        //    agent.speed.Equals(3);
-        //    agent.angularSpeed.Equals(120);
-        //    agent.acceleration.Equals(8);
-        //    isScared = false;
-        //    agent.isStopped = false;
-        //    nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
-        //    agent.SetDestination(nextPosition);
-            
-        //}
+		//if (isIdle == true && agent.speed != 0)
+		//{
+		//    agent.speed.Equals(3);
+		//    agent.angularSpeed.Equals(120);
+		//    agent.acceleration.Equals(8);
+		//    isScared = false;
+		//    agent.isStopped = false;
+		//    nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
+		//    agent.SetDestination(nextPosition);
 
+		//}
+
+		isIdle = false;
         if (Vector3.Distance(nextPosition, transform.position) <= 1.5f)
         {
             nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
@@ -209,9 +217,9 @@ public class Enemy : Pushable
             }
         }
         return closest;
-    }
+	}
 
-    bool IsPushActive()
+	bool IsPushActive()
     {
         return !agent.enabled;
     }
@@ -283,8 +291,6 @@ public class Enemy : Pushable
     {
         return Time.time >= attackTime && TargetInRange() && (!shoot || ShootAngleInRange());
     }
-
-	
 
     private void Attack()
     {
@@ -396,11 +402,21 @@ public class Enemy : Pushable
 			EnemyPause();
 			isScared = true;
 		}
+		if (other.tag == "Player") {
+			isIdle = false;
+			MoveToClosest();
+			Debug.Log("SeenPlayer");
+		}
 	}
 
 	private void OnTriggerExit(Collider other) {
 		if (other.tag == "Torch") {
 			EnemyUnpause();
+		}
+		if (other.tag == "Player") {
+			isIdle = true;
+			Idle();
+			Debug.Log("LostPlayer");
 		}
 	}
 

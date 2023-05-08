@@ -58,6 +58,9 @@ public class Player : MonoBehaviour
 	[SerializeField]
 	private bool useGravityOnJump = false;
 
+	
+
+
 	[SerializeField]
     private int maxHealth = 9;
     private int maxHealthBoost = 0;
@@ -118,7 +121,19 @@ public class Player : MonoBehaviour
     [SerializeField]
     GameObject model;
 
-    private enum State
+	public GameObject currentPlayerTorch;
+
+	public Rigidbody torchRB; public bool canThrow;
+
+	public Torch torch;
+
+	public int torchThrowSpeed;
+
+	public Vector3 torchThrowVector;
+
+	public Transform torchThrower;
+
+	private enum State
     {
 		IDLE,
 		WALKING,
@@ -132,6 +147,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+		torch = this.gameObject.GetComponent<Torch>();
 		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
         CharacterController controller = GetComponent<CharacterController>();
@@ -140,6 +156,9 @@ public class Player : MonoBehaviour
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
         healthBar = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<HealthBar>();
+		torchThrowSpeed = 50;
+
+		torchThrowVector = new Vector3(torchThrowSpeed, 0, 0);
 
         if (healthBar)
         {
@@ -274,7 +293,37 @@ public class Player : MonoBehaviour
 		//Enjoy being dead
 	}
 
-    public void OnMove(InputAction.CallbackContext context)
+	public void OnThrow(InputAction.CallbackContext context) {
+		currentPlayerTorch = torch.currentTorch;
+		Instantiate(currentPlayerTorch, torchThrower.position, Quaternion.identity);
+		{
+			
+			//torchThrowVector = torchThrower.gameObject.GetComponent<Transform>();
+			//Torch 
+			// Instantiate the projectile at the position and rotation of this transform
+			Rigidbody currentTorch;
+			currentTorch = Instantiate(torchRB, transform.position, transform.rotation);
+
+			// Give the cloned object an initial velocity along the current
+			// object's Z axis
+			currentTorch.velocity = transform.TransformDirection(Vector3.forward * 100);
+			currentTorch.velocity = new Vector3(10, 0, 0);
+			Invoke("ThrowSwitch", 3);
+		}
+		//if (canThrow) {
+		//	canThrow = false;
+		//}	
+	}
+
+	public void ThrowSwitch() {
+		canThrow = true;
+	}
+
+	public void ThrowForce() {
+
+	}
+
+	public void OnMove(InputAction.CallbackContext context)
     {
         // read the value for the "move" action each event call
         Vector2 moveAmount = context.ReadValue<Vector2>();
