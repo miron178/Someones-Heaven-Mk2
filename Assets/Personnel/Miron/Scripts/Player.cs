@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
 	private float speedBoost = 0f;
     private float speedBoostEnd = 0f;
 
+    [SerializeField] GameObject deathScreen;
+
     public float Speed
     {
         get
@@ -131,6 +133,12 @@ public class Player : MonoBehaviour
 		DEAD,
     }
     private State state = State.FALLING;
+
+    private void Awake()
+    {
+        deathScreen = GameObject.FindGameObjectWithTag("DeathScreen");
+        deathScreen.SetActive(false);
+    }
 
     private void Start()
     {
@@ -269,6 +277,9 @@ public class Player : MonoBehaviour
     void Die()
 	{
 		state = State.DEAD;
+
+        deathScreen.SetActive(true);
+        GameManager.Instance.ClearGame();
 	}
 
 	void Dead()

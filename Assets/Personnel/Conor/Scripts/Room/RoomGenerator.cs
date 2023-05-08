@@ -167,6 +167,7 @@ public class RoomGenerator : MonoBehaviour
                     GameObject enemy = Instantiate(m_enemyPrefabs[m_random.Next(0, m_enemyPrefabs.Length)], pos, Quaternion.identity, m_enemyParent.transform);
 
                     m_enemies.Add(enemy);
+                    //print(gO.name);
                     gO.GetComponent<RoomActivation>().AddEnemy(enemy);
                     gO.GetComponent<RoomActivation>().AddEnemyPosition(pos);
 
@@ -176,5 +177,22 @@ public class RoomGenerator : MonoBehaviour
 
             gO.GetComponent<RoomActivation>().DisableEnemies();
         }
+    }
+
+    public void PickRandomRoom(bool nextRoom = false) 
+    { 
+        LevelGenerator levelGen = LevelGenerator.Instance;
+        if(!nextRoom) {  m_random = m_gameManager.RandomGenerator; }
+        else { m_random = m_gameManager.RandomGeneratorSame; }
+
+        GameObject endRoom = levelGen.Rooms[m_random.Next(1, levelGen.Rooms.Count)];
+        Destroy(endRoom.GetComponent<BoxCollider>());
+        Destroy(endRoom.GetComponent<RoomActivation>());
+
+        endRoom.AddComponent<EndRoom>();
+        BoxCollider bC = endRoom.AddComponent<BoxCollider>();
+        bC.isTrigger = true;
+        bC.size = new Vector3(40, 1, 40);
+        bC.center = new Vector3(0, 1, 0);
     }
 }
