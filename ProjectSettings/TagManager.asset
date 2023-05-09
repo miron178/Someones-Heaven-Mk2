@@ -10,6 +10,9 @@ TagManager:
   - FloorParent
   - MainCharacter
   - HealthBar
+  - Torch
+  - WinScreen
+  - DeathScreen
   layers:
   - Default
   - TransparentFX

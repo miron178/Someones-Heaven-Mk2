@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(LevelGenerator))]
 [RequireComponent(typeof(RoomGenerator))]
 [RequireComponent(typeof(PlayerManager))]
-[RequireComponent(typeof(DearIMGUI))]
+//[RequireComponent(typeof(DearIMGUI))]
 public class GameManager : MonoBehaviour
 {
     #region Variables
@@ -62,6 +62,21 @@ public class GameManager : MonoBehaviour
         m_roomGenerator.GenerateTraps();
         m_levelGenerator.GenerateNavMesh();
         m_roomGenerator.GenerateEnemies();
+        m_roomGenerator.PickRandomRoom();
+        m_playerManager.SpawnPlayer();
+    }
+
+    public void RestartGame()
+    {
+        m_playerManager.DeletePlayer();
+        m_roomGenerator.ClearRoom();
+        m_levelGenerator.ClearLevel();
+
+        m_levelGenerator.GenerateLevel();
+        m_roomGenerator.GenerateTraps();
+        m_levelGenerator.GenerateNavMesh();
+        m_roomGenerator.GenerateEnemies();
+        m_roomGenerator.PickRandomRoom();
         m_playerManager.SpawnPlayer();
     }
 

@@ -31,7 +31,7 @@ public class LevelGenerator : MonoBehaviour
     public int OffBranchChance { get { return m_offBranchChance; } set { m_offBranchChance = value; } }
 
     [Header("Floor Settings", order = 1)]
-    Transform m_floorParent;
+    GameObject m_floorParent;
 
     [SerializeField] GameObject[] m_roomPrefabs;
     [SerializeField] List<GameObject> m_northPrefabs;
@@ -124,7 +124,9 @@ public class LevelGenerator : MonoBehaviour
         bC.isTrigger = true;
         bC.center = new Vector3(0, -5, 0);
         bC.size = new Vector3(1000, 1, 1000);
-        m_floorParent = m_floorParentObj.transform;
+        m_floorParent = m_floorParentObj;
+
+        bool endRoomSpawned = false;
 
         if(!nextLevel) { m_random = m_gameManager.RandomGenerator; }
         else { m_random = m_gameManager.RandomGeneratorSame; }
@@ -174,11 +176,11 @@ public class LevelGenerator : MonoBehaviour
         for(int i = 0; i < numberOfBranches; i++)
         {
             Debug.Log($"Generating Branch {i+1}");
-            GenerateBranch(branchDirections[i], baseRoom);
+            GenerateBranch(branchDirections[i], baseRoom, endRoomSpawned, i + 1);
         }
     }
 
-    void GenerateBranch(Direction initalDir, RoomInfo baseBranch)
+    void GenerateBranch(Direction initalDir, RoomInfo baseBranch, bool endRoomSpawned, int currentBranch)
     {
         //Push out 1 Room First
         Direction dir = initalDir;
@@ -278,14 +280,36 @@ public class LevelGenerator : MonoBehaviour
                 posFound = true;
             }
 
-            if(!posFound) { Debug.LogWarning($"Branch Terminated at {i}!"); break; }
+            if(!posFound) 
+            { 
+                // if(!endRoomSpawned)
+                // {
+                //     int chance = 0;
+
+                //     if(m_numofBranches == 1) { chance = 100; }
+                //     else if(m_numofBranches == 2) { chance = 50; }
+                //     else if(m_numofBranches == 3) { chance = 34; }
+                //     else if(m_numofBranches == 4) { chance = 25; }
+
+                //     if(m_random.Next(1, 101) < (currentBranch * chance))
+                //     {
+
+                //     }
+                // }
+
+                Debug.LogWarning($"Branch Terminated at {i}!"); 
+                break; 
+            }
             else 
             { 
                 if(m_random.Next(1, 101) < m_offBranchChance) { OffBranching(1, currentPosition, currentRoom); }
             }
         }
 
-        if(passes < 10) { Debug.Log("Branch Complete"); }
+        if(passes < 10) 
+        { 
+            Debug.Log("Branch Complete"); 
+        }
     }
 
     void OffBranching(int currentOffBranchCount, Vector3 currentPos, RoomInfo currentRoom)
@@ -421,7 +445,7 @@ public class LevelGenerator : MonoBehaviour
 
     RoomInfo SpawnFloor(GameObject gO, Vector3 pos)
     {
-        GameObject newObject = Instantiate(gO, pos, Quaternion.identity, m_floorParent);
+        GameObject newObject = Instantiate(gO, pos, Quaternion.identity, m_floorParent.transform);
 
         m_rooms.Add(newObject);
         m_roomPositions.Add(pos);

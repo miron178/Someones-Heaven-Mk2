@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
 	private float speedBoost = 0f;
     private float speedBoostEnd = 0f;
 
+    [SerializeField] GameObject deathScreen;
+
     public float Speed
     {
         get
@@ -57,9 +59,6 @@ public class Player : MonoBehaviour
 	private float jumpDuration = 0.5f;
 	[SerializeField]
 	private bool useGravityOnJump = false;
-
-	
-
 
 	[SerializeField]
     private int maxHealth = 9;
@@ -121,19 +120,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     GameObject model;
 
-	public GameObject currentPlayerTorch;
+    private FollowMouse followMouse = null;
 
-	public Rigidbody torchRB; public bool canThrow;
-
-	public Torch torch;
-
-	public int torchThrowSpeed;
-
-	public Vector3 torchThrowVector;
-
-	public Transform torchThrower;
-
-	private enum State
+    private enum State
     {
 		IDLE,
 		WALKING,
@@ -145,20 +134,23 @@ public class Player : MonoBehaviour
     }
     private State state = State.FALLING;
 
+    private void Awake()
+    {
+        deathScreen = GameObject.FindGameObjectWithTag("DeathScreen");
+        deathScreen.SetActive(false);
+    }
+
     private void Start()
     {
-		torch = this.gameObject.GetComponent<Torch>();
 		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
+        followMouse = GetComponent<FollowMouse>();
         CharacterController controller = GetComponent<CharacterController>();
         // calculate the correct vertical position:
         float correctHeight = controller.center.y + controller.skinWidth;
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
         healthBar = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<HealthBar>();
-		torchThrowSpeed = 50;
-
-		torchThrowVector = new Vector3(torchThrowSpeed, 0, 0);
 
         if (healthBar)
         {
@@ -285,6 +277,9 @@ public class Player : MonoBehaviour
     void Die()
 	{
 		state = State.DEAD;
+
+        deathScreen.SetActive(true);
+        GameManager.Instance.ClearGame();
 	}
 
 	void Dead()
@@ -293,41 +288,11 @@ public class Player : MonoBehaviour
 		//Enjoy being dead
 	}
 
-	public void OnThrow(InputAction.CallbackContext context) {
-		currentPlayerTorch = torch.currentTorch;
-		Instantiate(currentPlayerTorch, torchThrower.position, Quaternion.identity);
-		{
-			
-			//torchThrowVector = torchThrower.gameObject.GetComponent<Transform>();
-			//Torch 
-			// Instantiate the projectile at the position and rotation of this transform
-			Rigidbody currentTorch;
-			currentTorch = Instantiate(torchRB, transform.position, transform.rotation);
-
-			// Give the cloned object an initial velocity along the current
-			// object's Z axis
-			currentTorch.velocity = transform.TransformDirection(Vector3.forward * 100);
-			currentTorch.velocity = new Vector3(10, 0, 0);
-			Invoke("ThrowSwitch", 3);
-		}
-		//if (canThrow) {
-		//	canThrow = false;
-		//}	
-	}
-
-	public void ThrowSwitch() {
-		canThrow = true;
-	}
-
-	public void ThrowForce() {
-
-	}
-
-	public void OnMove(InputAction.CallbackContext context)
+    public void OnMove(InputAction.CallbackContext context)
     {
         // read the value for the "move" action each event call
         Vector2 moveAmount = context.ReadValue<Vector2>();
-        moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
+        moveVelocity = (Vector3.right * moveAmount.x + Vector3.forward * moveAmount.y);
 		Invoke("SwitchAnimationBools", animationSwitchTime);
 	}
 
@@ -398,7 +363,7 @@ public class Player : MonoBehaviour
 		Vector3 movementXZ = movement;
 		movementXZ.y = 0;
 
-        if (model != null)
+        if (model != null && !followMouse.enabled)
         {
             Quaternion lookAt = Quaternion.LookRotation(movementXZ);
             model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
@@ -507,9 +472,7 @@ public class Player : MonoBehaviour
 
         if (Time.time >= rollEnd || (useGravityOnRoll && !controller.isGrounded))
         {
-			
 			StartFall();
-			
 		}
 		
     }

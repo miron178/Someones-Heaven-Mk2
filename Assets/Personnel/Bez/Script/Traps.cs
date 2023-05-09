@@ -17,21 +17,42 @@ public class Traps : MonoBehaviour
 
 	private void OnCollisionEnter(Collision collision)
     {
-		if (collision.collider.tag != "Player")
-			return;
-
-		if (player == null)
-			player = collision.gameObject.GetComponent<Player>();
+		if (collision.collider.tag != "Player") { return; }
+		else 
+		{ 
+			if (player == null) 
+			{ 
+				player = collision.gameObject.GetComponent<Player>(); 
+			} 
+			
+			if (Time.time > damageCDEnd)
+			{
+				player.TakeDamage(damage);
+				damageCDEnd = Time.time + damageCD;
+			}
+		}
 
 		ContactPoint cp = collision.contacts[0];
 
 		Vector3 pull = cp.normal * force * -1;
 		player.AddPull(pull);
+	}
 
-		if (Time.time > damageCDEnd)
+    private void OnTriggerEnter(Collider other)
+    {
+		if (other.tag != "Player") { return; }
+		else
 		{
-			player.TakeDamage(damage);
-			damageCDEnd = Time.time + damageCD;
+			if (player == null)
+			{
+				player = other.gameObject.GetComponent<Player>();
+			}
+
+			if (Time.time > damageCDEnd)
+			{
+				player.TakeDamage(damage);
+				damageCDEnd = Time.time + damageCD;
+			}
 		}
 	}
 }
