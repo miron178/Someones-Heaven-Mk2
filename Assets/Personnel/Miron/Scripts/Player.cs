@@ -160,21 +160,7 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-		if (Keyboard.current[Key.LeftShift].wasPressedThisFrame && moveVelocity.sqrMagnitude >= 0) {
-			StartRun();
-		}
-		if (Keyboard.current[Key.LeftShift].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
-			StartWalk();
-			Invoke("SwitchAnimationBools", animationSwitchTime);
-		}
-		if (Keyboard.current[Key.LeftCtrl].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
-			StartWalk();
-			Invoke("SwitchAnimationBools", animationSwitchTime);
-		}
-		if (Keyboard.current[Key.X].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
-			StartJump();
-			Invoke("SwitchAnimationBools", animationSwitchTime);
-		}
+		
 		switch (state)
         {
 			case State.IDLE:
@@ -363,13 +349,12 @@ public class Player : MonoBehaviour
 		Vector3 movementXZ = movement;
 		movementXZ.y = 0;
 
-        if (model != null && !followMouse.enabled)
-        {
-            Quaternion lookAt = Quaternion.LookRotation(movementXZ);
-            model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
-        }
+		if (model != null && !followMouse.enabled) {
+			Quaternion lookAt = Quaternion.LookRotation(movementXZ);
+			model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
+		}
 
-        if (movementXZ.magnitude >= controller.minMoveDistance)
+		if (movementXZ.magnitude >= controller.minMoveDistance)
         {
             controller.Move(movement);
             if (!controller.isGrounded)
