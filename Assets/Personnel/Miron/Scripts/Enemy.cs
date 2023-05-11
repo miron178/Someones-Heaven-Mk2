@@ -2,10 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 
 public class Enemy : Pushable
+
 {
+    [SerializeField]
+    private float wanderRadius;
+    [SerializeField]
+    private bool DEBUG_BOOL;
+    Vector3 nextPosition;
+
+
     public NavMeshAgent agent;
+
+    public bool isIdle;
 
 	[SerializeField]
 	private Animator enemyAnimator;
@@ -65,18 +76,178 @@ public class Enemy : Pushable
 
     Rigidbody rb;
 
-	
+	private enum State
+	{
+		IDLE,
+		WALKING,
+		RUNNING,
+		FALLING,
+		ROLLING,
+		JUMPING,
+		DEAD,
+	}
+
+	private State state = State.FALLING;
+
 
 	//public int speed;
-	
-    private void Start()
+
+	private void Start()
     {
 
+		nextPosition = transform.position;
 		enemyAnimator = GetComponent<Animator>();
 
         rb = GetComponent<Rigidbody>();
+        //isIdle = true;
     }
 
+    void FixedUpdate()
+    {
+
+		//switch (state) {
+		//	case State.IDLE:
+		//		Idle();
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsMoving", false);
+		//		break;
+		//	case State.WALKING:
+		//		Walk();
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsMoving", true);
+		//		break;
+		//	case State.RUNNING:
+		//		Run();
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsRunning", true);
+		//		break;
+		//	case State.FALLING:
+		//		Fall();
+		//		break;
+		//	case State.ROLLING:
+		//		Roll();
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsRolling", true);
+		//		break;
+		//	case State.JUMPING:
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsJumping", true);
+		//		Jump();
+		//		break;
+		//	case State.DEAD:
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsDead", true);
+		//		Dead();
+		//		break;
+		//	default:
+		//		Debug.LogError("The state is unknown.");
+		//		break;
+		//}
+		if (isIdle) {
+			EnemyWander();
+		}
+        //if (isScared)
+        //{
+        //    EnemyScared();
+        //}
+        //else if (IsPushActive())
+        //{
+        //    Vector3 horiz = rb.velocity;
+        //    horiz.y = 0;
+
+        //    //This function can be called before rb.AddForce() actually changes the velocity
+        //    //hence the > 0 check
+        //    bool slowedDown = horiz.sqrMagnitude > 0 && horiz.sqrMagnitude < endPushSpeed * endPushSpeed;
+        //    if (slowedDown)
+        //    {
+        //        EndPush();
+        //    }
+        //}
+        //else if (CanAttack())
+        //{
+        //    Attack();
+        //}
+        //else if (CanPull())
+        //{
+        //    Pull();
+        //}
+        //else
+        //{
+        //    ClosestTarget();
+        //    MoveToClosest();
+        //}
+        //if (material)
+        //{
+        //    Color color = Time.time >= attackTime ? Color.red : Color.black;
+        //    material.color = color;
+        //}
+        
+    }
+
+    private void Idle()
+    {
+
+		if (enemyAnimator) {
+			enemyAnimator.SetBool("isMoving", false);
+		}
+		isIdle = true;
+		//if (isIdle == true && agent.speed >= 0)
+		//{
+		//    agent.speed.Equals(0);
+		//    agent.angularSpeed.Equals(0);
+		//    agent.acceleration.Equals(0);
+		//    agent.isStopped = true;
+		//    agent.SetDestination(this.gameObject.transform.position);
+		//    if (enemyAnimator)
+		//    {
+		//        enemyAnimator.SetBool("isIdle", true);
+		//    }
+		//    Invoke("IdleOff", 10);
+		//    Debug.Log("Idle");
+		//}
+	}
+
+    private void EnemyWander()
+    {
+		//if (isIdle == true && agent.speed != 0)
+		//{
+		//    agent.speed.Equals(3);
+		//    agent.angularSpeed.Equals(120);
+		//    agent.acceleration.Equals(8);
+		//    isScared = false;
+		//    agent.isStopped = false;
+		//    nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
+		//    agent.SetDestination(nextPosition);
+
+		//}
+
+		isIdle = false;
+        if (Vector3.Distance(nextPosition, transform.position) <= 1.5f)
+        {
+            nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
+            agent.SetDestination(nextPosition);
+        }
+        if (enemyAnimator)
+        {
+            enemyAnimator.SetBool("isMoving", true);
+        }
+    }
+
+    public void IdleOn()
+    {
+        if (isIdle == true)
+        {
+            isIdle = false;
+        }
+    }
+
+    public void IdleOff()
+    {
+        if (isIdle == false)
+        {
+            isIdle = true;
+        }
+    }
     GameObject ClosestTarget()
     {
         targets = GameObject.FindGameObjectsWithTag(SelectedTag);
@@ -99,9 +270,9 @@ public class Enemy : Pushable
             }
         }
         return closest;
-    }
+	}
 
-    bool IsPushActive()
+	bool IsPushActive()
     {
         return !agent.enabled;
     }
@@ -144,47 +315,7 @@ public class Enemy : Pushable
         //Debug.DrawLine(target, transform.position);
     }
 
-    void FixedUpdate()
-    {
-		
-		if (isScared) {
-			EnemyScared();
-		}
-        else if (IsPushActive())
-        {
-            Vector3 horiz = rb.velocity;
-            horiz.y = 0;
-
-            //This function can be called before rb.AddForce() actually changes the velocity
-            //hence the > 0 check
-            bool slowedDown = horiz.sqrMagnitude > 0 && horiz.sqrMagnitude < endPushSpeed * endPushSpeed;
-            if (slowedDown)
-            {
-                EndPush();
-            }
-        }
-        else if (CanAttack())
-        {
-            Attack();
-        }
-        else if (CanPull())
-        {
-            Pull();
-        }
-        else
-        {
-            ClosestTarget();
-            MoveToClosest();
-        }
-        if (material)
-        {
-            Color color = Time.time >= attackTime ? Color.red : Color.black;
-            material.color = color;
-        }
-		//if (enemyAnimator) {
-		//	enemyAnimator.SetBool("isAttacking", false);
-		//}
-	}
+    
 
     private bool TargetInRange()
     {
@@ -214,11 +345,7 @@ public class Enemy : Pushable
         return Time.time >= attackTime && TargetInRange() && (!shoot || ShootAngleInRange());
     }
 
-	private void Idle() {
-
-	}
-
-	private void Attack()
+    private void Attack()
     {
         if (enemyAnimator)
         {
@@ -306,6 +433,12 @@ public class Enemy : Pushable
         Gizmos.color = CanPull() ? Color.green : Color.red;
         Gizmos.DrawWireSphere(transform.position, pullRange);
 
+        if (DEBUG_BOOL == true)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, nextPosition);
+        }
+
 
         if (shoot && TargetInRange())
         {
@@ -319,22 +452,28 @@ public class Enemy : Pushable
 
 	private void OnTriggerEnter(Collider other) {
 		if (other.tag == "Torch") {
-			EnemyScared();
+			EnemyPause();
 			isScared = true;
+		}
+		if (other.tag == "Player") {
+			isIdle = false;
+			MoveToClosest();
+			Debug.Log("SeenPlayer");
 		}
 	}
 
 	private void OnTriggerExit(Collider other) {
 		if (other.tag == "Torch") {
-			NotScared();
+			EnemyUnpause();
+		}
+		if (other.tag == "Player") {
+			isIdle = true;
+			Idle();
+			Debug.Log("LostPlayer");
 		}
 	}
 
-	private void EnemyWander() {
-
-	}
-
-	public void EnemyScared() {
+	public void EnemyPause() {
 		agent.speed.Equals(0);
 		agent.angularSpeed.Equals(0);
 		agent.acceleration.Equals(0);
@@ -348,7 +487,7 @@ public class Enemy : Pushable
 		//Destroy(gameObject);
 	}
 
-	public void NotScared() {
+	public void EnemyUnpause() {
 		agent.speed.Equals(3);
 		agent.angularSpeed.Equals(120);
 		agent.acceleration.Equals(8);
