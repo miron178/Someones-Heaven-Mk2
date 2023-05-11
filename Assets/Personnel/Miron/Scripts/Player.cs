@@ -12,9 +12,10 @@ public class Player : MonoBehaviour
 	private Animator Animator;
 
     [SerializeField]
-    private float speed = 5f;
+    public float speed = 5f;
 	[SerializeField]
-	private float runSpeed = 10f;
+	public float runSpeed = 10f;
+
 	private float speedBoost = 0f;
     private float speedBoostEnd = 0f;
 
@@ -80,9 +81,11 @@ public class Player : MonoBehaviour
     }
 
     [SerializeField]
-    private int health = 9;
+    public int health = 9;
+	public bool canDamage;
 
-    public int Health
+
+	public int Health
     {
         get
         {
@@ -90,6 +93,8 @@ public class Player : MonoBehaviour
             return health;
         }
     }
+
+	
 
     [SerializeField]
 	private bool isDead = false;
@@ -133,6 +138,7 @@ public class Player : MonoBehaviour
 		DEAD,
     }
     private State state = State.FALLING;
+
 
     private void Awake()
     {
@@ -250,9 +256,13 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {	
+
+		if (canDamage) {
+			health -= damage < health ? damage : health;
+		}
 		if (!IsInvincible())
         {
-            health -= damage < health ? damage : health;
+            
 		} 
         if (health == 0)
         {

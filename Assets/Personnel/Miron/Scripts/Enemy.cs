@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 
 public class Enemy : Pushable
 
@@ -75,13 +76,26 @@ public class Enemy : Pushable
 
     Rigidbody rb;
 
-	
+	private enum State
+	{
+		IDLE,
+		WALKING,
+		RUNNING,
+		FALLING,
+		ROLLING,
+		JUMPING,
+		DEAD,
+	}
+
+	private State state = State.FALLING;
+
 
 	//public int speed;
-	
-    private void Start()
+
+	private void Start()
     {
-        nextPosition = transform.position;
+
+		nextPosition = transform.position;
 		enemyAnimator = GetComponent<Animator>();
 
         rb = GetComponent<Rigidbody>();
@@ -90,6 +104,45 @@ public class Enemy : Pushable
 
     void FixedUpdate()
     {
+
+		//switch (state) {
+		//	case State.IDLE:
+		//		Idle();
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsMoving", false);
+		//		break;
+		//	case State.WALKING:
+		//		Walk();
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsMoving", true);
+		//		break;
+		//	case State.RUNNING:
+		//		Run();
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsRunning", true);
+		//		break;
+		//	case State.FALLING:
+		//		Fall();
+		//		break;
+		//	case State.ROLLING:
+		//		Roll();
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsRolling", true);
+		//		break;
+		//	case State.JUMPING:
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsJumping", true);
+		//		Jump();
+		//		break;
+		//	case State.DEAD:
+		//		if (enemyAnimator)
+		//			enemyAnimator.SetBool("IsDead", true);
+		//		Dead();
+		//		break;
+		//	default:
+		//		Debug.LogError("The state is unknown.");
+		//		break;
+		//}
 		if (isIdle) {
 			EnemyWander();
 		}
