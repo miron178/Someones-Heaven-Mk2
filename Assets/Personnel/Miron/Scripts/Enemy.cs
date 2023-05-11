@@ -365,5 +365,8 @@ public class Enemy : Pushable
 		}
 	}
 
-	
+    void OnDestroy()
+    {
+        RoomGenerator.Instance.RemoveEnemy(gameObject);
+    }
 }

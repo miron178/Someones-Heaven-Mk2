@@ -54,6 +54,7 @@ public class RoomGenerator : MonoBehaviour
 
     [SerializeField] List<GameObject> m_enemies;
     public int EnemyCount { get { return m_enemies.Count; } }
+    public void RemoveEnemy(GameObject gO) { m_enemies.Remove(gO); }
     public void ClearEnemies()
     {
         foreach(GameObject gO in m_enemies) { Destroy(gO); }
