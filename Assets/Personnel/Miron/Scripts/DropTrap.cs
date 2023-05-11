@@ -12,5 +12,4 @@ public class DropTrap : Pushable
         dropTrap.isKinematic = false;
         GameObject.Destroy(this.gameObject);
     }
-
 }

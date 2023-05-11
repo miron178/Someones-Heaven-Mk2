@@ -52,7 +52,7 @@ MonoBehaviour:
   scanFrequency: 30
   layers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 320
   occlusionLayers:
     serializedVersion: 2
     m_Bits: 1
@@ -63,7 +63,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 660211180}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e3dc5aae80d64042aaec5e5f360516f, type: 3}
   m_Name: 
@@ -173,6 +173,8 @@ MonoBehaviour:
   controller: {fileID: 2828482584548335709}
   Animator: {fileID: 0}
   speed: 5
+  runSpeed: 10
+  deathScreen: {fileID: 0}
   pushForce: 300
   gravity: -9.81
   invincibiltyDuration: 0.3
@@ -181,14 +183,19 @@ MonoBehaviour:
   rollCD: 1
   rollDuration: 0.5
   useGravityOnRoll: 0
+  jumpSpeed: 10
+  canJump: 1
+  JumpCD: 1
+  jumpDuration: 0.5
+  useGravityOnJump: 0
   maxHealth: 9
   health: 4
   isDead: 0
   material: {fileID: 2100000, guid: 5c939248b77a7864fba2f9e4a54c6b3b, type: 2}
   healthBar: {fileID: 0}
   smoothRotation: 0.1
+  animationSwitchTime: 0.2
   model: {fileID: 0}
-  followMouse: 0
 --- !u!143 &2828482584548335709
 CharacterController:
   m_ObjectHideFlags: 0
@@ -350,7 +357,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2828482584548336039}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e3dc5aae80d64042aaec5e5f360516f, type: 3}
   m_Name: 
