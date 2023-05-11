@@ -10678,6 +10678,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Environment Floor
       objectReference: {fileID: 0}
+    - target: {fileID: 2591312890496774850, guid: 2cd9b48df1802ac4686516d2da881df7,
+        type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     - target: {fileID: 2935750973043452024, guid: 2cd9b48df1802ac4686516d2da881df7,
         type: 3}
       propertyPath: m_RootOrder
@@ -10902,6 +10907,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Environment Floor (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2591312890496774850, guid: 2cd9b48df1802ac4686516d2da881df7,
+        type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 2935750973043452024, guid: 2cd9b48df1802ac4686516d2da881df7,
         type: 3}
@@ -11427,6 +11437,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Environment Floor (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2591312890496774850, guid: 2cd9b48df1802ac4686516d2da881df7,
+        type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 2935750973043452024, guid: 2cd9b48df1802ac4686516d2da881df7,
         type: 3}
@@ -19788,6 +19803,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Environment Floor (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 2591312890496774850, guid: 2cd9b48df1802ac4686516d2da881df7,
+        type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     - target: {fileID: 2935750973043452024, guid: 2cd9b48df1802ac4686516d2da881df7,
         type: 3}
       propertyPath: m_RootOrder
@@ -20612,6 +20632,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Environment Floor (15)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2591312890496774850, guid: 2cd9b48df1802ac4686516d2da881df7,
+        type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 2935750973043452024, guid: 2cd9b48df1802ac4686516d2da881df7,
         type: 3}
