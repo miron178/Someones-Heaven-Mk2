@@ -551,63 +551,63 @@ public class Enemy : Pushable
         RoomGenerator.Instance.RemoveEnemy(gameObject);
     }
 
-	public void IdleOn() {
-		if (isIdle == true) {
-			isIdle = false;
-		}
-	}
+	//public void IdleOn() {
+	//	if (isIdle == true) {
+	//		isIdle = false;
+	//	}
+	//}
 
-	public void IdleOff() {
-		if (isIdle == false) {
-			isIdle = true;
-		}
-	}
+	//public void IdleOff() {
+	//	if (isIdle == false) {
+	//		isIdle = true;
+	//	}
+	//}
 
-	public void WanderOn() {
-		if (isIdle == true) {
-			isIdle = false;
-		}
-	}
+	//public void WanderOn() {
+	//	if (isIdle == true) {
+	//		isIdle = false;
+	//	}
+	//}
 
-	public void WanderOff() {
-		if (isIdle == false) {
-			isIdle = true;
-		}
-	}
+	//public void WanderOff() {
+	//	if (isIdle == false) {
+	//		isIdle = true;
+	//	}
+	//}
 
-	public void ChasingOn() {
-		if (isIdle == true) {
-			isIdle = false;
-		}
-	}
+	//public void ChasingOn() {
+	//	if (isIdle == true) {
+	//		isIdle = false;
+	//	}
+	//}
 
-	public void ChasingOff() {
-		if (isIdle == false) {
-			isIdle = true;
-		}
-	}
+	//public void ChasingOff() {
+	//	if (isIdle == false) {
+	//		isIdle = true;
+	//	}
+	//}
 
-	public void FleeOn() {
-		if (isIdle == true) {
-			isIdle = false;
-		}
-	}
+	//public void FleeOn() {
+	//	if (isIdle == true) {
+	//		isIdle = false;
+	//	}
+	//}
 
-	public void FleeOff() {
-		if (isIdle == false) {
-			isIdle = true;
-		}
-	}
+	//public void FleeOff() {
+	//	if (isIdle == false) {
+	//		isIdle = true;
+	//	}
+	//}
 
-	public void SurprisedOn() {
-		if (isIdle == true) {
-			isIdle = false;
-		}
-	}
+	//public void SurprisedOn() {
+	//	if (isIdle == true) {
+	//		isIdle = false;
+	//	}
+	//}
 
-	public void SurprisedOff() {
-		if (isIdle == false) {
-			isIdle = true;
-		}
-	}
+	//public void SurprisedOff() {
+	//	if (isIdle == false) {
+	//		isIdle = true;
+	//	}
+	//}
 }
