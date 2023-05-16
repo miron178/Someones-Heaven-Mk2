@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class PowerUpCore : MonoBehaviour
 {
-
-	public float multiplier = 1.4f;
-
 	public int effectIncrease;
 	public int effectTimeOut;
 
@@ -14,12 +11,10 @@ public class PowerUpCore : MonoBehaviour
 	public bool isSpeed = false;
 	public bool isDefence = false;
 
-	public int originalInt;
-	public float originalFloat;
-
 	public GameObject pickupEffect;
 
 	public GameObject playerObject;
+
 
 	public Player player;
 
@@ -28,22 +23,18 @@ public class PowerUpCore : MonoBehaviour
 		player = playerObject.GetComponent<Player>();
 	}
 
-	private void OnTriggerEnter(Collider other) {
-		if (other.CompareTag("Player")) {
-			PickUp(other);
-		}
-	}
+	//private void OnTriggerEnter(Collider other) {
+	//	if (other.CompareTag("Player")) {
+	//		PickUp(other);
+	//	}
+	//}
 
-	void PickUp(Collider player) {
+	public void PickUp() {
 
 		Debug.Log("player");
 
 		Instantiate(pickupEffect, transform.position, transform.rotation);
-
-		//this.gameObject.transform.localScale;
-
-		//player.transform.localScale *= multiplier;
-
+		
 		if (isSpeed) {
 			SpeedUp();
 		}
@@ -53,14 +44,10 @@ public class PowerUpCore : MonoBehaviour
 		if (isDefence) {
 			DefenceUp();
 		}
-
 		DestroyObject();
-
-
 	}
 
 	public void SpeedUp() {
-		originalFloat = player.speed;
 		player.speed += effectIncrease;
 		Invoke("ResetStats", effectTimeOut);
 	}
@@ -71,17 +58,7 @@ public class PowerUpCore : MonoBehaviour
 	}
 
 	public void HealthUp() {
-		originalInt = player.health;
 		player.health += effectIncrease;
-	}
-
-	public void ResetStats() {
-		if (isSpeed) {
-			player.speed = originalFloat;
-		}
-		if (isDefence) {
-			player.canDamage = true;
-		}
 	}
 
 	private void DestroyObject() {

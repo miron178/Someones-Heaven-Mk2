@@ -11,10 +11,16 @@ public class Player : MonoBehaviour
 	[SerializeField]
 	private Animator Animator;
 
+	public PowerUpCore playerPowerUp;
+
+	public ParticleHolder particleHolder;
+
     [SerializeField]
     public float speed = 5f;
+	public float originalSpeed;
 	[SerializeField]
 	public float runSpeed = 10f;
+	public float originalRunspeed;
 	private float speedBoost = 0f;
     private float speedBoostEnd = 0f;
 
@@ -148,6 +154,9 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+		particleHolder = gameObject.GetComponent<ParticleHolder>();
+		originalSpeed = speed;
+		originalRunspeed = runSpeed;
 		torch = this.gameObject.GetComponent<Torch>();
 		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
@@ -610,6 +619,36 @@ public class Player : MonoBehaviour
     {
         pull += force;
     }
+
+	public void OnTriggerEnter(Collider other) {
+		
+		if (other.CompareTag("Powerup")) {
+			int resetTime;
+			playerPowerUp = other.GetComponent<PowerUpCore>();
+			playerPowerUp.PickUp();
+			resetTime = playerPowerUp.effectTimeOut;
+			Invoke("ResetStats", resetTime);
+			if (playerPowerUp.isDefence) {
+				particleHolder.DefenceBubbleOn();
+				//particleHolder.Invoke("DefenceBubbleOff", resetTime);
+			}
+			if (playerPowerUp.isSpeed) {
+				particleHolder.SpeedBoostOn();
+				//particleHolder.Invoke("SpeedBoostOff", resetTime);
+			}
+			
+			if (playerPowerUp.isHealth) {
+				particleHolder.HealthUpOn();
+				//particleHolder.Invoke("HealthUpOff", resetTime);
+			}
+		}
+	}
+
+	public void ResetStats() {
+		speed = originalSpeed;
+		runSpeed = originalRunspeed;
+		canDamage = true;
+	}
 
 	private void SwitchAnimationBools() {
 		if (Animator)
