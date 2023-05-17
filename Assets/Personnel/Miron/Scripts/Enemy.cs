@@ -5,15 +5,19 @@ using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 public class Enemy : Pushable
-
 {
-    private float wanderRadius = 10;
-	private float wanderTime = 10;
-	private float idleTime = 10;
-	private float surprisedTime = 1;
-	
+    [SerializeField]
+    private float chaseRange = 15;
 
-	public bool playerSeen;
+    [SerializeField]
+    private float wanderRadius = 10;
+    [SerializeField]
+    private float wanderTime = 10;
+    [SerializeField]
+    private float idleTime = 10;
+    [SerializeField]
+    private float surprisedTime = 1;
+	
 
 	[SerializeField]
     private bool DEBUG_BOOL;
@@ -21,14 +25,8 @@ public class Enemy : Pushable
 
     public NavMeshAgent agent;
 
-    public bool isIdle = true;
-	public bool isWandering = false;
-	public bool isFleeing = false;
-	public bool isChasing = false;
-	public bool isSurprised = false;
-	private bool isPulling = false;
-	public bool isFiring = false;
-	public bool scaredOfFire = false;
+    [SerializeField]
+	private bool scaredOfFire = false;
 
 	[SerializeField]
 	private Animator enemyAnimator;
@@ -91,15 +89,28 @@ public class Enemy : Pushable
 	private enum State
 	{
 		IDLE,
-		WANDER,
+		WANDERING,
 		CHASING,
 		ATTACKING,
-		FLEE,
+		FLEEING,
 		SURPRISED,
 		PULLING,
 		DEAD,
 		PUSHED,
-	}
+    }
+
+    private static string[] stateName =
+    {
+        "isIdle",
+        "isWandering",
+        "isChasing",
+        "isAttacking",
+        "isFleeing",
+        "isSurprised",
+        "isPulling",
+        "isDead",
+        "isPushed",
+    };
 
 	private State state = State.IDLE;
 
@@ -113,195 +124,200 @@ public class Enemy : Pushable
 		enemyAnimator = GetComponent<Animator>();
 
         rb = GetComponent<Rigidbody>();
-        //isIdle = true;
     }
 
     void FixedUpdate()
     {
-		ClosestTarget();
-		MoveToClosest();
-		//switch (state) {
-		//	case State.IDLE:
-		//		Idle();
-		//		break;
-		//	case State.WANDER:
-		//		EnemyWander();
-		//		break;
-		//	case State.CHASING:
-		//		Debug.Log("Chasing");
-		//		ClosestTarget();
-		//		MoveToClosest();
-		//		break;
-		//	case State.ATTACKING:
-		//		Attack();
-		//		break;
-		//	case State.FLEE:
-		//		EnemyFlee();
-		//		break;
-		//	case State.SURPRISED:
-		//		Surprised();
-		//		break;
-		//	case State.PULLING:
-		//		isPulling = true;
-		//		break;
-		//	case State.DEAD:
-		//		Dead();
-		//		break;
-		//	case State.PUSHED:
-		//		Push();
-		//		break;
-		//	default:
-		//		Debug.LogError("The state is unknown.");
-		//		break;
-		//}
-		//if (isIdle) {
-		//	state = State.IDLE;
-		//	//Idle();
-		//}
-		//if (isFleeing) {
-		//	state = State.FLEE;
-		//	//EnemyFlee();
-		//} else if (IsPushActive()) {
-		//	state = State.PUSHED;
-		//} else if (CanAttack()) {
-		//	state = State.ATTACKING;
-		//} else if (CanPull()) {
-		//	state = State.PULLING;
-		//} else if (playerSeen) {
-		//	state = State.CHASING;
-		//	//ClosestTarget();
-		//	//MoveToClosest();
-		//}
-		//if (material) {
-		//	Color color = Time.time >= attackTime ? Color.red : Color.black;
-		//	material.color = color;
-		//}
+		//ClosestTarget();
+		//MoveToClosest();
+		switch (state)
+        {
+            case State.IDLE:
+                Idle();
+                break;
+            case State.WANDERING:
+                Wandering();
+                break;
+            case State.CHASING:
+                Chasing();
+                break;
+            case State.ATTACKING:
+                Attacking();
+                break;
+            case State.FLEEING:
+                Fleeing();
+                break;
+            case State.SURPRISED:
+                Surprised();
+                break;
+            case State.PULLING:
+                Pulling();
+                break;
+            case State.DEAD:
+                Dead();
+                break;
+            case State.PUSHED:
+                Pushed();
+                break;
+            default:
+                Debug.LogError("The state is unknown.");
+                break;
+        }
+    }
 
-	}
+    private void SetState(State newState)
+    {
+        Debug.Log("State: " + state + " --> " + newState);
+        state = newState;
+        SetAnimationBool(stateName[(int)newState]);
+
+        CancelInvoke(); //TODO: is it a good idea?
+    }
+
+    private void StartAgent()
+    {
+        agent.speed.Equals(3);
+        agent.angularSpeed.Equals(120);
+        agent.acceleration.Equals(8);
+        agent.isStopped = false;
+    }
+
+    private void StopAgent()
+    {
+        agent.speed.Equals(0);
+        agent.angularSpeed.Equals(0);
+        agent.acceleration.Equals(0);
+        agent.isStopped = true;
+        agent.SetDestination(transform.position);
+    }
+
+    private void StartIdle()
+    {
+        SetState(State.IDLE);
+        StopAgent();
+    }
 
 	private void Idle()
     {
-		SwitchAnimationBools();
-		isIdle = true;
-		isWandering = false;
-		agent.speed.Equals(0);
-		agent.angularSpeed.Equals(0);
-		agent.acceleration.Equals(0);
-		agent.isStopped = true;
-		agent.SetDestination(this.gameObject.transform.position);
-		if (isIdle && agent.isStopped) {
-			
-			if (enemyAnimator) {
-				enemyAnimator.SetBool("isIdle", true);
-			}
-			isIdle = false;
-			
-			Invoke("EnemyWander", idleTime);
-			Debug.Log("Idle");
-		}
+		Invoke(nameof(EndIdle), idleTime);
 	}
 
-	private void Surprised() {
-		isSurprised = true;
-		agent.speed.Equals(0);
-		agent.angularSpeed.Equals(0);
-		agent.acceleration.Equals(0);
-		agent.isStopped = true;
-		agent.SetDestination(this.gameObject.transform.position);
-		Invoke("MoveToClosest", 1);
-		Invoke("chasingStateChange", surprisedTime);
-		SwitchAnimationBools();
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isSurprised", true);
-		}
-	}
-
-	private void chasingStateChange() {
-		state = State.CHASING;
-	}
-
-	private void EnemyWander()
+    private void EndIdle()
     {
-		SwitchAnimationBools();
-		isIdle = false;
-		isWandering = true;
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isWandering", true);
-		}
-		nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
-		agent.SetDestination(nextPosition);
+        StartWandering();
+    }
 
-		if (Vector3.Distance(nextPosition, transform.position) <= 1.5f)
-        {
-            nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
-            agent.SetDestination(nextPosition);
-        }
+    private void StartWandering()
+    {
+        SetState(State.WANDERING);
         if (enemyAnimator)
         {
             enemyAnimator.SetBool("isMoving", true);
         }
-		if (!isIdle && !agent.isStopped) {
-			Invoke("Idle", wanderTime);
-			isIdle = true;
-			agent.speed.Equals(3);
-			agent.angularSpeed.Equals(120);
-			agent.acceleration.Equals(8);
-			agent.isStopped = false;
-		}
-		
+
+        // Pick next point that's far enough
+        do
+        {
+            nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
+        } while (Vector3.Distance(nextPosition, transform.position) <= 1.5f);
+
+        StartAgent();
+        agent.SetDestination(nextPosition);
+
+        Invoke(nameof(EndWandering), wanderTime);
     }
 
-	private void EnemyFlee() {
+    private void Wandering()
+    {
+        if (ClosestTarget())
+        {
+            StartChasing();
+        }
+    }
 
-		if (scaredOfFire) {
-			if (enemyAnimator) {
-				enemyAnimator.SetBool("isFleeing", false);
-			}
-			SwitchAnimationBools();
-			isIdle = false;
-			agent.speed.Equals(3);
-			agent.angularSpeed.Equals(120);
-			agent.acceleration.Equals(8);
-			isFleeing = true;
-			agent.isStopped = false;
-			nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
-			agent.SetDestination(nextPosition);
+    private void EndWandering()
+    {
+        StartIdle();
+    }
 
-			if (Vector3.Distance(nextPosition, transform.position) <= 1.5f) {
-				nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
-				agent.SetDestination(nextPosition);
-			}
-			if (enemyAnimator) {
-				enemyAnimator.SetBool("isFleeing", true);
-			}
-		}
+    private void StartSurprised()
+    {
+        SetState(State.SURPRISED);
+        StopAgent();
+    }
+
+    private void Surprised()
+    {
+		Invoke(nameof(EndSurprised), surprisedTime);
 	}
 
+    private void EndSurprised()
+    {
+        StartChasing();
+    }
 
+    private void StartChasing()
+    {
+        SetState(State.CHASING);
+        StartAgent();
+    }
+
+    private void Chasing()
+    {
+        if (ClosestTarget()) 
+        {
+            MoveToClosest();
+            if (CanAttack())
+            {
+                StartAttacking();
+            }
+            else if (CanPull())
+            {
+                StartPulling();
+            }
+        }
+        else
+        {
+            EndChasing();
+        }
+    }
+
+    private void EndChasing()
+    {
+        StartWandering();
+    }
+
+    private void StartFleeing()
+    {
+        SetState(State.FLEEING);
+        StartAgent();
+    }
+
+	private void Fleeing() {
+        if (ClosestTarget())
+        {
+            Vector3 away = closest.transform.position - transform.position;
+            MoveTo(away);
+        }
+        else
+        {
+            EndFleeing();
+        }
+	}
+
+    private void EndFleeing()
+    {
+        StartIdle();
+    }
 
 	//private void StartFall() {
 	//	state = State.FALLING;
 	//}
-
-	
-	private void Push() {
-		SwitchAnimationBools();
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isPushed", true);
-		}
-		Vector3 horiz = rb.velocity;
-		horiz.y = 0;
-
-		//This function can be called before rb.AddForce() actually changes the velocity
-		//hence the > 0 check
-		bool slowedDown = horiz.sqrMagnitude > 0 && horiz.sqrMagnitude < endPushSpeed * endPushSpeed;
-		if (slowedDown) {
-			EndPush();
-		}
-	}
 	
 	GameObject ClosestTarget()
     {
+        closest = null;
+
         targets = GameObject.FindGameObjectsWithTag(SelectedTag);
 
         float distance = Mathf.Infinity;
@@ -315,6 +331,12 @@ public class Enemy : Pushable
 
             Vector3 difference = target.transform.position - pos;
             float currentDistance = difference.sqrMagnitude;
+
+            if (currentDistance > chaseRange * chaseRange)
+            {
+                continue; //too far
+            }
+
             if (currentDistance < distance)
             {
                 closest = target;
@@ -324,44 +346,65 @@ public class Enemy : Pushable
         return closest;
 	}
 
-	bool IsPushActive()
+	public bool IsPushActive()
     {
         return !agent.enabled;
     }
 
-    void StartPush()
+    public override void Push(Vector3 force)
     {
+        StartPushed();
+        rb.AddForce(force);
+    }
+
+    void StartPushed()
+    {
+        StopAgent();
+
         agent.enabled = false;
         rb.isKinematic = false;
 
         //interrupt pull, if active
-        StopPull();
+        //if (state == State.PULLING)
+        //{
+        //    StopPulling();
+        //}
+
+        //stop all pending invokes
+        CancelInvoke();
+
+        SetState(State.PUSHED);
     }
 
-    void EndPush()
+    private void Pushed()
+    {
+        Vector3 horiz = rb.velocity;
+        horiz.y = 0;
+
+        //This function can be called before rb.AddForce() actually changes the velocity
+        //hence the > 0 check
+        bool slowedDown = horiz.sqrMagnitude > 0 && horiz.sqrMagnitude < endPushSpeed * endPushSpeed;
+        if (slowedDown)
+        {
+            EndPushed();
+        }
+    }
+
+    void EndPushed()
     {
         agent.enabled = true;
         rb.isKinematic = true;
-    }
 
-    void MoveToClosest()
+        StartIdle();
+	}
+
+    private void MoveTo(Vector3 target)
     {
-		agent.speed.Equals(3);
-		agent.angularSpeed.Equals(120);
-		agent.acceleration.Equals(8);
-		agent.isStopped = false;
-		nextPosition = RandomPointGenerator.PointGen(transform.position, wanderRadius);
-		agent.SetDestination(nextPosition);
-		if (enemyAnimator)
+        if (enemyAnimator)
         {
             enemyAnimator.SetBool("isMoving", true);
-            enemyAnimator.SetBool("isMoving", true);
         }
-		//radius round target
-		Vector3 target = transform.position - closest.transform.position;
-        target = target.normalized * radiusToTarget + closest.transform.position;
 
-        //move to target radius
         agent.SetDestination(target);
         Debug.DrawLine(transform.position, target);
 
@@ -371,12 +414,17 @@ public class Enemy : Pushable
         Quaternion look = Quaternion.LookRotation(forward);
         agent.transform.rotation = Quaternion.Slerp(transform.rotation, look, speed);
 
-		//Debug.Log("Chasing");
-
-        //Debug.DrawLine(target, transform.position);
     }
 
-    
+    private void MoveToClosest()
+    {
+		//radius round target
+		Vector3 target = transform.position - closest.transform.position;
+        target = target.normalized * radiusToTarget + closest.transform.position;
+
+        //move to target radius
+        MoveTo(target);
+    }
 
     private bool TargetInRange()
     {
@@ -406,13 +454,10 @@ public class Enemy : Pushable
         return Time.time >= attackTime && TargetInRange() && (!shoot || ShootAngleInRange());
     }
 
-    private void Attack()
+    private void StartAttacking()
     {
-		SwitchAnimationBools();
-		if (enemyAnimator)
-        {
-            enemyAnimator.SetBool("isAttacking", true);
-        }
+        SetState(State.ATTACKING);
+
         bool hit = Random.value <= hitChance;
         if (hit)
         {
@@ -431,27 +476,42 @@ public class Enemy : Pushable
             }
         }
         attackTime = Time.time + attackCD;
-		Invoke("SwitchAnimationBools", 0.2f);
     }
 
-    public void StartPull()
+    private void Attacking()
     {
-		if (!isPulling)
+		Invoke(nameof(EndAttacking), 0.2f);
+    }
+
+    private void EndAttacking()
+    {
+        StartChasing();
+    }
+
+    private void StartPulling()
+    {
+        SetState(State.PULLING);
+        pullStart = Time.time;
+    }
+
+    private void Pulling()
+    {
+        if (CanPull())
         {
-			state = State.PULLING;
-			isPulling = true;
-            pullStart = Time.time;
+            Player player = closest.GetComponent<Player>();
+            Vector3 direction = transform.position - closest.transform.position;
+            player.AddPull(direction.normalized * pullForce);
+        }
+        else
+        {
+            StopPulling();
         }
     }
 
-    public void StopPull()
+    private void StopPulling()
     {
-        if (isPulling)
-        {
-			state = State.IDLE;
-			isPulling = false;
-            pullStart = Time.time + pullCD;
-        }
+        pullStart = Time.time + pullCD;
+        StartChasing();
     }
 
     private bool CanPull()
@@ -459,7 +519,7 @@ public class Enemy : Pushable
         bool can = true;
         if (!closest ||
             Time.time < pullStart ||
-            (isPulling && Time.time > (pullStart + pullDuration)))
+            (state == State.PULLING && Time.time > (pullStart + pullDuration)))
         {
             can = false;
         }
@@ -468,36 +528,22 @@ public class Enemy : Pushable
             Vector3 distance = transform.position - closest.transform.position;
             can = distance.magnitude <= pullRange;
         }
-
-        if (!can)
-        {
-            StopPull();
-        }
         return can;
-    }
-
-    private void Pull()
-    {
-		SwitchAnimationBools();
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isPulling", true);
-		}
-		StartPull();
-	 
-        Player player = closest.GetComponent<Player>();
-        Vector3 direction = transform.position - closest.transform.position;
-        player.AddPull(direction.normalized * pullForce);
-    }
-
-    public override void Push(Vector3 force)
-    {
-        StartPush();
-        rb.AddForce(force);
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = CanPull() ? Color.green : Color.red;
+        Color chase = Color.green;
+        Color attack = Color.red;
+        Color pull = Color.blue;
+
+        Gizmos.color = closest ? chase : chase * 0.5f;
+        Gizmos.DrawWireSphere(transform.position, chaseRange);
+
+        Gizmos.color = closest ? attack : attack * 0.5f;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = CanPull() ? pull : pull * 0.5f;
         Gizmos.DrawWireSphere(transform.position, pullRange);
 
         if (DEBUG_BOOL == true)
@@ -516,150 +562,60 @@ public class Enemy : Pushable
 
     }
 
-	private void Dead() {
-		SwitchAnimationBools();
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isDead", true);
-		}
-		state = State.DEAD;
-		Debug.Log("Ded");
+    //TODO: Call this from somewhere!
+    private void StartDead()
+    {
+        SetState(State.DEAD);
+        StopAgent();
+    }
+
+	private void Dead() 
+    {
+        //Enjoy!
 	}
 
-	private void OnTriggerEnter(Collider other) {
-		if (other.tag == "Torch" && scaredOfFire) {
-			EnemyPause();
-			isFleeing = true;
+    private void EndDead()
+    {
+        //No ressurections
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+		if (other.tag == "Torch" && scaredOfFire)
+        {
+            StartFleeing();
 		}
-		if (other.tag == "Player") {
-			playerSeen = true;
-			isChasing = true;
-			state = State.CHASING;
+		else if (other.tag == "Player") 
+        {
+            StartChasing();
 		}
 	}
 
 	private void OnTriggerExit(Collider other) {
-		if (other.tag == "Torch" && scaredOfFire) {
-			EnemyUnpause();
+		if (other.tag == "Torch" && scaredOfFire) 
+        {
+			EndFleeing();
 		}
-		if (other.tag == "Player") {
-			playerSeen = false;
-			isChasing = false;
-			state = State.WANDER;
-			Debug.Log("LostPlayer");
-		}
-	}
-
-	public void EnemyPause() {
-		agent.speed.Equals(0);
-		agent.angularSpeed.Equals(0);
-		agent.acceleration.Equals(0);
-		isFleeing = true;
-		agent.isStopped = true;
-
-		//if (enemyAnimator) {
-		//	enemyAnimator.SetBool("isScared", true);
-		//}
-
-		//Destroy(gameObject);
-	}
-
-	public void EnemyUnpause() {
-		agent.speed.Equals(3);
-		agent.angularSpeed.Equals(120);
-		agent.acceleration.Equals(8);
-		isFleeing = false;
-		agent.isStopped = false;
-	}
-
-	private void SwitchAnimationBools() {
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isAttacking", false);
-		}
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isMoving", false);
-		}
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isSurprised", false);
-		}
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isIdle", false);
-		}
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isPulling", false);
-		}
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isChasing", false);
-		}
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isFleeing", false);
-		}
-		if (enemyAnimator) {
-			enemyAnimator.SetBool("isPushed", false);
+		else if (other.tag == "Player")
+        {
+            EndChasing();
 		}
 	}
+
+    private void SetAnimationBool(string name, bool value = true)
+    {
+        if (enemyAnimator)
+        {
+            foreach (string state in stateName)
+            {
+                enemyAnimator.SetBool(state, false);
+            }
+            enemyAnimator.SetBool(name, value);
+        }
+    }
 
     void OnDestroy()
     {
         RoomGenerator.Instance.RemoveEnemy(gameObject);
     }
-
-	//public void IdleOn() {
-	//	if (isIdle == true) {
-	//		isIdle = false;
-	//	}
-	//}
-
-	//public void IdleOff() {
-	//	if (isIdle == false) {
-	//		isIdle = true;
-	//	}
-	//}
-
-	//public void WanderOn() {
-	//	if (isIdle == true) {
-	//		isIdle = false;
-	//	}
-	//}
-
-	//public void WanderOff() {
-	//	if (isIdle == false) {
-	//		isIdle = true;
-	//	}
-	//}
-
-	//public void ChasingOn() {
-	//	if (isIdle == true) {
-	//		isIdle = false;
-	//	}
-	//}
-
-	//public void ChasingOff() {
-	//	if (isIdle == false) {
-	//		isIdle = true;
-	//	}
-	//}
-
-	//public void FleeOn() {
-	//	if (isIdle == true) {
-	//		isIdle = false;
-	//	}
-	//}
-
-	//public void FleeOff() {
-	//	if (isIdle == false) {
-	//		isIdle = true;
-	//	}
-	//}
-
-	//public void SurprisedOn() {
-	//	if (isIdle == true) {
-	//		isIdle = false;
-	//	}
-	//}
-
-	//public void SurprisedOff() {
-	//	if (isIdle == false) {
-	//		isIdle = true;
-	//	}
-	//}
 }

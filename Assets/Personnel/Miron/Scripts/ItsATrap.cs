@@ -25,11 +25,6 @@ public class ItsATrap : MonoBehaviour
                (rb && rb.velocity.magnitude > trapDeadlySpeed);
     }
 
-    private bool IsEnemyPushed(Enemy enemy)
-    {
-        return !enemy.agent.enabled;
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         Enemy enemy = collision.gameObject.GetComponent<Enemy>();
@@ -37,7 +32,7 @@ public class ItsATrap : MonoBehaviour
         {
             return;
         }
-        if (enemyPushedToKill && !IsEnemyPushed(enemy))
+        if (enemyPushedToKill && !enemy.IsPushActive())
         {
             return;
         }
