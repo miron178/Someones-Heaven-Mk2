@@ -118,41 +118,42 @@ public class Enemy : Pushable
 
     void FixedUpdate()
     {
-
-		switch (state) {
-			case State.IDLE:
-				Idle();
-				break;
-			case State.WANDER:
-				EnemyWander();
-				break;
-			case State.CHASING:
-				Debug.Log("Chasing");
-				ClosestTarget();
-				MoveToClosest();
-				break;
-			case State.ATTACKING:
-				Attack();
-				break;
-			case State.FLEE:
-				EnemyFlee();
-				break;
-			case State.SURPRISED:
-				Surprised();
-				break;
-			case State.PULLING:
-				isPulling = true;
-				break;
-			case State.DEAD:
-				Dead();
-				break;
-			case State.PUSHED:
-				Push();
-				break;
-			default:
-				Debug.LogError("The state is unknown.");
-				break;
-		}
+		ClosestTarget();
+		MoveToClosest();
+		//switch (state) {
+		//	case State.IDLE:
+		//		Idle();
+		//		break;
+		//	case State.WANDER:
+		//		EnemyWander();
+		//		break;
+		//	case State.CHASING:
+		//		Debug.Log("Chasing");
+		//		ClosestTarget();
+		//		MoveToClosest();
+		//		break;
+		//	case State.ATTACKING:
+		//		Attack();
+		//		break;
+		//	case State.FLEE:
+		//		EnemyFlee();
+		//		break;
+		//	case State.SURPRISED:
+		//		Surprised();
+		//		break;
+		//	case State.PULLING:
+		//		isPulling = true;
+		//		break;
+		//	case State.DEAD:
+		//		Dead();
+		//		break;
+		//	case State.PUSHED:
+		//		Push();
+		//		break;
+		//	default:
+		//		Debug.LogError("The state is unknown.");
+		//		break;
+		//}
 		//if (isIdle) {
 		//	state = State.IDLE;
 		//	//Idle();
@@ -353,7 +354,8 @@ public class Enemy : Pushable
 		agent.SetDestination(nextPosition);
 		if (enemyAnimator)
         {
-            enemyAnimator.SetBool("isChasing", true);
+            enemyAnimator.SetBool("isMoving", true);
+            enemyAnimator.SetBool("isMoving", true);
         }
 		//radius round target
 		Vector3 target = transform.position - closest.transform.position;

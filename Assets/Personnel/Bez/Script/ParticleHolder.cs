@@ -8,12 +8,14 @@ public class ParticleHolder : MonoBehaviour
 	private bool defenceBubble;
 	private bool speedBoost;
 	private bool healthBoost;
+	public int timeout;
 
 	public GameObject DefenceBubble;
 
 	public GameObject SpeedBoost;
 
 	public GameObject HealthUp;
+
 
 
 
@@ -32,6 +34,7 @@ public class ParticleHolder : MonoBehaviour
 	public void DefenceBubbleOn() {
 		defenceBubble = true;
 		DefenceBubble.SetActive(true);
+		Invoke("DefenceBubbleOff", timeout);
 	}
 
 	public void DefenceBubbleOff() {
