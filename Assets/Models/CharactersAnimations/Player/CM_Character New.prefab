@@ -1404,7 +1404,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8587251080209003148}
         m_TargetAssemblyTypeName: Player, Assembly-CSharp
-        m_MethodName: OnJump
+        m_MethodName: OnPush
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
