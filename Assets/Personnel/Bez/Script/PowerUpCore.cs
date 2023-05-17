@@ -15,7 +15,6 @@ public class PowerUpCore : MonoBehaviour
 
 	public GameObject playerObject;
 
-
 	public Player player;
 
 	public void Awake() {
