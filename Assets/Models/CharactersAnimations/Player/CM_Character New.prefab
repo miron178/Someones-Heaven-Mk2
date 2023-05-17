@@ -1492,6 +1492,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 3798ddf7-cbc9-4178-9d98-221514f15264
     m_ActionName: Player/Run[/Keyboard/leftShift]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 41edd60d-6c9e-44fb-abf2-30ada12f3e5e
+    m_ActionName: Player/Throw[/Mouse/leftButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -1511,9 +1515,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 8587251080209003151}
   Animator: {fileID: 8587251080209003150}
+  playerPowerUp: {fileID: 0}
+  particleHolder: {fileID: 0}
   speed: 5
+  originalSpeed: 0
   runSpeed: 8
-  deathScreen: {fileID: 0}
+  originalRunspeed: 0
   pushForce: 300
   gravity: -9.81
   invincibiltyDuration: 0.5
@@ -1529,6 +1536,7 @@ MonoBehaviour:
   useGravityOnJump: 0
   maxHealth: 9
   health: 9
+  canDamage: 0
   isDead: 0
   material: {fileID: -3487637683973761237, guid: 59bf7d037cdc1bd4f9010f0aeff12c9a,
     type: 3}
@@ -1536,6 +1544,13 @@ MonoBehaviour:
   smoothRotation: 0.364
   animationSwitchTime: 0.2
   model: {fileID: 8587251080286975825}
+  currentPlayerTorch: {fileID: 0}
+  torchRB: {fileID: 0}
+  canThrow: 0
+  torch: {fileID: 0}
+  torchThrowSpeed: 0
+  torchThrowVector: {x: 0, y: 0, z: 0}
+  torchThrower: {fileID: 0}
 --- !u!65 &8587251080209003185
 BoxCollider:
   m_ObjectHideFlags: 0
