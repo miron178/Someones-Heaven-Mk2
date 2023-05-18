@@ -765,7 +765,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ee7941251cd9364fb0f0753ce8f07dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerPrefab: {fileID: 8587251080209003147, guid: 8222c577b21a5754e9533917daa4040d,
+  m_playerPrefab: {fileID: 8214737304108014609, guid: d6abece459c274b49b09fc41987f1b82,
     type: 3}
 --- !u!114 &745702768
 MonoBehaviour:
@@ -822,7 +822,8 @@ MonoBehaviour:
   m_westPrefabs: []
   m_rooms: []
   m_roomPositions: []
-  m_player: {fileID: 0}
+  m_player: {fileID: 8214737304108014609, guid: d6abece459c274b49b09fc41987f1b82,
+    type: 3}
 --- !u!114 &745702770
 MonoBehaviour:
   m_ObjectHideFlags: 0
