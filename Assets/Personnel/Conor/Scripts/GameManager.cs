@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour
         GenerateSeed();
         m_levelGenerator.GenerateLevel();
         m_roomGenerator.GenerateTraps();
+        m_roomGenerator.GeneratePowerUps();
         m_levelGenerator.GenerateNavMesh();
         m_roomGenerator.GenerateEnemies();
         m_roomGenerator.PickRandomRoom();
@@ -74,6 +75,7 @@ public class GameManager : MonoBehaviour
 
         m_levelGenerator.GenerateLevel();
         m_roomGenerator.GenerateTraps();
+        m_roomGenerator.GeneratePowerUps();
         m_levelGenerator.GenerateNavMesh();
         m_roomGenerator.GenerateEnemies();
         m_roomGenerator.PickRandomRoom();
@@ -88,6 +90,7 @@ public class GameManager : MonoBehaviour
 
         m_levelGenerator.GenerateLevel(true);
         m_roomGenerator.GenerateTraps(true);
+        m_roomGenerator.GeneratePowerUps(true);
         m_levelGenerator.GenerateNavMesh();
         m_roomGenerator.GenerateEnemies(true);
         m_playerManager.SpawnPlayer();

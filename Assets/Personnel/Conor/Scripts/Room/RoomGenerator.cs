@@ -38,10 +38,19 @@ public class RoomGenerator : MonoBehaviour
 
     [SerializeField] int m_maxEnemyAmount = 3;
     public int MaxEnemyAmount { get { return m_maxEnemyAmount; } set { m_maxEnemyAmount = value; } }
+
+    //Power Ups
+    GameObject m_powerUpParent;
+
+    [SerializeField] bool m_setPowerUpAmount = false;
+    [SerializeField] int m_powerUpAmount = 1;
+    [SerializeField] int m_minPowerUpAmount = 1;
+    [SerializeField] int m_maxPowerUpAmount = 3;
     
     [Header("Prefabs", order = 2)]
     [SerializeField] GameObject m_trapPrefab;
     [SerializeField] GameObject[] m_enemyPrefabs;
+    [SerializeField] GameObject[] m_powerUpPrefabs;
 
     [Header("Generated Variables", order = 3)]
     [SerializeField] List<GameObject> m_traps;
@@ -61,12 +70,22 @@ public class RoomGenerator : MonoBehaviour
         m_enemies.Clear();
     }
 
+    [SerializeField] List<GameObject> m_powerUps;
+    public int PowerUpCount { get { return m_powerUps.Count; } }
+    public void RemovePowerUp(GameObject gO) { m_powerUps.Remove(gO); }
+    public void ClearPowerUps() 
+    { 
+        foreach(GameObject gO in m_powerUps) { Destroy(gO); }
+        m_powerUps.Clear();
+    }
+
     void Awake()
     {
         if(Instance == null) { m_instance = this; }
         else { Destroy(this); }
 
         m_enemyPrefabs = Resources.LoadAll<GameObject>("Prefabs/Enemies");
+        m_powerUpPrefabs = Resources.LoadAll<GameObject>("Prefabs/Power Ups");
     }
 
     void Start() { m_gameManager = GameManager.Instance; }
@@ -75,11 +94,14 @@ public class RoomGenerator : MonoBehaviour
     {
         foreach(GameObject gO in m_traps) { Destroy(gO); }
         foreach(GameObject gO in m_enemies) { Destroy(gO); }
+        foreach(GameObject gO in m_powerUps) { Destroy(gO); }
 
         Destroy(m_enemyParent);
+        Destroy(m_powerUpParent);
 
         m_traps.Clear();
         m_enemies.Clear();
+        m_powerUps.Clear();
     }
 
     public void GenerateTraps(bool nextRoom = false)
@@ -177,6 +199,50 @@ public class RoomGenerator : MonoBehaviour
             }
 
             gO.GetComponent<RoomActivation>().DisableEnemies();
+        }
+    }
+
+    public void GeneratePowerUps(bool nextRoom = false)
+    {
+        m_powerUpParent = new GameObject();
+        m_powerUpParent.name = "Power Ups";
+        LevelGenerator levelGen = LevelGenerator.Instance;
+
+        if(!nextRoom) { m_random = m_gameManager.RandomGenerator; }
+        else { m_random = m_gameManager.RandomGeneratorSame; }
+
+        if(!m_setPowerUpAmount) { m_powerUpAmount = m_random.Next(m_minPowerUpAmount, m_maxPowerUpAmount + 1); }
+
+        bool skipFirstRoom = true;
+
+        foreach(GameObject gO in levelGen.Rooms)
+        {
+            if(skipFirstRoom) { skipFirstRoom = false; continue; }
+
+            List<GameObject> floors = Utilities.FindRoomFloors(gO);
+            List<int> pickedIndex = new List<int>();
+
+            for(int i = 0; i < m_powerUpAmount; i++)
+            {
+                bool powerUpPlaced = false;
+                int passes = 0;
+
+                while(!powerUpPlaced)
+                {
+                    if(passes == 10) { break; }
+
+                    int index = m_random.Next(0, floors.Count);
+                    if(pickedIndex.Contains(index)) { passes++; continue; }
+
+                    Transform floorTransform = floors[index].transform;
+                    Vector3 pos = new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z);
+
+                    GameObject powerUp = Instantiate(m_powerUpPrefabs[m_random.Next(0, m_powerUpPrefabs.Length)], pos, Quaternion.identity, m_powerUpParent.transform);
+
+                    m_powerUps.Add(powerUp);
+                    powerUpPlaced = true;
+                }
+            }
         }
     }
 

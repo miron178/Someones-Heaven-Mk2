@@ -7,6 +7,11 @@ public class WinScreen : MonoBehaviour
 {
     [SerializeField] GameObject m_winScreen;
 
+    void Awake()
+    {
+        // m_winScreen.SetActive(false);
+    }
+
     public void RestartSameSeed()
     {
         SceneManager.LoadScene(1);

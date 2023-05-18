@@ -17,9 +17,13 @@ public class PowerUpCore : MonoBehaviour
 
 	public Player player;
 
-	public void Awake() {
-		playerObject = GameObject.FindGameObjectWithTag("Player");
-		player = playerObject.GetComponent<Player>();
+	public void Update() {
+		if(player == null) 
+		{ 
+			playerObject = GameObject.FindGameObjectWithTag("Player");
+
+			if(playerObject != null) { player = playerObject.GetComponent<Player>(); }
+		}
 	}
 
 	//private void OnTriggerEnter(Collider other) {

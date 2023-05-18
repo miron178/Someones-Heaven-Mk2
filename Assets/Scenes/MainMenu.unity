@@ -787,11 +787,17 @@ MonoBehaviour:
   m_enemyAmount: 3
   m_minEnemyAmount: 1
   m_maxEnemyAmount: 3
+  m_setPowerUpAmount: 1
+  m_powerUpAmount: 1
+  m_minPowerUpAmount: 1
+  m_maxPowerUpAmount: 3
   m_trapPrefab: {fileID: 4035551911747403428, guid: 94b8c738b9f84fdf096c585a30a7b88e,
     type: 3}
   m_enemyPrefabs: []
+  m_powerUpPrefabs: []
   m_traps: []
   m_enemies: []
+  m_powerUps: []
 --- !u!114 &745702769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6242,10 +6248,10 @@ RectTransform:
   m_Father: {fileID: 748659850}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 672.3559, y: -301.05}
-  m_SizeDelta: {x: 0, y: 602.1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1344.7118, y: 602.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2090052806
 MonoBehaviour:
