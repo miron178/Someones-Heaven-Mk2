@@ -126,8 +126,6 @@ public class LevelGenerator : MonoBehaviour
         bC.size = new Vector3(1000, 1, 1000);
         m_floorParent = m_floorParentObj;
 
-        bool endRoomSpawned = false;
-
         if(!nextLevel) { m_random = m_gameManager.RandomGenerator; }
         else { m_random = m_gameManager.RandomGeneratorSame; }
 
@@ -172,12 +170,40 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
+        bool endRoomSpawned = false;
+
         //Generate the Branches
         for(int i = 0; i < numberOfBranches; i++)
         {
             Debug.Log($"Generating Branch {i+1}");
             GenerateBranch(branchDirections[i], baseRoom, endRoomSpawned, i + 1);
+
+            //Pick this Branch as the End Branch?
+            if(!endRoomSpawned)
+            {
+                if(m_random.Next(2) == 1) 
+                { 
+                    SpawnEndRoom();
+                    endRoomSpawned = true;   
+                }
+            }
         }
+
+        if(!endRoomSpawned)
+        {
+            SpawnEndRoom();
+            endRoomSpawned = true;
+        }
+    }
+
+    void SpawnEndRoom()
+    {
+        GameObject endRoom = m_rooms[m_rooms.Count - 1];
+        endRoom.AddComponent<EndRoom>();
+        BoxCollider bC = endRoom.AddComponent<BoxCollider>();
+        bC.isTrigger = true;
+        bC.size = new Vector3(40, 1, 40);
+        bC.center = new Vector3(0, 1, 0); 
     }
 
     void GenerateBranch(Direction initalDir, RoomInfo baseBranch, bool endRoomSpawned, int currentBranch)
@@ -282,21 +308,6 @@ public class LevelGenerator : MonoBehaviour
 
             if(!posFound) 
             { 
-                // if(!endRoomSpawned)
-                // {
-                //     int chance = 0;
-
-                //     if(m_numofBranches == 1) { chance = 100; }
-                //     else if(m_numofBranches == 2) { chance = 50; }
-                //     else if(m_numofBranches == 3) { chance = 34; }
-                //     else if(m_numofBranches == 4) { chance = 25; }
-
-                //     if(m_random.Next(1, 101) < (currentBranch * chance))
-                //     {
-
-                //     }
-                // }
-
                 Debug.LogWarning($"Branch Terminated at {i}!"); 
                 break; 
             }
