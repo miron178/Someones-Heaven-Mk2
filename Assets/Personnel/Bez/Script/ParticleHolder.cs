@@ -16,9 +16,6 @@ public class ParticleHolder : MonoBehaviour
 
 	public GameObject HealthUp;
 
-
-
-
 	private void Update() {
 		if (defenceBubble) {
 			DefenceBubble.SetActive(true);
@@ -34,7 +31,6 @@ public class ParticleHolder : MonoBehaviour
 	public void DefenceBubbleOn() {
 		defenceBubble = true;
 		DefenceBubble.SetActive(true);
-		Invoke("DefenceBubbleOff", timeout);
 	}
 
 	public void DefenceBubbleOff() {

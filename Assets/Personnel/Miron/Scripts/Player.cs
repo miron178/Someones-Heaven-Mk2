@@ -154,6 +154,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+		canDamage = true;
 		particleHolder = gameObject.GetComponent<ParticleHolder>();
 		originalSpeed = speed;
 		originalRunspeed = runSpeed;
@@ -178,21 +179,7 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-		if (Keyboard.current[Key.LeftShift].wasPressedThisFrame && moveVelocity.sqrMagnitude >= 0) {
-			StartRun();
-		}
-		if (Keyboard.current[Key.LeftShift].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
-			StartWalk();
-			Invoke("SwitchAnimationBools", animationSwitchTime);
-		}
-		if (Keyboard.current[Key.LeftCtrl].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
-			StartWalk();
-			Invoke("SwitchAnimationBools", animationSwitchTime);
-		}
-		if (Keyboard.current[Key.X].wasReleasedThisFrame && moveVelocity.sqrMagnitude >= 0) {
-			StartJump();
-			Invoke("SwitchAnimationBools", animationSwitchTime);
-		}
+		
 		switch (state)
         {
 			case State.IDLE:
@@ -282,7 +269,7 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {	
-		if (!IsInvincible())
+		if (!IsInvincible() && canDamage)
         {
             health -= damage < health ? damage : health;
 		} 
@@ -623,23 +610,23 @@ public class Player : MonoBehaviour
 	public void OnTriggerEnter(Collider other) {
 		
 		if (other.CompareTag("Powerup")) {
-			int resetTime;
+			
 			playerPowerUp = other.GetComponent<PowerUpCore>();
+			particleHolder.timeout = playerPowerUp.effectTimeOut;
 			playerPowerUp.PickUp();
-			resetTime = playerPowerUp.effectTimeOut;
-			Invoke("ResetStats", resetTime);
+			Invoke("ResetStats", particleHolder.timeout);
 			if (playerPowerUp.isDefence) {
 				particleHolder.DefenceBubbleOn();
-				//particleHolder.Invoke("DefenceBubbleOff", resetTime);
+				particleHolder.Invoke("DefenceBubbleOff", particleHolder.timeout);
 			}
 			if (playerPowerUp.isSpeed) {
 				particleHolder.SpeedBoostOn();
-				//particleHolder.Invoke("SpeedBoostOff", resetTime);
+				particleHolder.Invoke("SpeedBoostOff", particleHolder.timeout);
 			}
 			
 			if (playerPowerUp.isHealth) {
 				particleHolder.HealthUpOn();
-				//particleHolder.Invoke("HealthUpOff", resetTime);
+				particleHolder.Invoke("HealthUpOff", particleHolder.timeout);
 			}
 		}
 	}
