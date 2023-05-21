@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
-public class Enemy : Pushable
+public class Enemy : MonoBehaviour, IPushable, IDamageable
 {
     [SerializeField]
     private float chaseRange = 15;
@@ -167,7 +167,7 @@ public class Enemy : Pushable
 
     private void SetState(State newState)
     {
-        Debug.Log("State: " + state + " --> " + newState);
+        //Debug.Log("State: " + state + " --> " + newState);
         state = newState;
         SetAnimationBool(stateName[(int)newState]);
 
@@ -351,16 +351,18 @@ public class Enemy : Pushable
         return !agent.enabled;
     }
 
-    public override void Push(Vector3 force)
+    public void Push(Vector3 force)
     {
-        StartPushed();
+        if (state != State.PUSHED)
+        {
+            StartPushed();
+        }
         rb.AddForce(force);
     }
 
     void StartPushed()
     {
         StopAgent();
-
         agent.enabled = false;
         rb.isKinematic = false;
 
@@ -500,7 +502,7 @@ public class Enemy : Pushable
         {
             Player player = closest.GetComponent<Player>();
             Vector3 direction = transform.position - closest.transform.position;
-            player.AddPull(direction.normalized * pullForce);
+            player.Push(direction.normalized * pullForce);
         }
         else
         {
@@ -617,5 +619,10 @@ public class Enemy : Pushable
     void OnDestroy()
     {
         RoomGenerator.Instance.RemoveEnemy(gameObject);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        GameObject.Destroy(this.gameObject);
     }
 }

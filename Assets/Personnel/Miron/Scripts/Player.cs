@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
     [SerializeField]
     private CharacterController controller;
@@ -345,8 +345,8 @@ public class Player : MonoBehaviour
             {
                 Vector3 dir = target.transform.position - transform.position;
                 Vector3 force = dir.normalized * pushForce;
-                Pushable pushable = target.GetComponent<Pushable>();
-                if (pushable)
+                IPushable pushable = target.GetComponent<IPushable>();
+                if (pushable != null)
                 {
                     pushable.Push(force);
                 }
@@ -602,7 +602,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void AddPull(Vector3 force)
+    public void Push(Vector3 force)
     {
         pull += force;
     }
