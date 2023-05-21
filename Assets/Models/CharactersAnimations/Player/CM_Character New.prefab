@@ -490,8 +490,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2348802315313375357}
+  - component: {fileID: 7931896034793572681}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -513,6 +514,19 @@ Transform:
   m_Father: {fileID: 2348802315360939423}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7931896034793572681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2348802315313375358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e3dc5aae80d64042aaec5e5f360516f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useCamera: {fileID: 5180198920146554182}
 --- !u!1 &2348802315360939428
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,7 +542,6 @@ GameObject:
   - component: {fileID: 2348802315360939427}
   - component: {fileID: 2348802315360939422}
   - component: {fileID: 2348802315360939420}
-  - component: {fileID: 3248275140220153913}
   - component: {fileID: 6319839036941927276}
   - component: {fileID: 6319839036941927285}
   m_Layer: 0
@@ -545,8 +558,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2348802315360939428}
-  m_LocalRotation: {x: 0, y: -0.38268343, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0.5, y: 6.46, z: -218.98}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -557,7 +570,7 @@ Transform:
   - {fileID: 6319839037204429480}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -45, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &2348802315360939424
 CharacterController:
   m_ObjectHideFlags: 0
@@ -828,19 +841,6 @@ MonoBehaviour:
   maxTorchLevel: 0
   hasTorch: 0
   enemy: {fileID: 0}
---- !u!114 &3248275140220153913
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2348802315360939428}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e3dc5aae80d64042aaec5e5f360516f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useCamera: {fileID: 5180198920146554182}
 --- !u!135 &6319839036941927276
 SphereCollider:
   m_ObjectHideFlags: 0

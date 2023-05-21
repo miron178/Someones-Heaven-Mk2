@@ -168,7 +168,7 @@ PrefabInstance:
     - target: {fileID: 2483611562729190533, guid: 752c4b3ff0c8d0147a28c6467b89c6be,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2483611562729190533, guid: 752c4b3ff0c8d0147a28c6467b89c6be,
         type: 3}
@@ -535,7 +535,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!114 &1152391386
 MonoBehaviour:
@@ -696,21 +696,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2348802315360939423, guid: 8222c577b21a5754e9533917daa4040d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -20
+      objectReference: {fileID: 0}
     - target: {fileID: 8587251080209003147, guid: 8222c577b21a5754e9533917daa4040d,
         type: 3}
       propertyPath: m_Name
       value: CM_Character New
       objectReference: {fileID: 0}
-    - target: {fileID: 8587251080209003148, guid: 8222c577b21a5754e9533917daa4040d,
-        type: 3}
-      propertyPath: pushForce
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 8587251080209003148, guid: 8222c577b21a5754e9533917daa4040d,
-        type: 3}
-      propertyPath: deathScreen
-      value: 
-      objectReference: {fileID: 1258505458}
     - target: {fileID: 8587251080209003184, guid: 8222c577b21a5754e9533917daa4040d,
         type: 3}
       propertyPath: m_RootOrder
@@ -764,16 +759,6 @@ PrefabInstance:
     - target: {fileID: 8587251080209003184, guid: 8222c577b21a5754e9533917daa4040d,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8587251080209003187, guid: 8222c577b21a5754e9533917daa4040d,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8836243997703515926, guid: 8222c577b21a5754e9533917daa4040d,
-        type: 3}
-      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -980,11 +965,16 @@ MonoBehaviour:
   m_enemyAmount: 3
   m_minEnemyAmount: 1
   m_maxEnemyAmount: 3
+  m_setPowerUpAmount: 0
+  m_powerUpAmount: 1
+  m_minPowerUpAmount: 1
+  m_maxPowerUpAmount: 3
   m_trapPrefab: {fileID: 4035551911747403428, guid: 94b8c738b9f84fdf096c585a30a7b88e,
     type: 3}
   m_enemyPrefabs:
   - {fileID: 7379972483583032262, guid: df1d2496843e97345a63745cba865740, type: 3}
   - {fileID: 4353641316808009532, guid: d14445f8c08ad1b26bf25d09198b2b72, type: 3}
+  m_powerUpPrefabs: []
   m_traps:
   - {fileID: 0}
   - {fileID: 0}
@@ -1077,6 +1067,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  m_powerUps: []
 --- !u!114 &1920270597
 MonoBehaviour:
   m_ObjectHideFlags: 0
