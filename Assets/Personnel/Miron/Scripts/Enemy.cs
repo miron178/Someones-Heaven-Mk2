@@ -636,29 +636,6 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
         //No ressurections
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-		if (other.tag == "Torch" && scaredOfFire)
-        {
-            StartFleeing();
-		}
-		else if (other.tag == "Player") 
-        {
-            StartChasing();
-		}
-	}
-
-	private void OnTriggerExit(Collider other) {
-		if (other.tag == "Torch" && scaredOfFire) 
-        {
-			EndFleeing();
-		}
-		else if (other.tag == "Player")
-        {
-            EndChasing();
-		}
-	}
-
     private void SetAnimationBool(string name, bool value = true)
     {
         if (enemyAnimator)

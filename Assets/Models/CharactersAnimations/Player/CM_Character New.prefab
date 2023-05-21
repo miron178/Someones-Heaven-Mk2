@@ -542,7 +542,6 @@ GameObject:
   - component: {fileID: 2348802315360939427}
   - component: {fileID: 2348802315360939422}
   - component: {fileID: 2348802315360939420}
-  - component: {fileID: 6319839036941927276}
   - component: {fileID: 6319839036941927285}
   m_Layer: 0
   m_Name: CM_Character New
@@ -841,19 +840,6 @@ MonoBehaviour:
   maxTorchLevel: 0
   hasTorch: 0
   enemy: {fileID: 0}
---- !u!135 &6319839036941927276
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2348802315360939428}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 7.113361
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6319839036941927285
 MonoBehaviour:
   m_ObjectHideFlags: 0
