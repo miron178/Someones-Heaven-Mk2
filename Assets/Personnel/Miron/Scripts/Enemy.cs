@@ -380,7 +380,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
     public void Push(Vector3 force)
     {
-        if (state != State.PUSHED)
+        if (!IsPushActive())
         {
             StartPushed();
         }
