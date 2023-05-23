@@ -21,6 +21,7 @@ public class WinScreen : MonoBehaviour
 
     public void RestartNewSeed()
     {
+        SceneManager.LoadScene(1);
         GameManager.Instance.StartGame();    
     }
 
