@@ -40,9 +40,11 @@ public class ItsATrap : MonoBehaviour
 
 	private void OnCollisionEnter(Collision collision)
 	{
+		if(collision.gameObject.tag == "Player") { print("Player Collision"); }
 		Player player = collision.gameObject.GetComponent<Player>();
 		if (player != null)
 		{
+			Debug.Log("YES PLAYER");
 			ContactPoint cp = collision.contacts[0];
 			Vector3 knock = cp.normal * force * -1;
 			player.Push(knock);
@@ -63,6 +65,7 @@ public class ItsATrap : MonoBehaviour
 			}
 			if (Time.time > damageCDEnd)
 			{
+				Debug.Log("YES DAMAGE");
 				damageable.TakeDamage(damage);
 				damageCDEnd = Time.time + damageCD;
 			}
