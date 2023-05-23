@@ -16,6 +16,8 @@ TagManager:
   - Powerup
   - Timer
   - WinTimerText
+  - Arrow
+  - EndRoom
   layers:
   - Default
   - TransparentFX

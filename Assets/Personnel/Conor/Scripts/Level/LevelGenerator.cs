@@ -199,6 +199,7 @@ public class LevelGenerator : MonoBehaviour
     void SpawnEndRoom()
     {
         GameObject endRoom = m_rooms[m_rooms.Count - 1];
+        endRoom.tag = "EndRoom";
         endRoom.AddComponent<EndRoom>();
         BoxCollider bC = endRoom.AddComponent<BoxCollider>();
         bC.isTrigger = true;
