@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 [RequireComponent(typeof(LevelGenerator))]
 [RequireComponent(typeof(RoomGenerator))]
@@ -40,6 +42,17 @@ public class GameManager : MonoBehaviour
 
     bool m_enableDevMenu = false;
     public bool EnableDevMenu { get { return m_enableDevMenu; } }
+
+    bool m_timerRun = false;
+    public void StopTimer() { m_timerRun = false; }
+    public string CurrentTime { get { return m_minutes.ToString("00") + ":" + m_seconds.ToString("00") + ":" + m_milliseconds.ToString("00"); } }
+    public void ResetTimer() { m_milliseconds = 0; m_seconds = 0; m_minutes = 0; m_timer = 0; }
+
+    float m_milliseconds = 0;
+    float m_seconds = 0;
+    float m_minutes = 0;
+    float m_timer;
+    TMP_Text timerText;
     #endregion
 
     void Awake() 
@@ -64,6 +77,8 @@ public class GameManager : MonoBehaviour
         m_levelGenerator.GenerateNavMesh();
         m_roomGenerator.GenerateEnemies();
         m_playerManager.SpawnPlayer();
+        timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TMP_Text>();
+        m_timerRun = true;
     }
 
     public void RestartGame()
@@ -72,12 +87,19 @@ public class GameManager : MonoBehaviour
         m_roomGenerator.ClearRoom();
         m_levelGenerator.ClearLevel();
 
+        m_timer = 0;
+        m_minutes = 0;
+        m_seconds = 0;
+        m_milliseconds = 0;
+
         m_levelGenerator.GenerateLevel();
         m_roomGenerator.GenerateTraps();
         m_roomGenerator.GeneratePowerUps();
         m_levelGenerator.GenerateNavMesh();
         m_roomGenerator.GenerateEnemies();
         m_playerManager.SpawnPlayer();
+        timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TMP_Text>();
+        m_timerRun = true;
     }
 
     public void NextLevel()
@@ -92,6 +114,8 @@ public class GameManager : MonoBehaviour
         m_levelGenerator.GenerateNavMesh();
         m_roomGenerator.GenerateEnemies(true);
         m_playerManager.SpawnPlayer();
+        timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TMP_Text>();
+        m_timerRun = true;
     }
 
     public void ClearGame()
@@ -99,5 +123,19 @@ public class GameManager : MonoBehaviour
         m_playerManager.DeletePlayer();
         m_roomGenerator.ClearRoom();
         m_levelGenerator.ClearLevel();
+    }
+
+    void FixedUpdate()
+    {
+        if(m_timerRun)
+        {
+            m_timer += Time.deltaTime;
+
+            m_minutes = MathF.Floor(m_timer / 60f);
+            m_seconds = MathF.Floor(m_timer % 60f);
+            m_milliseconds = (m_timer % 1) * 100;
+
+            timerText.text = m_minutes.ToString("00") + ":" + m_seconds.ToString("00") + ":" + m_milliseconds.ToString("00");
+        }
     }
 }

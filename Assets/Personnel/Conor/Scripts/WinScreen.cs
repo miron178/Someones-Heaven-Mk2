@@ -26,6 +26,7 @@ public class WinScreen : MonoBehaviour
 
     public void MainMenu()
     {
+        GameManager.Instance.ResetTimer();
         SceneManager.LoadScene(0);
     }
 }
