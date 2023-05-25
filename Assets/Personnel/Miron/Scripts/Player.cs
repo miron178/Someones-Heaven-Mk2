@@ -64,9 +64,6 @@ public class Player : MonoBehaviour, IDamageable
 	[SerializeField]
 	private bool useGravityOnJump = false;
 
-	
-
-
 	[SerializeField]
     private int maxHealth = 9;
     private int maxHealthBoost = 0;
@@ -485,7 +482,6 @@ public class Player : MonoBehaviour, IDamageable
         state = State.ROLLING;
 
         AddInvinciblity(invincibiltyDuration);
-
     }
 
     private void Roll()
