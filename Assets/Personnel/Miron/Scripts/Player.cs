@@ -34,10 +34,17 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     [SerializeField]
-    private float pushForce = 300f;
-    public float PushForce { get => pushForce; set => pushForce = value; }
+    private float pushForceMax = 300f;
+    public float PushForceMax { get => pushForceMax; }
 
-    public float gravity = -9.81f;
+	[SerializeField]
+	private float pushRamp = 1f;
+
+	private float pushForceCurrent = 0f;
+	public float PushForceCurrent { get => pushForceCurrent; }
+	private bool pushHold = false;
+
+	public float gravity = -9.81f;
 
     [SerializeField]
     float invincibiltyDuration = 0.5f;
@@ -137,6 +144,9 @@ public class Player : MonoBehaviour, IDamageable
 
 	public Transform torchThrower;
 
+	[SerializeField]
+	GameObject chargeBar;
+
 	private enum State
     {
 		IDLE,
@@ -228,6 +238,11 @@ public class Player : MonoBehaviour, IDamageable
         {
             healthBar.UpdateHealth(this);
         }
+
+		if (pushHold)
+        {
+			pushForceCurrent = Mathf.Min(pushForceCurrent + pushRamp * Time.deltaTime, pushForceMax);
+		}
 
         //cayan when IsInvincible
         //material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
@@ -336,28 +351,43 @@ public class Player : MonoBehaviour, IDamageable
 
 	public void OnPush(InputAction.CallbackContext context)
     {
-        if (context.performed && state != State.DEAD)
+		if (state == State.DEAD)
+			return;
+
+		switch(context.phase)
         {
-            foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
-            {
-                Vector3 dir = target.transform.position - transform.position;
-                Vector3 force = dir.normalized * pushForce;
-                IPushable pushable = target.GetComponent<IPushable>();
-                if (pushable != null)
-                {
-                    pushable.Push(force);
-                }
-                else
-                {
-                    Rigidbody rb = target.GetComponent<Rigidbody>();
-                    if (rb)
-                    {
-                        rb.AddForce(force);
-                    }
-                }
-            }
-        }
-		Invoke("SwitchAnimationBools", animationSwitchTime);
+			case InputActionPhase.Performed:
+				pushForceCurrent = 0;
+				pushHold = true;
+				chargeBar.SetActive(true);
+				break;
+			case InputActionPhase.Canceled:
+				foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
+				{
+					Vector3 dir = target.transform.position - transform.position;
+					Vector3 force = dir.normalized * pushForceCurrent;
+					IPushable pushable = target.GetComponent<IPushable>();
+					if (pushable != null)
+					{
+						pushable.Push(force);
+					}
+					else
+					{
+						Rigidbody rb = target.GetComponent<Rigidbody>();
+						if (rb)
+						{
+							rb.AddForce(force);
+						}
+					}
+				}
+				pushHold = false;
+				pushForceCurrent = 0;
+				Invoke("SwitchAnimationBools", animationSwitchTime);
+				chargeBar.SetActive(false);
+				break;
+			default:
+				break;
+		}
 	}
 
     public void OnRoll(InputAction.CallbackContext context)
