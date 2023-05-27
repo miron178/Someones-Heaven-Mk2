@@ -284,8 +284,9 @@ public class Player : MonoBehaviour, IDamageable
 		if (!IsInvincible() && canDamage)
         {
             health -= damage < health ? damage : health;
-		} 
-        if (health == 0)
+			AddInvinciblity(invincibiltyDuration);
+		}
+		if (health == 0)
         {
             Die();
         }
