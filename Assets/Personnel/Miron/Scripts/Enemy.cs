@@ -81,6 +81,9 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
     [SerializeField]
     Transform gun;
 
+    [SerializeField]
+    int healthPoints = 1;
+
     GameObject[] targets;
     GameObject closest;
 
@@ -655,6 +658,10 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
     public void TakeDamage(int damage)
     {
-        GameObject.Destroy(this.gameObject);
+        healthPoints = healthPoints - damage;
+        if (healthPoints <= 0)
+        {
+            GameObject.Destroy(this.gameObject);
+        }
     }
 }
