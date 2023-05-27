@@ -392,7 +392,7 @@ public class Player : MonoBehaviour, IDamageable
 		Vector3 movementXZ = movement;
 		movementXZ.y = 0;
 
-        if (model != null)
+        if (model != null && movementXZ != Vector3.zero)
         {
             Quaternion lookAt = Quaternion.LookRotation(movementXZ);
             model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
