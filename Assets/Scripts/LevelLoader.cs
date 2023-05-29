@@ -5,11 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class LevelLoader : MonoBehaviour
 {
-    //public string LevelName;
+    public int LevelIndex = 1;
 
     public void LoadLevel()
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(LevelIndex);
     }
+
 
 }
