@@ -543,11 +543,6 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
     {
         if (CanAttack())
         {
-            StartAttacking();
-        }
-        else if (CanPull())
-        {
-            LookAt(closest.transform.position);
             Player player = closest.GetComponent<Player>();
             Vector3 direction = transform.position - closest.transform.position;
             player.Push(direction.normalized * pullForce);

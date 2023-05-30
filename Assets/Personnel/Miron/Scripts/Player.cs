@@ -173,8 +173,12 @@ public class Player : MonoBehaviour, IDamageable
 
     void FixedUpdate()
     {
-		Vector3 dir = torchThrowDir.position - model.transform.position;
-		Debug.DrawRay(model.transform.position, dir.normalized * 10, Color.red);
+		if (Keyboard.current.leftShiftKey.isPressed) {
+			state = State.RUNNING;
+		}
+		if (Keyboard.current.leftShiftKey.wasReleasedThisFrame) {
+			state = State.WALKING;
+		}
 		switch (state)
         {
 			case State.IDLE:
