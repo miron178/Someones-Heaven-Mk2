@@ -3281,7 +3281,8 @@ GameObject:
   - component: {fileID: 4035551911747403426}
   - component: {fileID: 4035551911747403429}
   - component: {fileID: 4035551911747403427}
-  m_Layer: 0
+  - component: {fileID: 7727607014363690957}
+  m_Layer: 8
   m_Name: Spikes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3327,11 +3328,11 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4035551911747403428}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 4.2509413, y: 2.2083905, z: 3.9060636}
-  m_Center: {x: 2.106029, y: 0.604195, z: -1.0608398}
+  m_Size: {x: 4.2509413, y: 0.6970311, z: 3.9060636}
+  m_Center: {x: 2.106029, y: 0.39895442, z: -1.0608399}
 --- !u!114 &4035551911747403427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3341,12 +3342,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 4035551911747403428}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec529b565df5c4f41bfc74455140bb4b, type: 3}
+  m_Script: {fileID: 11500000, guid: 140f7119c9dac424089b5a9c1550bf55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  force: 20
+  force: 0
   damage: 1
-  damageCD: 2
+  damageCD: 1
+  trapDeadlySpeed: 0
+  enemyPushedToKill: 0
+--- !u!54 &7727607014363690957
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4035551911747403428}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 1
 --- !u!1 &4035551911858455349
 GameObject:
   m_ObjectHideFlags: 0

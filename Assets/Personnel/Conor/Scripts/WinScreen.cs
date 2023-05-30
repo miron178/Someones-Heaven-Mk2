@@ -21,11 +21,13 @@ public class WinScreen : MonoBehaviour
 
     public void RestartNewSeed()
     {
+        SceneManager.LoadScene(1);
         GameManager.Instance.StartGame();    
     }
 
     public void MainMenu()
     {
+        GameManager.Instance.ResetTimer();
         SceneManager.LoadScene(0);
     }
 }
