@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8745146016197106045}
   m_Layer: 12
   m_Name: Torch 2
-  m_TagString: Untagged
+  m_TagString: Torch
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,6 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 243a5770ddcaf194dbd59cd3eb7c0d63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  delay: 10
 --- !u!1 &3020006695641513302
 GameObject:
   m_ObjectHideFlags: 0
