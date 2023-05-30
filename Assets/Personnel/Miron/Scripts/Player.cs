@@ -193,7 +193,13 @@ public class Player : MonoBehaviour, IDamageable
 
     void FixedUpdate()
     {
-		
+
+		if (Keyboard.current.leftShiftKey.isPressed) {
+			state = State.RUNNING;
+		}
+		if (Keyboard.current.leftShiftKey.wasReleasedThisFrame) {
+			state = State.WALKING;
+		}
 		switch (state)
         {
 			case State.IDLE:
