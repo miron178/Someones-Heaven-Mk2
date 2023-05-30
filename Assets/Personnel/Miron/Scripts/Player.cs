@@ -33,28 +33,6 @@ public class Player : MonoBehaviour, IDamageable
         }
     }
 
-    [SerializeField]
-    private float pushForceMax = 300f;
-    public float PushForceMax { get => pushForceMax; }
-
-	[SerializeField]
-	private float pushRamp = 1f;
-
-	private float pushForceCurrent = 0f;
-	public float PushForceCurrent { get => pushForceCurrent; }
-	private bool pushHold = false;
-
-	[SerializeField]
-	private float throwForceMax = 300f;
-	public float ThrowForceMax { get => throwForceMax; }
-
-	[SerializeField]
-	private float throwRamp = 1f;
-
-	private float throwForceCurrent = 0f;
-	public float ThrowForceCurrent { get => throwForceCurrent; }
-	private bool throwHold = false;
-
 	public float gravity = -9.81f;
 
     [SerializeField]
@@ -144,13 +122,15 @@ public class Player : MonoBehaviour, IDamageable
     GameObject model;
 
 	[SerializeField]
-	Vector3 torchThrowVector;
+	Transform torchAttachment;
 
 	[SerializeField]
-	Transform torchThrower;
+	Transform torchThrowDir;
 
 	[SerializeField]
 	GameObject torchPrefab;
+
+	GameObject torch = null;
 
 	[SerializeField]
 	GameObject torchThrowCharge;
@@ -193,7 +173,8 @@ public class Player : MonoBehaviour, IDamageable
 
     void FixedUpdate()
     {
-		
+		Vector3 dir = torchThrowDir.position - model.transform.position;
+		Debug.DrawRay(model.transform.position, dir.normalized * 10, Color.red);
 		switch (state)
         {
 			case State.IDLE:
@@ -245,16 +226,6 @@ public class Player : MonoBehaviour, IDamageable
         {
             healthBar.UpdateHealth(this);
         }
-
-		if (pushHold)
-        {
-			pushForceCurrent = Mathf.Min(pushForceCurrent + pushRamp * Time.deltaTime, pushForceMax);
-		}
-
-		if (throwHold)
-		{
-			throwForceCurrent = Mathf.Min(throwForceCurrent + throwRamp * Time.deltaTime, throwForceMax);
-		}
 
 		//cayan when IsInvincible
 		//material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
@@ -364,11 +335,22 @@ public class Player : MonoBehaviour, IDamageable
 	}
 	public void OnThrowEnd(float magnitude)
 	{
-		Vector3 dir = torchThrowVector;
-		Vector3 force = dir.normalized * magnitude;
-		Rigidbody rb = torchPrefab.GetComponent<Rigidbody>();
-		rb.AddForce(force);
-		Invoke("SwitchAnimationBools", animationSwitchTime);
+		if (torch)
+        {
+
+			Vector3 dir = torchThrowDir.position - model.transform.position;
+			Vector3 force = dir.normalized * magnitude;
+			Rigidbody rb = torch.GetComponent<Rigidbody>();
+			rb.isKinematic = false;
+			rb.useGravity = true;
+			rb.AddForce(force);
+
+			//let go
+			torch.transform.parent = null;
+			torch = null;
+
+			Invoke("SwitchAnimationBools", animationSwitchTime);
+		}
 		torchThrowCharge.SetActive(false);
 		throwing = false;
 	}
@@ -382,15 +364,19 @@ public class Player : MonoBehaviour, IDamageable
 	{
 		if (context.canceled)
 		{
-			if (!torchPrefab.activeSelf)
+			if (!torch)
 			{
+				torch = GameObject.Instantiate(torchPrefab, torchAttachment);
+				Rigidbody rb = torch.GetComponent<Rigidbody>();
+				rb.isKinematic = true;
+				rb.useGravity = false;
 				torchThrowCharge.SetActive(true);
-				torchPrefab.SetActive(true);
 			}
 			else if (!throwing)
 			{
 				torchThrowCharge.SetActive(false);
-				torchPrefab.SetActive(false);
+				GameObject.Destroy(torch);
+				torch = null;
 			}
 		}
 	}
