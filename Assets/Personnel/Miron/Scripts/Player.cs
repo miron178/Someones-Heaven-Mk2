@@ -352,6 +352,10 @@ public class Player : MonoBehaviour, IDamageable
 			rb.useGravity = true;
 			rb.AddForce(force);
 
+			//initiate delayed kill
+			KillDelay kd = torch.GetComponent<KillDelay>();
+			kd.KillStart();
+
 			//let go
 			torch.transform.parent = null;
 			torch = null;
