@@ -44,6 +44,17 @@ public class Player : MonoBehaviour, IDamageable
 	public float PushForceCurrent { get => pushForceCurrent; }
 	private bool pushHold = false;
 
+	[SerializeField]
+	private float throwForceMax = 300f;
+	public float ThrowForceMax { get => throwForceMax; }
+
+	[SerializeField]
+	private float throwRamp = 1f;
+
+	private float throwForceCurrent = 0f;
+	public float ThrowForceCurrent { get => throwForceCurrent; }
+	private bool throwHold = false;
+
 	public float gravity = -9.81f;
 
     [SerializeField]
@@ -132,20 +143,20 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField]
     GameObject model;
 
-	public GameObject currentPlayerTorch;
-
-	public Rigidbody torchRB; public bool canThrow;
-
-	public Torch torch;
-
-	public int torchThrowSpeed;
-
-	public Vector3 torchThrowVector;
-
-	public Transform torchThrower;
+	[SerializeField]
+	Vector3 torchThrowVector;
 
 	[SerializeField]
-	GameObject chargeBar;
+	Transform torchThrower;
+
+	[SerializeField]
+	GameObject torchPrefab;
+
+	[SerializeField]
+	GameObject torchThrowCharge;
+
+	private bool throwing = false;
+
 
 	private enum State
     {
@@ -165,7 +176,6 @@ public class Player : MonoBehaviour, IDamageable
 		particleHolder = gameObject.GetComponent<ParticleHolder>();
 		originalSpeed = speed;
 		originalRunspeed = runSpeed;
-		torch = this.gameObject.GetComponent<Torch>();
 		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
         CharacterController controller = GetComponent<CharacterController>();
@@ -174,9 +184,6 @@ public class Player : MonoBehaviour, IDamageable
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
         healthBar = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<HealthBar>();
-		torchThrowSpeed = 50;
-
-		torchThrowVector = new Vector3(torchThrowSpeed, 0, 0);
 
         if (healthBar)
         {
@@ -244,11 +251,16 @@ public class Player : MonoBehaviour, IDamageable
 			pushForceCurrent = Mathf.Min(pushForceCurrent + pushRamp * Time.deltaTime, pushForceMax);
 		}
 
-        //cayan when IsInvincible
-        //material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
+		if (throwHold)
+		{
+			throwForceCurrent = Mathf.Min(throwForceCurrent + throwRamp * Time.deltaTime, throwForceMax);
+		}
 
-        //transparant when IsInvincible
-        if (material != null)
+		//cayan when IsInvincible
+		//material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
+
+		//transparant when IsInvincible
+		if (material != null)
         {
             Color color = CanRoll() ? Color.green : Color.yellow;
             color.a = IsInvincible() ? 0.5f : 1f;
@@ -303,36 +315,6 @@ public class Player : MonoBehaviour, IDamageable
 		//Enjoy being dead
 	}
 
-	public void OnThrow(InputAction.CallbackContext context) {
-		currentPlayerTorch = torch.currentTorch;
-		Instantiate(currentPlayerTorch, torchThrower.position, Quaternion.identity);
-		{
-			
-			//torchThrowVector = torchThrower.gameObject.GetComponent<Transform>();
-			//Torch 
-			// Instantiate the projectile at the position and rotation of this transform
-			Rigidbody currentTorch;
-			currentTorch = Instantiate(torchRB, transform.position, transform.rotation);
-
-			// Give the cloned object an initial velocity along the current
-			// object's Z axis
-			currentTorch.velocity = transform.TransformDirection(Vector3.forward * 100);
-			currentTorch.velocity = new Vector3(10, 0, 0);
-			Invoke("ThrowSwitch", 3);
-		}
-		//if (canThrow) {
-		//	canThrow = false;
-		//}	
-	}
-
-	public void ThrowSwitch() {
-		canThrow = true;
-	}
-
-	public void ThrowForce() {
-
-	}
-
 	public void OnMove(InputAction.CallbackContext context)
     {
         // read the value for the "move" action each event call
@@ -350,48 +332,70 @@ public class Player : MonoBehaviour, IDamageable
 	}
 
 
-	public void OnPush(InputAction.CallbackContext context)
+	public void OnPush(float magnitude)
     {
 		if (state == State.DEAD)
 			return;
 
-		switch(context.phase)
-        {
-			case InputActionPhase.Performed:
-				pushForceCurrent = 0;
-				pushHold = true;
-				chargeBar.SetActive(true);
-				break;
-			case InputActionPhase.Canceled:
-				foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
+		foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
+		{
+			Vector3 dir = target.transform.position - transform.position;
+			Vector3 force = dir.normalized * magnitude;
+			IPushable pushable = target.GetComponent<IPushable>();
+			if (pushable != null)
+			{
+				pushable.Push(force);
+			}
+			else
+			{
+				Rigidbody rb = target.GetComponent<Rigidbody>();
+				if (rb)
 				{
-					Vector3 dir = target.transform.position - transform.position;
-					Vector3 force = dir.normalized * pushForceCurrent;
-					IPushable pushable = target.GetComponent<IPushable>();
-					if (pushable != null)
-					{
-						pushable.Push(force);
-					}
-					else
-					{
-						Rigidbody rb = target.GetComponent<Rigidbody>();
-						if (rb)
-						{
-							rb.AddForce(force);
-						}
-					}
+					rb.AddForce(force);
 				}
-				pushHold = false;
-				pushForceCurrent = 0;
-				Invoke("SwitchAnimationBools", animationSwitchTime);
-				chargeBar.SetActive(false);
-				break;
-			default:
-				break;
+			}
+		}
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+	}
+
+	public void OnThrowStart()
+    {
+		throwing = true;
+	}
+	public void OnThrowEnd(float magnitude)
+	{
+		Vector3 dir = torchThrowVector;
+		Vector3 force = dir.normalized * magnitude;
+		Rigidbody rb = torchPrefab.GetComponent<Rigidbody>();
+		rb.AddForce(force);
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+		torchThrowCharge.SetActive(false);
+		throwing = false;
+	}
+
+	public void OnThrowCancel()
+    {
+		throwing = false;
+	}
+
+	public void OnTorch(InputAction.CallbackContext context)
+	{
+		if (context.canceled)
+		{
+			if (!torchPrefab.activeSelf)
+			{
+				torchThrowCharge.SetActive(true);
+				torchPrefab.SetActive(true);
+			}
+			else if (!throwing)
+			{
+				torchThrowCharge.SetActive(false);
+				torchPrefab.SetActive(false);
+			}
 		}
 	}
 
-    public void OnRoll(InputAction.CallbackContext context)
+	public void OnRoll(InputAction.CallbackContext context)
     {
         if (context.performed && controller.isGrounded && CanRoll() && state != State.DEAD)
         {
