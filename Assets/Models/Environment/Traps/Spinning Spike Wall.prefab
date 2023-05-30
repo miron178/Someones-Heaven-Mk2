@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 3551997130855162517}
   - component: {fileID: 1634751533759649375}
   - component: {fileID: 7971667103746727077}
-  - component: {fileID: -2583547378338668839}
   - component: {fileID: 7400926084518620558}
   - component: {fileID: 6288192901132532539}
+  - component: {fileID: 668231278}
+  - component: {fileID: 2196157451558394468}
   m_Layer: 8
   m_Name: Spinning Spike Wall
   m_TagString: Untagged
@@ -29,7 +30,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 986061457809176458}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -102,21 +103,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.3451344, y: 4, z: 16}
   m_Center: {x: 0, y: 2, z: 0}
---- !u!114 &-2583547378338668839
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 986061457809176458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec529b565df5c4f41bfc74455140bb4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  force: 20
-  damage: 1
-  damageCD: 2
 --- !u!114 &7400926084518620558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138,11 +124,44 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 986061457809176458}
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 1000
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 94
+  m_Interpolate: 1
+  m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!208 &668231278
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986061457809176458}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.67300004, y: 2, z: 8}
+  m_MoveThreshold: 0.3
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 2, z: 0}
+  m_TimeToStationary: 0.5
+--- !u!114 &2196157451558394468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986061457809176458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 140f7119c9dac424089b5a9c1550bf55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  force: 50
+  damage: 1
+  damageCD: 2
+  trapDeadlySpeed: 0
+  enemyPushedToKill: 0

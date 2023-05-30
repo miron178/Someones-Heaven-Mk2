@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
-public class Enemy : Pushable
+public class Enemy : MonoBehaviour, IPushable, IDamageable
 {
 	private EnemyParticleHolder enemyParticleHolder;
 
@@ -83,6 +83,9 @@ public class Enemy : Pushable
     [SerializeField]
     Transform gun;
 
+    [SerializeField]
+    int healthPoints = 1;
+
     GameObject[] targets;
     GameObject closest;
 
@@ -130,8 +133,9 @@ public class Enemy : Pushable
 
     void FixedUpdate()
     {
-		//ClosestTarget();
-		//MoveToClosest();
+        //Find the closest target once here
+		ClosestTarget();
+
 		switch (state)
         {
             case State.IDLE:
@@ -169,7 +173,7 @@ public class Enemy : Pushable
 
     private void SetState(State newState)
     {
-        Debug.Log("State: " + state + " --> " + newState);
+        //Debug.Log("State: " + state + " --> " + newState);
         state = newState;
         SetAnimationBool(stateName[(int)newState]);
 
@@ -193,16 +197,40 @@ public class Enemy : Pushable
         agent.SetDestination(transform.position);
     }
 
+    private void SelectNextState()
+    {
+        if (CanAttack())
+        {
+            StartAttacking();
+        }
+        else if (CanPull())
+        {
+            StartPulling();
+        }
+        else if (CanChase())
+        {
+            StartChasing();
+        }
+        else
+        {
+            StartIdle();
+        }
+    }
+
     private void StartIdle()
     {
         SetState(State.IDLE);
         StopAgent();
+        Invoke(nameof(EndIdle), idleTime);
     }
 
-	private void Idle()
+    private void Idle()
     {
-		Invoke(nameof(EndIdle), idleTime);
-	}
+        if (closest)
+        {
+            StartSurprised();
+        }
+    }
 
     private void EndIdle()
     {
@@ -231,9 +259,9 @@ public class Enemy : Pushable
 
     private void Wandering()
     {
-        if (ClosestTarget())
+        if (closest)
         {
-            StartChasing();
+            StartSurprised();
         }
     }
 
@@ -255,7 +283,7 @@ public class Enemy : Pushable
 
     private void EndSurprised()
     {
-        StartChasing();
+        SelectNextState();
     }
 
     private void StartChasing()
@@ -266,7 +294,7 @@ public class Enemy : Pushable
 
     private void Chasing()
     {
-        if (ClosestTarget()) 
+        if (closest) 
         {
             MoveToClosest();
             if (CanAttack())
@@ -286,7 +314,7 @@ public class Enemy : Pushable
 
     private void EndChasing()
     {
-        StartWandering();
+        SelectNextState();
     }
 
     private void StartFleeing()
@@ -296,7 +324,7 @@ public class Enemy : Pushable
     }
 
 	private void Fleeing() {
-        if (ClosestTarget())
+        if (closest)
         {
             Vector3 away = closest.transform.position - transform.position;
             MoveTo(away);
@@ -309,16 +337,18 @@ public class Enemy : Pushable
 
     private void EndFleeing()
     {
-        StartIdle();
+        SelectNextState();
     }
 
-	//private void StartFall() {
-	//	state = State.FALLING;
-	//}
-	
-	GameObject ClosestTarget()
+    //private void StartFall() {
+    //	state = State.FALLING;
+    //}
+
+    GameObject ClosestTarget()
     {
         closest = null;
+
+        float range = Mathf.Max(chaseRange, pullRange, attackRange);
 
         targets = GameObject.FindGameObjectsWithTag(SelectedTag);
 
@@ -334,7 +364,7 @@ public class Enemy : Pushable
             Vector3 difference = target.transform.position - pos;
             float currentDistance = difference.sqrMagnitude;
 
-            if (currentDistance > chaseRange * chaseRange)
+            if (currentDistance > range * range)
             {
                 continue; //too far
             }
@@ -353,16 +383,18 @@ public class Enemy : Pushable
         return !agent.enabled;
     }
 
-    public override void Push(Vector3 force)
+    public void Push(Vector3 force)
     {
-        StartPushed();
+        if (!IsPushActive())
+        {
+            StartPushed();
+        }
         rb.AddForce(force);
     }
 
     void StartPushed()
     {
         StopAgent();
-
         agent.enabled = false;
         rb.isKinematic = false;
 
@@ -400,6 +432,14 @@ public class Enemy : Pushable
         StartIdle();
 	}
 
+    private void LookAt(Vector3 target)
+    {
+        Vector3 forward = closest.transform.position - transform.position;
+        float speed = agent.angularSpeed / 180f * Time.fixedDeltaTime;
+        Quaternion look = Quaternion.LookRotation(forward);
+        agent.transform.rotation = Quaternion.Slerp(transform.rotation, look, speed);
+    }
+
     private void MoveTo(Vector3 target)
     {
         if (enemyAnimator)
@@ -411,11 +451,7 @@ public class Enemy : Pushable
         Debug.DrawLine(transform.position, target);
 
         //rotate towards target
-        Vector3 forward = closest.transform.position - transform.position;
-        float speed = agent.angularSpeed / 180f * Time.fixedDeltaTime;
-        Quaternion look = Quaternion.LookRotation(forward);
-        agent.transform.rotation = Quaternion.Slerp(transform.rotation, look, speed);
-
+        LookAt(target);
     }
 
     private void MoveToClosest()
@@ -478,16 +514,25 @@ public class Enemy : Pushable
             }
         }
         attackTime = Time.time + attackCD;
+
+        Invoke(nameof(EndAttacking), 0.2f);
     }
 
     private void Attacking()
     {
-		Invoke(nameof(EndAttacking), 0.2f);
+        if (TargetInRange())
+        {
+            LookAt(closest.transform.position);
+        }
+        else
+        {
+            EndAttacking();
+        }
     }
 
     private void EndAttacking()
     {
-        StartChasing();
+        SelectNextState();
     }
 
     private void StartPulling()
@@ -498,12 +543,11 @@ public class Enemy : Pushable
 
     private void Pulling()
     {
-        if (CanPull())
+        if (CanAttack())
         {
-			enemyParticleHolder.ParticlesOn();
             Player player = closest.GetComponent<Player>();
             Vector3 direction = transform.position - closest.transform.position;
-            player.AddPull(direction.normalized * pullForce);
+            player.Push(direction.normalized * pullForce);
         }
         else
         {
@@ -514,9 +558,19 @@ public class Enemy : Pushable
     private void StopPulling()
     {
         pullStart = Time.time + pullCD;
-        StartChasing();
+        SelectNextState();
     }
 
+    private bool CanChase()
+    {
+        bool can = false;
+        if (closest)
+        {
+            Vector3 distance = transform.position - closest.transform.position;
+            can = distance.magnitude <= chaseRange;
+        }
+        return can;
+    }
     private bool CanPull()
     {
         bool can = true;
@@ -540,10 +594,10 @@ public class Enemy : Pushable
         Color attack = Color.red;
         Color pull = Color.blue;
 
-        Gizmos.color = closest ? chase : chase * 0.5f;
+        Gizmos.color = CanChase() ? chase : chase * 0.5f;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
 
-        Gizmos.color = closest ? attack : attack * 0.5f;
+        Gizmos.color = CanAttack() ? attack : TargetInRange() ? attack * 0.75f : attack * 0.5f;
         Gizmos.DrawWireSphere(transform.position, attackRange);
 
         Gizmos.color = CanPull() ? pull : pull * 0.5f;
@@ -582,29 +636,6 @@ public class Enemy : Pushable
         //No ressurections
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-		if (other.tag == "Torch" && scaredOfFire)
-        {
-            StartFleeing();
-		}
-		else if (other.tag == "Player") 
-        {
-            StartChasing();
-		}
-	}
-
-	private void OnTriggerExit(Collider other) {
-		if (other.tag == "Torch" && scaredOfFire) 
-        {
-			EndFleeing();
-		}
-		else if (other.tag == "Player")
-        {
-            EndChasing();
-		}
-	}
-
     private void SetAnimationBool(string name, bool value = true)
     {
         if (enemyAnimator)
@@ -620,5 +651,14 @@ public class Enemy : Pushable
     void OnDestroy()
     {
         RoomGenerator.Instance.RemoveEnemy(gameObject);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        healthPoints = healthPoints - damage;
+        if (healthPoints <= 0)
+        {
+            GameObject.Destroy(this.gameObject);
+        }
     }
 }

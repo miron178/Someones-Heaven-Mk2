@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
     [SerializeField]
     private CharacterController controller;
@@ -34,10 +34,28 @@ public class Player : MonoBehaviour
     }
 
     [SerializeField]
-    private float pushForce = 300f;
-    public float PushForce { get => pushForce; set => pushForce = value; }
+    private float pushForceMax = 300f;
+    public float PushForceMax { get => pushForceMax; }
 
-    public float gravity = -9.81f;
+	[SerializeField]
+	private float pushRamp = 1f;
+
+	private float pushForceCurrent = 0f;
+	public float PushForceCurrent { get => pushForceCurrent; }
+	private bool pushHold = false;
+
+	[SerializeField]
+	private float throwForceMax = 300f;
+	public float ThrowForceMax { get => throwForceMax; }
+
+	[SerializeField]
+	private float throwRamp = 1f;
+
+	private float throwForceCurrent = 0f;
+	public float ThrowForceCurrent { get => throwForceCurrent; }
+	private bool throwHold = false;
+
+	public float gravity = -9.81f;
 
     [SerializeField]
     float invincibiltyDuration = 0.5f;
@@ -63,9 +81,6 @@ public class Player : MonoBehaviour
 	private float jumpDuration = 0.5f;
 	[SerializeField]
 	private bool useGravityOnJump = false;
-
-	
-
 
 	[SerializeField]
     private int maxHealth = 9;
@@ -128,17 +143,20 @@ public class Player : MonoBehaviour
     [SerializeField]
     GameObject model;
 
-	public GameObject currentPlayerTorch;
+	[SerializeField]
+	Vector3 torchThrowVector;
 
-	public Rigidbody torchRB; public bool canThrow;
+	[SerializeField]
+	Transform torchThrower;
 
-	public Torch torch;
+	[SerializeField]
+	GameObject torchPrefab;
 
-	public int torchThrowSpeed;
+	[SerializeField]
+	GameObject torchThrowCharge;
 
-	public Vector3 torchThrowVector;
+	private bool throwing = false;
 
-	public Transform torchThrower;
 
 	private enum State
     {
@@ -158,7 +176,6 @@ public class Player : MonoBehaviour
 		particleHolder = gameObject.GetComponent<ParticleHolder>();
 		originalSpeed = speed;
 		originalRunspeed = runSpeed;
-		torch = this.gameObject.GetComponent<Torch>();
 		Animator = GetComponent<Animator>();
         pushSensor = GetComponentInChildren<Sensor>();
         CharacterController controller = GetComponent<CharacterController>();
@@ -167,9 +184,6 @@ public class Player : MonoBehaviour
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
         healthBar = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<HealthBar>();
-		torchThrowSpeed = 50;
-
-		torchThrowVector = new Vector3(torchThrowSpeed, 0, 0);
 
         if (healthBar)
         {
@@ -232,11 +246,21 @@ public class Player : MonoBehaviour
             healthBar.UpdateHealth(this);
         }
 
-        //cayan when IsInvincible
-        //material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
+		if (pushHold)
+        {
+			pushForceCurrent = Mathf.Min(pushForceCurrent + pushRamp * Time.deltaTime, pushForceMax);
+		}
 
-        //transparant when IsInvincible
-        if (material != null)
+		if (throwHold)
+		{
+			throwForceCurrent = Mathf.Min(throwForceCurrent + throwRamp * Time.deltaTime, throwForceMax);
+		}
+
+		//cayan when IsInvincible
+		//material.color = IsInvincible() ? Color.cyan : (CanRoll() ? Color.green : Color.yellow);
+
+		//transparant when IsInvincible
+		if (material != null)
         {
             Color color = CanRoll() ? Color.green : Color.yellow;
             color.a = IsInvincible() ? 0.5f : 1f;
@@ -272,8 +296,9 @@ public class Player : MonoBehaviour
 		if (!IsInvincible() && canDamage)
         {
             health -= damage < health ? damage : health;
-		} 
-        if (health == 0)
+			AddInvinciblity(invincibiltyDuration);
+		}
+		if (health == 0)
         {
             Die();
         }
@@ -288,36 +313,6 @@ public class Player : MonoBehaviour
 	{
 		//TODO: do things on reset
 		//Enjoy being dead
-	}
-
-	public void OnThrow(InputAction.CallbackContext context) {
-		currentPlayerTorch = torch.currentTorch;
-		Instantiate(currentPlayerTorch, torchThrower.position, Quaternion.identity);
-		{
-			
-			//torchThrowVector = torchThrower.gameObject.GetComponent<Transform>();
-			//Torch 
-			// Instantiate the projectile at the position and rotation of this transform
-			Rigidbody currentTorch;
-			currentTorch = Instantiate(torchRB, transform.position, transform.rotation);
-
-			// Give the cloned object an initial velocity along the current
-			// object's Z axis
-			currentTorch.velocity = transform.TransformDirection(Vector3.forward * 100);
-			currentTorch.velocity = new Vector3(10, 0, 0);
-			Invoke("ThrowSwitch", 3);
-		}
-		//if (canThrow) {
-		//	canThrow = false;
-		//}	
-	}
-
-	public void ThrowSwitch() {
-		canThrow = true;
-	}
-
-	public void ThrowForce() {
-
 	}
 
 	public void OnMove(InputAction.CallbackContext context)
@@ -337,33 +332,70 @@ public class Player : MonoBehaviour
 	}
 
 
-	public void OnPush(InputAction.CallbackContext context)
+	public void OnPush(float magnitude)
     {
-        if (context.performed && state != State.DEAD)
-        {
-            foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
-            {
-                Vector3 dir = target.transform.position - transform.position;
-                Vector3 force = dir.normalized * pushForce;
-                Pushable pushable = target.GetComponent<Pushable>();
-                if (pushable)
-                {
-                    pushable.Push(force);
-                }
-                else
-                {
-                    Rigidbody rb = target.GetComponent<Rigidbody>();
-                    if (rb)
-                    {
-                        rb.AddForce(force);
-                    }
-                }
-            }
-        }
+		if (state == State.DEAD)
+			return;
+
+		foreach (GameObject target in pushSensor.InSight(pushSensor.layers))
+		{
+			Vector3 dir = target.transform.position - transform.position;
+			Vector3 force = dir.normalized * magnitude;
+			IPushable pushable = target.GetComponent<IPushable>();
+			if (pushable != null)
+			{
+				pushable.Push(force);
+			}
+			else
+			{
+				Rigidbody rb = target.GetComponent<Rigidbody>();
+				if (rb)
+				{
+					rb.AddForce(force);
+				}
+			}
+		}
 		Invoke("SwitchAnimationBools", animationSwitchTime);
 	}
 
-    public void OnRoll(InputAction.CallbackContext context)
+	public void OnThrowStart()
+    {
+		throwing = true;
+	}
+	public void OnThrowEnd(float magnitude)
+	{
+		Vector3 dir = torchThrowVector;
+		Vector3 force = dir.normalized * magnitude;
+		Rigidbody rb = torchPrefab.GetComponent<Rigidbody>();
+		rb.AddForce(force);
+		Invoke("SwitchAnimationBools", animationSwitchTime);
+		torchThrowCharge.SetActive(false);
+		throwing = false;
+	}
+
+	public void OnThrowCancel()
+    {
+		throwing = false;
+	}
+
+	public void OnTorch(InputAction.CallbackContext context)
+	{
+		if (context.canceled)
+		{
+			if (!torchPrefab.activeSelf)
+			{
+				torchThrowCharge.SetActive(true);
+				torchPrefab.SetActive(true);
+			}
+			else if (!throwing)
+			{
+				torchThrowCharge.SetActive(false);
+				torchPrefab.SetActive(false);
+			}
+		}
+	}
+
+	public void OnRoll(InputAction.CallbackContext context)
     {
         if (context.performed && controller.isGrounded && CanRoll() && state != State.DEAD)
         {
@@ -395,7 +427,7 @@ public class Player : MonoBehaviour
 		Vector3 movementXZ = movement;
 		movementXZ.y = 0;
 
-        if (model != null)
+        if (model != null && movementXZ != Vector3.zero)
         {
             Quaternion lookAt = Quaternion.LookRotation(movementXZ);
             model.transform.rotation = Quaternion.Lerp(model.transform.rotation, lookAt, smoothRotation);
@@ -485,7 +517,6 @@ public class Player : MonoBehaviour
         state = State.ROLLING;
 
         AddInvinciblity(invincibiltyDuration);
-
     }
 
     private void Roll()
@@ -602,7 +633,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void AddPull(Vector3 force)
+    public void Push(Vector3 force)
     {
         pull += force;
     }
