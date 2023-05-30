@@ -137,6 +137,9 @@ public class Player : MonoBehaviour, IDamageable
 
 	private bool throwing = false;
 
+	[SerializeField]
+	private float torchCD = 5f;
+	private float nextTorchTime = 0f;
 
 	private enum State
     {
@@ -353,6 +356,8 @@ public class Player : MonoBehaviour, IDamageable
 			torch.transform.parent = null;
 			torch = null;
 
+			nextTorchTime = Time.time + torchCD;
+
 			Invoke("SwitchAnimationBools", animationSwitchTime);
 		}
 		torchThrowCharge.SetActive(false);
@@ -368,7 +373,7 @@ public class Player : MonoBehaviour, IDamageable
 	{
 		if (context.canceled)
 		{
-			if (!torch)
+			if (!torch && Time.time > nextTorchTime)
 			{
 				torch = GameObject.Instantiate(torchPrefab, torchAttachment);
 				Rigidbody rb = torch.GetComponent<Rigidbody>();
