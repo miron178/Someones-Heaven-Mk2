@@ -240,8 +240,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e7e65e3fe1d0804d81f43dab7fc9814, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectIncrease: 100
-  effectTimeOut: 10
+  effectIncrease: 10
+  effectTimeOut: 200
   isHealth: 0
   isSpeed: 1
   isDefence: 0

@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class Enemy : Pushable
 {
+	private EnemyParticleHolder enemyParticleHolder;
+
     [SerializeField]
     private float chaseRange = 15;
 
@@ -119,7 +121,7 @@ public class Enemy : Pushable
 
 	private void Start()
     {
-
+		enemyParticleHolder = gameObject.GetComponent<EnemyParticleHolder>();
 		nextPosition = transform.position;
 		enemyAnimator = GetComponent<Animator>();
 
@@ -498,6 +500,7 @@ public class Enemy : Pushable
     {
         if (CanPull())
         {
+			enemyParticleHolder.ParticlesOn();
             Player player = closest.GetComponent<Player>();
             Vector3 direction = transform.position - closest.transform.position;
             player.AddPull(direction.normalized * pullForce);
