@@ -25,14 +25,14 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
     public NavMeshAgent agent;
 
+    [SerializeField]
+	private bool scaredOfFire = false;
+
 	[SerializeField]
 	private Animator enemyAnimator;
 
     [SerializeField]
-    private static string PlayerTag = "Player";
-
-    [SerializeField]
-    private static string TorchTag = "Torch";
+    private static string SelectedTag = "Player";
 
     [SerializeField]
     private float endPushSpeed = 0.1f;
@@ -84,6 +84,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
     [SerializeField]
     int healthPoints = 1;
 
+    GameObject[] targets;
     GameObject closest;
 
     Rigidbody rb;
@@ -116,15 +117,8 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
 	private State state = State.IDLE;
 
-    enum TorchBehaviour
-    {
-        IGNORE,
-        CHASE,
-        FLEE,
-    }
 
-    [SerializeField]
-    TorchBehaviour torchBehaviour = TorchBehaviour.IGNORE;
+	//public int speed;
 
 	private void Start()
     {
@@ -203,11 +197,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
     private void SelectNextState()
     {
-        if (MustFlee())
-        {
-            StartFleeing();
-        }
-        else if (CanAttack())
+        if (CanAttack())
         {
             StartAttacking();
         }
@@ -305,11 +295,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
         if (closest) 
         {
             MoveToClosest();
-            if (MustFlee())
-            {
-                StartFleeing();
-            }
-            else if (CanAttack())
+            if (CanAttack())
             {
                 StartAttacking();
             }
@@ -336,9 +322,10 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
     }
 
 	private void Fleeing() {
-        if (closest && closest.tag == TorchTag)
+        if (closest)
         {
-            MoveAvawayFromClosest();
+            Vector3 away = closest.transform.position - transform.position;
+            MoveTo(away);
         }
         else
         {
@@ -361,21 +348,17 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
         float range = Mathf.Max(chaseRange, pullRange, attackRange);
 
-        GameObject[] targets = new GameObject[0];
-        if (torchBehaviour != TorchBehaviour.IGNORE)
-        {
-            targets = GameObject.FindGameObjectsWithTag(TorchTag);
-        }
-        if (targets.Length == 0)
-        {
-            targets = GameObject.FindGameObjectsWithTag(PlayerTag);
-        }
+        targets = GameObject.FindGameObjectsWithTag(SelectedTag);
 
         float distance = Mathf.Infinity;
         Vector3 pos = transform.position;
 
         foreach (GameObject target in targets)
         {
+            Player player = target.GetComponent<Player>();
+            if (!player)
+                continue;
+
             Vector3 difference = target.transform.position - pos;
             float currentDistance = difference.sqrMagnitude;
 
@@ -393,17 +376,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
         return closest;
 	}
 
-    bool ClosestIsPlayer()
-    {
-        return closest != null && closest.tag == PlayerTag;
-    }
-
-    bool ClosestIsTorch()
-    {
-        return closest != null && closest.tag == TorchTag;
-    }
-
-    public bool IsPushActive()
+	public bool IsPushActive()
     {
         return !agent.enabled;
     }
@@ -489,22 +462,13 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
         MoveTo(target);
     }
 
-    private void MoveAvawayFromClosest()
-    {
-        Vector3 target = transform.position + transform.position - closest.transform.position;
-
-        //move to target radius
-        MoveTo(target);
-    }
-
-
     private bool TargetInRange()
     {
-        if (!ClosestIsPlayer())
+        if (!closest)
         {
             return false;
         }
-        
+
         Vector3 distance = transform.position - closest.transform.position;
         return distance.magnitude <= attackRange;
     }
@@ -577,12 +541,13 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
     private void Pulling()
     {
-        if (MustFlee())
+        if (CanAttack())
         {
-            StartFleeing();
+            StartAttacking();
         }
-        else if(CanAttack())
+        else if (CanPull())
         {
+            LookAt(closest.transform.position);
             Player player = closest.GetComponent<Player>();
             Vector3 direction = transform.position - closest.transform.position;
             player.Push(direction.normalized * pullForce);
@@ -597,17 +562,6 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
     {
         pullStart = Time.time + pullCD;
         SelectNextState();
-    }
-
-    private bool MustFlee()
-    {
-        bool must = false;
-        if (ClosestIsTorch() && torchBehaviour == TorchBehaviour.FLEE)
-        {
-            Vector3 distance = transform.position - closest.transform.position;
-            must = distance.magnitude <= chaseRange;
-        }
-        return must;
     }
 
     private bool CanChase()
@@ -639,12 +593,11 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
     private void OnDrawGizmos()
     {
-        Color flee = Color.yellow;
         Color chase = Color.green;
         Color attack = Color.red;
         Color pull = Color.blue;
 
-        Gizmos.color = MustFlee() ? flee : CanChase() ? chase : chase * 0.5f;
+        Gizmos.color = CanChase() ? chase : chase * 0.5f;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
 
         Gizmos.color = CanAttack() ? attack : TargetInRange() ? attack * 0.75f : attack * 0.5f;

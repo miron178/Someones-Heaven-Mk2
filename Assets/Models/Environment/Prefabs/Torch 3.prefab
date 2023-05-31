@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 1992620661297915}
   - component: {fileID: 1992620661297893}
   - component: {fileID: 1992620661297914}
-  m_Layer: 12
+  - component: {fileID: 1992620661297892}
+  m_Layer: 0
   m_Name: Point Light (2)
   m_TagString: Torch
   m_Icon: {fileID: 0}
@@ -115,6 +116,19 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!135 &1992620661297892
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992620661297912}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1992621184228137
 GameObject:
   m_ObjectHideFlags: 0
@@ -126,7 +140,8 @@ GameObject:
   - component: {fileID: 1992621184228136}
   - component: {fileID: 1992621184228138}
   - component: {fileID: 1992621184228139}
-  m_Layer: 12
+  - component: {fileID: 1992621184228181}
+  m_Layer: 0
   m_Name: Point Light (4)
   m_TagString: Torch
   m_Icon: {fileID: 0}
@@ -230,6 +245,19 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!135 &1992621184228181
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992621184228137}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1992622078442589
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,7 +269,8 @@ GameObject:
   - component: {fileID: 1992622078442588}
   - component: {fileID: 1992622078442590}
   - component: {fileID: 1992622078442591}
-  m_Layer: 12
+  - component: {fileID: 1992622078442585}
+  m_Layer: 0
   m_Name: Point Light (3)
   m_TagString: Torch
   m_Icon: {fileID: 0}
@@ -345,6 +374,19 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!135 &1992622078442585
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992622078442589}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1992622128082757
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,7 +398,8 @@ GameObject:
   - component: {fileID: 1992622128082756}
   - component: {fileID: 1992622128082758}
   - component: {fileID: 1992622128082759}
-  m_Layer: 12
+  - component: {fileID: 1992622128082753}
+  m_Layer: 0
   m_Name: Point Light (1)
   m_TagString: Torch
   m_Icon: {fileID: 0}
@@ -460,6 +503,19 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!135 &1992622128082753
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992622128082757}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &920561260373565904
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,11 +527,9 @@ GameObject:
   - component: {fileID: 544281596148923242}
   - component: {fileID: 3468465157459555535}
   - component: {fileID: 1713199537132322821}
-  - component: {fileID: 2745755401379080421}
-  - component: {fileID: 4129706758670975954}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Torch 3
-  m_TagString: Torch
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -551,32 +605,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2745755401379080421
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920561260373565904}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.006050041, y: 0.0026051658, z: 0.006710484}
-  m_Center: {x: -2.3283067e-10, y: -1.4551915e-11, z: 5.8207654e-11}
---- !u!114 &4129706758670975954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920561260373565904}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 243a5770ddcaf194dbd59cd3eb7c0d63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  delay: 10
 --- !u!1 &8150010601581137198
 GameObject:
   m_ObjectHideFlags: 0
@@ -588,7 +616,8 @@ GameObject:
   - component: {fileID: 6887913453266185105}
   - component: {fileID: 4902156824142637644}
   - component: {fileID: 6984035720663441060}
-  m_Layer: 12
+  - component: {fileID: 8150010601581137193}
+  m_Layer: 0
   m_Name: Point Light
   m_TagString: Torch
   m_Icon: {fileID: 0}
@@ -692,3 +721,16 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!135 &8150010601581137193
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8150010601581137198}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}

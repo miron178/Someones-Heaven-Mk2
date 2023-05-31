@@ -18,7 +18,6 @@ TagManager:
   - WinTimerText
   - Arrow
   - EndRoom
-  - New
   layers:
   - Default
   - TransparentFX
@@ -32,8 +31,8 @@ TagManager:
   - Bullet
   - Mask
   - SeeThrough
-  - Torch
-  - Player
+  - 
+  - 
   - 
   - 
   - 
