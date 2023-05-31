@@ -75,6 +75,7 @@ public class GameManager : MonoBehaviour
         m_levelGenerator.GenerateLevel();
         m_roomGenerator.GenerateTraps();
         m_roomGenerator.GeneratePowerUps();
+        m_roomGenerator.SpawnEndDoor();
         m_levelGenerator.GenerateNavMesh();
         m_roomGenerator.GenerateEnemies();
         m_playerManager.SpawnPlayer();

@@ -815,6 +815,8 @@ MonoBehaviour:
     type: 3}
   m_enemyPrefabs: []
   m_powerUpPrefabs: []
+  m_endDoor: {fileID: 9219515149138739241, guid: 5fc1dead9e372604c9fae9cc5201cb74,
+    type: 3}
   m_traps: []
   m_enemies: []
   m_powerUps: []
@@ -841,6 +843,7 @@ MonoBehaviour:
   m_southPrefabs: []
   m_westPrefabs: []
   m_rooms: []
+  m_endRooms: []
   m_roomPositions: []
   m_player: {fileID: 2348802315360939428, guid: 8222c577b21a5754e9533917daa4040d,
     type: 3}

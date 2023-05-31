@@ -51,6 +51,7 @@ public class RoomGenerator : MonoBehaviour
     [SerializeField] GameObject m_trapPrefab;
     [SerializeField] GameObject[] m_enemyPrefabs;
     [SerializeField] GameObject[] m_powerUpPrefabs;
+    [SerializeField] GameObject m_endDoor;
 
     [Header("Generated Variables", order = 3)]
     [SerializeField] List<GameObject> m_traps;
@@ -185,7 +186,7 @@ public class RoomGenerator : MonoBehaviour
                     if(pickedIndex.Contains(index)) { passes++; continue; }
 
                     Transform floorTransform = floors[index].transform;
-                    Vector3 pos = new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z);
+                    Vector3 pos = new Vector3(floorTransform.position.x + 2, floorTransform.position.y + 1, floorTransform.position.z - 3.5f);
 
                     GameObject enemy = Instantiate(m_enemyPrefabs[m_random.Next(0, m_enemyPrefabs.Length)], pos, Quaternion.identity, m_enemyParent.transform);
 
@@ -235,7 +236,7 @@ public class RoomGenerator : MonoBehaviour
                     if(pickedIndex.Contains(index)) { passes++; continue; }
 
                     Transform floorTransform = floors[index].transform;
-                    Vector3 pos = new Vector3(floorTransform.position.x, floorTransform.position.y + 1, floorTransform.position.z);
+                    Vector3 pos = new Vector3(floorTransform.position.x + 2, floorTransform.position.y + 1, floorTransform.position.z - 3.5f);
 
                     GameObject powerUp = Instantiate(m_powerUpPrefabs[m_random.Next(0, m_powerUpPrefabs.Length)], pos, Quaternion.identity, m_powerUpParent.transform);
 
@@ -244,5 +245,25 @@ public class RoomGenerator : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void SpawnEndDoor(bool nextRoom = false)
+    {
+        List<GameObject> branchEnds = LevelGenerator.Instance.GetBranchEnds;
+
+        if(!nextRoom) { m_random = m_gameManager.RandomGenerator; }
+        else { m_random = m_gameManager.RandomGeneratorSame; }
+
+        GameObject pickedRoom = branchEnds[m_random.Next(0, branchEnds.Count)];
+        List<GameObject> floors = Utilities.FindRoomFloors(pickedRoom);
+
+        GameObject pickedFloor = floors[m_random.Next(0, floors.Count)];
+
+        Transform floorTransform = pickedFloor.transform;
+        Vector3 pos = new Vector3(floorTransform.position.x + 2, floorTransform.position.y + 1, floorTransform.position.z - 3.5f);
+
+        GameObject door = Instantiate(m_endDoor, pos, Quaternion.identity, floorTransform.parent);
+
+        door.transform.rotation = Quaternion.Euler(-90, 0, 0);
     }
 }
