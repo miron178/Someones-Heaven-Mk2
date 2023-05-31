@@ -6,9 +6,11 @@ using UnityEngine.InputSystem;
 
 public class Enemy : MonoBehaviour, IPushable, IDamageable
 {
+
+	public AudioHolder audioHolder;
+
     [SerializeField]
     private float chaseRange = 15;
-
     [SerializeField]
     private float wanderRadius = 10;
     [SerializeField]
@@ -128,7 +130,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
 	private void Start()
     {
-
+		audioHolder = this.gameObject.GetComponent<AudioHolder>();
 		nextPosition = transform.position;
 		enemyAnimator = GetComponent<Animator>();
 
@@ -280,6 +282,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
     private void StartSurprised()
     {
+		audioHolder.alerted.Play();
         SetState(State.SURPRISED);
         StopAgent();
     }

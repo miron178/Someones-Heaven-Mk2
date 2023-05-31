@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour, IDamageable
 {
+	public AudioHolder audioHolder;
+
     [SerializeField]
     private CharacterController controller;
 
@@ -156,6 +158,7 @@ public class Player : MonoBehaviour, IDamageable
 
     private void Start()
     {
+		audioHolder = this.gameObject.GetComponent<AudioHolder>();
 		canDamage = true;
 		particleHolder = gameObject.GetComponent<ParticleHolder>();
 		originalSpeed = speed;
@@ -276,6 +279,7 @@ public class Player : MonoBehaviour, IDamageable
     {	
 		if (!IsInvincible() && canDamage)
         {
+			audioHolder.damaged.Play();
             health -= damage < health ? damage : health;
 			AddInvinciblity(invincibiltyDuration);
 		}
