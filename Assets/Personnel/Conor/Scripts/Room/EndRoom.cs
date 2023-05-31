@@ -31,7 +31,7 @@ public class EndRoom : MonoBehaviour
             GameManager.Instance.StopTimer();
             GameManager.Instance.ClearGame();
 
-            m_winTimerText.text = GameManager.Instance.CurrentTime;
+            m_winTimerText.text = GameManager.Instance.CurrentTimeString;
             m_winScreen.SetActive(true);
         }
     }
