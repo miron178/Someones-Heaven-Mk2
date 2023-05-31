@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json.Nodes;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using System.Linq;
+
 
 public class Leaderboard : MonoBehaviour
 {
@@ -46,29 +48,40 @@ public class Leaderboard : MonoBehaviour
 
         // StartCoroutine(FetchResults());
 
-        // List<PlayerInfo> sortedList = m_playerInfos.OrderBy(o => o.Time).ToList();
-
-        // for(int i = 0; i < 25; i++)
-        // {
-        //     m_playerCards[i].SetName(sortedList[i].Name);
-        //     m_playerCards[i].SetTime(sortedList[i].Time);
-        // }
+        InvokeRepeating("FetchResultsBootstrap", 0f, 10f);
     }
 
-    // IEnumerator FetchResults()
-    // {
-    //     UnityWebRequest www = UnityWebRequest.Get($"https://halfempty.conorlewis.com/getTimes?seed={m_comxSeed}");
+    void FetchResultsBootstrap() { StartCoroutine(FetchResults()); }
+    IEnumerator FetchResults()
+    {
+        UnityWebRequest www = UnityWebRequest.Get($"https://halfempty.conorlewis.com/getTimes?seed={m_comxSeed}");
 
-    //     yield return www.SendWebRequest();
+        yield return www.SendWebRequest();
 
-    //     Debug.Log("Recieved Request:" + www.downloadHandler.text);
+        Debug.Log("Recieved Request:" + www.downloadHandler.text);
 
-    //     string rawData = www.downloadHandler.text.Substring(1, www.downloadHandler.text.Length - 2);
+        string rawData = www.downloadHandler.text.Substring(1, www.downloadHandler.text.Length - 2);
+        string[] rawDataList = rawData.Split(',');
 
-    //     dynamic jsonData = JsonUtility.FromJson(rawData);
+        for(int i = 0; i < rawDataList.Length; i+=2)
+        {
+            string data = rawDataList[i] + "," + rawDataList[i+1];
 
-    //     print(jsonData);
-    // }
+            JsonObject jsonData = JsonNode.Parse(data).AsObject();
+
+            PlayerInfo newInfo = new PlayerInfo() { Name = (string)jsonData["name"], Time = (float)jsonData["time"] };
+
+            if(!m_playerInfos.Contains(newInfo)) { m_playerInfos.Add(newInfo); }
+        }
+
+        List<PlayerInfo> sortedList = m_playerInfos.OrderBy(o => o.Time).ToList();
+
+        for(int i = 0; i < sortedList.Count; i++)
+        {
+            m_playerCards[i].SetName(sortedList[i].Name);
+            m_playerCards[i].SetTime(sortedList[i].Time);
+        }
+    }
 
     IEnumerator SetBackgroundColor()
     {
