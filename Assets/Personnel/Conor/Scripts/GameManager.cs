@@ -45,8 +45,7 @@ public class GameManager : MonoBehaviour
 
     bool m_timerRun = false;
     public void StopTimer() { m_timerRun = false; }
-    public float CurrentTimeFloat { get { return m_timer; } }
-    public string CurrentTimeString { get { return m_minutes.ToString("00") + ":" + m_seconds.ToString("00") + ":" + m_milliseconds.ToString("00"); } }
+    public string CurrentTime { get { return m_minutes.ToString("00") + ":" + m_seconds.ToString("00") + ":" + m_milliseconds.ToString("00"); } }
     public void ResetTimer() { m_milliseconds = 0; m_seconds = 0; m_minutes = 0; m_timer = 0; }
 
     float m_milliseconds = 0;
