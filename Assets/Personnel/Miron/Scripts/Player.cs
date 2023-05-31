@@ -158,7 +158,7 @@ public class Player : MonoBehaviour, IDamageable
 
     private void Start()
     {
-		audioHolder = this.gameObject.GetComponent<AudioHolder>();
+		//audioHolder = this.gameObject.GetComponent<AudioHolder>();
 		canDamage = true;
 		particleHolder = gameObject.GetComponent<ParticleHolder>();
 		originalSpeed = speed;
