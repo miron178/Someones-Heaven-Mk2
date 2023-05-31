@@ -115,6 +115,7 @@ public class LevelGenerator : MonoBehaviour
 
         m_rooms.Clear();
         m_roomPositions.Clear();
+        m_endRooms.Clear();
     }
 
     //Generate Level
