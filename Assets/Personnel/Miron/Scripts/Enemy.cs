@@ -9,7 +9,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
 	public AudioHolder audioHolder;
 
-    [SerializeField]
+	[SerializeField]
     private float chaseRange = 15;
     [SerializeField]
     private float wanderRadius = 10;
@@ -130,7 +130,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
 	private void Start()
     {
-		audioHolder = this.gameObject.GetComponent<AudioHolder>();
+		//audioHolder = this.gameObject.GetComponent<AudioHolder>();
 		nextPosition = transform.position;
 		enemyAnimator = GetComponent<Animator>();
 
@@ -675,6 +675,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
     //TODO: Call this from somewhere!
     private void StartDead()
     {
+		audioHolder.death.Play();
         SetState(State.DEAD);
         StopAgent();
     }
@@ -708,6 +709,7 @@ public class Enemy : MonoBehaviour, IPushable, IDamageable
 
     public void TakeDamage(int damage)
     {
+		audioHolder.damaged.Play();
         healthPoints = healthPoints - damage;
         if (healthPoints <= 0)
         {
