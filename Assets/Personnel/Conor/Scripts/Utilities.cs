@@ -68,4 +68,25 @@ public static class Utilities
 
         return childrenMatched;
     }
+
+    public static string ConvertFloatToTime(float value)
+    {
+        int minutes = 0;
+        int seconds = 0;
+        int milliseconds = (int)((value % 1) * 100);
+
+        while(value >= 1)
+        {
+            if(seconds + 1 == 60) { seconds = 0; minutes++; }
+            else { seconds++; }
+
+            value--;
+        }
+
+        string minutesText = minutes >= 10 ? $"{minutes}" : $"0{minutes}";
+        string secondsText =  seconds >= 10 ? $"{seconds}" : $"0{seconds}";
+        string millisecondsText = milliseconds >= 10 ? $"{milliseconds}" : $"0{milliseconds}";
+
+        return $"{minutesText}:{secondsText}:{millisecondsText}";
+    }
 }
