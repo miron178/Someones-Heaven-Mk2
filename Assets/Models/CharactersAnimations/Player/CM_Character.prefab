@@ -11522,6 +11522,8 @@ MonoBehaviour:
   torchPrefab: {fileID: 1587553380114558260, guid: 9fb077f4912e5d34ca4306705db22f89,
     type: 3}
   torchThrowCharge: {fileID: 6577878604713956556}
+  torchCD: 5
+  m_deathScreen: {fileID: 0}
 --- !u!65 &8214737304108014635
 BoxCollider:
   m_ObjectHideFlags: 0
