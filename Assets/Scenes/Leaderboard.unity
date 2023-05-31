@@ -1788,6 +1788,7 @@ MonoBehaviour:
   m_playerCardPrefab: {fileID: 5230740644605532990, guid: 01c2ea7340404d64a9e0e4440ab12fa8,
     type: 3}
   m_playerCards: []
+  m_playerInfos: []
 --- !u!1 &1739864611
 GameObject:
   m_ObjectHideFlags: 0
