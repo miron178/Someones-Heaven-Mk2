@@ -6473,7 +6473,6 @@ GameObject:
   - component: {fileID: 4807529143992957039}
   - component: {fileID: 4530844572592494683}
   - component: {fileID: 2838552023782629819}
-  - component: {fileID: 262125277196743463}
   m_Layer: 0
   m_Name: EM_Spider
   m_TagString: Untagged
@@ -6530,13 +6529,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90ff8ae40a63da4479818a172ca12b0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chaseRange: 15
-  wanderRadius: 10
-  wanderTime: 10
-  idleTime: 10
-  surprisedTime: 1
+  playerSeen: 0
   DEBUG_BOOL: 0
   agent: {fileID: 2838552023782629819}
+  isIdle: 1
+  isWandering: 0
+  isFleeing: 0
+  isChasing: 0
+  isSurprised: 0
+  isFiring: 0
   scaredOfFire: 0
   enemyAnimator: {fileID: 4807529143992957039}
   endPushSpeed: 0.1
@@ -6555,7 +6556,6 @@ MonoBehaviour:
   shootMaxAngle: 30
   material: {fileID: 0}
   gun: {fileID: 0}
-  healthPoints: 1
 --- !u!195 &2838552023782629819
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -6578,18 +6578,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &262125277196743463
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3744609394562758385}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7abf65cdd792d4448ae0fbd3badb7a89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3877142723024592732
 GameObject:
   m_ObjectHideFlags: 0

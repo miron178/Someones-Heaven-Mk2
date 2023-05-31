@@ -260,7 +260,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e7e65e3fe1d0804d81f43dab7fc9814, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectIncrease: 3
+  effectIncrease: 1
   effectTimeOut: 3
   isHealth: 1
   isSpeed: 0
