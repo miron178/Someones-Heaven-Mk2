@@ -11161,6 +11161,7 @@ GameObject:
   - component: {fileID: 6423848439061024437}
   - component: {fileID: 6423848439061024432}
   - component: {fileID: 6423848439061024435}
+  - component: {fileID: 993737289538043437}
   m_Layer: 0
   m_Name: EM_Goblin
   m_TagString: Untagged
@@ -11268,15 +11269,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90ff8ae40a63da4479818a172ca12b0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSeen: 0
+  chaseRange: 15
+  wanderRadius: 10
+  wanderTime: 10
+  idleTime: 10
+  surprisedTime: 1
   DEBUG_BOOL: 0
   agent: {fileID: 6423848439061024432}
-  isIdle: 0
-  isWandering: 0
-  isFleeing: 0
-  isChasing: 0
-  isSurprised: 0
-  isFiring: 0
   scaredOfFire: 0
   enemyAnimator: {fileID: 598008667842226788}
   endPushSpeed: 0.1
@@ -11295,6 +11294,19 @@ MonoBehaviour:
   shootMaxAngle: 30
   material: {fileID: 0}
   gun: {fileID: 0}
+  healthPoints: 1
+--- !u!114 &993737289538043437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6190041347061885604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7abf65cdd792d4448ae0fbd3badb7a89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6375660576120112456
 GameObject:
   m_ObjectHideFlags: 0
