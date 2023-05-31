@@ -51,6 +51,9 @@ public class LevelGenerator : MonoBehaviour
     public int RoomCount { get { return m_rooms.Count; } }
     public List<GameObject> Rooms { get { return m_rooms; } }
 
+    [SerializeField] List<GameObject> m_endRooms;
+    public List<GameObject> GetBranchEnds { get { return m_endRooms; } }
+
     [SerializeField] List<Vector3> m_roomPositions;
     [SerializeField] GameObject m_player = null;
     public GameObject Player { get { return m_player; } }
@@ -178,33 +181,8 @@ public class LevelGenerator : MonoBehaviour
             Debug.Log($"Generating Branch {i+1}");
             GenerateBranch(branchDirections[i], baseRoom, endRoomSpawned, i + 1);
 
-            //Pick this Branch as the End Branch?
-            if(!endRoomSpawned)
-            {
-                if(m_random.Next(2) == 1) 
-                { 
-                    SpawnEndRoom();
-                    endRoomSpawned = true;   
-                }
-            }
+            m_endRooms.Add(m_rooms[m_rooms.Count - 1]);
         }
-
-        if(!endRoomSpawned)
-        {
-            SpawnEndRoom();
-            endRoomSpawned = true;
-        }
-    }
-
-    void SpawnEndRoom()
-    {
-        GameObject endRoom = m_rooms[m_rooms.Count - 1];
-        endRoom.tag = "EndRoom";
-        endRoom.AddComponent<EndRoom>();
-        BoxCollider bC = endRoom.AddComponent<BoxCollider>();
-        bC.isTrigger = true;
-        bC.size = new Vector3(40, 1, 40);
-        bC.center = new Vector3(0, 1, 0); 
     }
 
     void GenerateBranch(Direction initalDir, RoomInfo baseBranch, bool endRoomSpawned, int currentBranch)
