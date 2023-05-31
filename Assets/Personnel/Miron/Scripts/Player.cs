@@ -309,6 +309,7 @@ public class Player : MonoBehaviour, IDamageable
 
     void Die()
 	{
+		GameManager.Instance.StopTimer();
 		state = State.DEAD;
 	}
 
@@ -317,8 +318,6 @@ public class Player : MonoBehaviour, IDamageable
 		//TODO: do things on reset
 		//Enjoy being dead
 		m_deathScreen.SetActive(true);
-
-		GameManager.Instance.StopTimer();
 		GameManager.Instance.ClearGame();
 	}
 
