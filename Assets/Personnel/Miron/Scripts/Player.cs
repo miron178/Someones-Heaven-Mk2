@@ -157,6 +157,7 @@ public class Player : MonoBehaviour, IDamageable
 
 	private bool throwing = false;
 
+	[SerializeField] GameObject m_deathScreen;
 
 	private enum State
     {
@@ -184,6 +185,8 @@ public class Player : MonoBehaviour, IDamageable
         // set the controller center vector:
         controller.center = new Vector3(0, correctHeight, 0);
         healthBar = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<HealthBar>();
+
+		if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MainLevel") { m_deathScreen = GameObject.FindGameObjectWithTag("DeathScreen"); m_deathScreen.SetActive(false); }
 
         if (healthBar)
         {
@@ -227,7 +230,7 @@ public class Player : MonoBehaviour, IDamageable
 			case State.DEAD:
 				if (Animator)
 					Animator.SetBool("IsDead", true);
-				Dead();
+				Invoke("Dead", 3f);
 				break;
 			default:
                 Debug.LogError("The state is unknown.");
@@ -300,7 +303,7 @@ public class Player : MonoBehaviour, IDamageable
 		}
 		if (health == 0)
         {
-            Die();
+			Die();
         }
 	}
 
@@ -313,6 +316,7 @@ public class Player : MonoBehaviour, IDamageable
 	{
 		//TODO: do things on reset
 		//Enjoy being dead
+		m_deathScreen.SetActive(true);
 	}
 
 	public void OnMove(InputAction.CallbackContext context)
