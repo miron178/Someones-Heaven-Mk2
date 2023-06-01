@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour
 
     bool m_timerRun = false;
     public void StopTimer() { m_timerRun = false; }
+    public void StartTimer() { m_timerRun = true; }
     public float CurrentTimeFloat { get { return m_timer; } }
     public string CurrentTimeString { get { return m_minutes.ToString("00") + ":" + m_seconds.ToString("00") + "." + m_milliseconds.ToString("00"); } }
     public void ResetTimer() { m_milliseconds = 0; m_seconds = 0; m_minutes = 0; m_timer = 0; }
@@ -86,23 +87,18 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-        m_playerManager.DeletePlayer();
-        m_roomGenerator.ClearRoom();
-        m_levelGenerator.ClearLevel();
+        ClearGame();
+        ResetTimer();
+        UnityEngine.SceneManagement.SceneManager.LoadScene(1);
 
-        m_timer = 0;
-        m_minutes = 0;
-        m_seconds = 0;
-        m_milliseconds = 0;
-
-        m_levelGenerator.GenerateLevel();
-        m_roomGenerator.GenerateTraps();
-        m_roomGenerator.GeneratePowerUps();
-        m_levelGenerator.GenerateNavMesh();
-        m_roomGenerator.GenerateEnemies();
-        m_playerManager.SpawnPlayer();
-        timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TMP_Text>();
-        m_timerRun = true;
+        // m_levelGenerator.GenerateLevel();
+        // m_roomGenerator.GenerateTraps();
+        // m_roomGenerator.GeneratePowerUps();
+        // m_levelGenerator.GenerateNavMesh();
+        // m_roomGenerator.GenerateEnemies();
+        // m_playerManager.SpawnPlayer();
+        // timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TMP_Text>();
+        // m_timerRun = true;
     }
 
     public void NextLevel()
