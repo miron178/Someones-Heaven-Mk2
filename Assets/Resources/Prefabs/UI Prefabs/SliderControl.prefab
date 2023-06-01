@@ -196,6 +196,30 @@ MonoBehaviour:
   audioMixer: {fileID: 24100000, guid: 2fc065fd131c5bb468b926f978ff0f85, type: 2}
   ParameterName: MasterVolume
   text: {fileID: 1942457822664235725}
+  remapCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.0018050539
+      value: -80
+      inSlope: 90.020164
+      outSlope: 90.020164
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0
+      outWeight: 0.20577615
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 22.06946
+      outSlope: 22.06946
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.8393502
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &1942457822660356440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,7 +310,7 @@ MonoBehaviour:
   m_text: 100%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6f6c8e2a6c93016379ad4df0bcf56d0e, type: 2}
-  m_sharedMaterial: {fileID: 5776095882287892892, guid: 6f6c8e2a6c93016379ad4df0bcf56d0e,
+  m_sharedMaterial: {fileID: 667041158708997992, guid: 6f6c8e2a6c93016379ad4df0bcf56d0e,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

@@ -9,11 +9,12 @@ public class VolumeControl : MonoBehaviour
     public AudioMixer audioMixer;
     public string ParameterName;
     public TextMeshProUGUI text;
+    public AnimationCurve remapCurve;
 
     public void SetVolume(float volume)
     {
         text.text = volume.ToString("P0");
-        volume = -80f * (1 - volume);
+        volume = remapCurve.Evaluate(volume);
         audioMixer.SetFloat(ParameterName, volume);
     }
 
