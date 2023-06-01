@@ -21,6 +21,8 @@ public class ArrowToEnd : MonoBehaviour
         Vector3 fromPos = m_player.transform.position;
         Vector3 dir = (toPos - fromPos).normalized;
         float angle = Vector3.Angle(dir, Vector3.forward);
-        m_arrow.transform.localEulerAngles = new Vector3(0, 0, angle);
+        
+        if(angle < 90) { m_arrow.transform.localEulerAngles = new Vector3(0, 0, -angle); }
+        else { m_arrow.transform.localEulerAngles = new Vector3(0, 0, angle); }
     }
 }

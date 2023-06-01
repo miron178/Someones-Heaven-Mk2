@@ -19,6 +19,8 @@ TagManager:
   - Arrow
   - EndRoom
   - New
+  - Seed
+  - SeedText
   layers:
   - Default
   - TransparentFX

@@ -80,6 +80,8 @@ public class Leaderboard : MonoBehaviour
             m_playerCards[i].SetName("");
             m_playerCards[i].SetTime(0.0f);
         }
+
+        m_playerInfos.Clear();
     }
 
     void FetchResultsBootstrap() { StartCoroutine(FetchResults()); }
