@@ -9,6 +9,7 @@ public class EndRoom : MonoBehaviour
     GameObject m_arrow;
     [SerializeField] GameObject m_winScreen;
     [SerializeField] TMP_Text m_winTimerText;
+    [SerializeField] TMP_Text m_seedText;
 
     private void Awake()
     {
@@ -17,6 +18,7 @@ public class EndRoom : MonoBehaviour
 
         m_winScreen = GameObject.FindGameObjectWithTag("WinScreen");
         m_winTimerText = GameObject.FindGameObjectWithTag("WinTimerText").GetComponent<TMP_Text>();
+        m_seedText = GameObject.FindGameObjectWithTag("Seed").GetComponent<TMP_Text>();
 
         m_winScreen.SetActive(false);
     }
@@ -32,6 +34,7 @@ public class EndRoom : MonoBehaviour
             GameManager.Instance.ClearGame();
 
             m_winTimerText.text = GameManager.Instance.CurrentTimeString;
+            m_seedText.text = GameManager.Instance.LevelSeed.ToString();
             m_winScreen.SetActive(true);
         }
     }

@@ -87,6 +87,6 @@ public static class Utilities
         string secondsText =  seconds >= 10 ? $"{seconds}" : $"0{seconds}";
         string millisecondsText = milliseconds >= 10 ? $"{milliseconds}" : $"0{milliseconds}";
 
-        return $"{minutesText}:{secondsText}:{millisecondsText}";
+        return $"{minutesText}:{secondsText}.{millisecondsText}";
     }
 }

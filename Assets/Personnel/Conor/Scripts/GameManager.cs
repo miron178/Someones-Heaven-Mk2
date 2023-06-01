@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     public System.Random RandomGeneratorSame { get { return m_randomGenerator; } }
 
     int m_levelSeed = 4444;
-    public int LevelSeed { get { return m_levelSeed; } }
+    public int LevelSeed { get { return m_levelSeed; } set  { m_levelSeed = value; }}
     public void GenerateSeed()
     {
         //Gets a Seed from Now.Millisecond and Gets a Random Value from it
@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     bool m_timerRun = false;
     public void StopTimer() { m_timerRun = false; }
     public float CurrentTimeFloat { get { return m_timer; } }
-    public string CurrentTimeString { get { return m_minutes.ToString("00") + ":" + m_seconds.ToString("00") + ":" + m_milliseconds.ToString("00"); } }
+    public string CurrentTimeString { get { return m_minutes.ToString("00") + ":" + m_seconds.ToString("00") + "." + m_milliseconds.ToString("00"); } }
     public void ResetTimer() { m_milliseconds = 0; m_seconds = 0; m_minutes = 0; m_timer = 0; }
 
     float m_milliseconds = 0;
@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
     float m_minutes = 0;
     float m_timer;
     TMP_Text timerText;
+    TMP_Text m_seedText;
     #endregion
 
     void Awake() 
@@ -71,7 +72,6 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        GenerateSeed();
         m_levelGenerator.GenerateLevel();
         m_roomGenerator.GenerateTraps();
         m_roomGenerator.GeneratePowerUps();
@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviour
         m_roomGenerator.GenerateEnemies();
         m_playerManager.SpawnPlayer();
         timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TMP_Text>();
+        GameObject.FindGameObjectWithTag("SeedText").GetComponent<TMP_Text>().text = "Seed: " + m_levelSeed.ToString();
         m_timerRun = true;
     }
 
