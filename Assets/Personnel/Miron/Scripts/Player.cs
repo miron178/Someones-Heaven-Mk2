@@ -118,7 +118,7 @@ public class Player : MonoBehaviour, IDamageable
 
     private Sensor pushSensor;
 
-	public float animationSwitchTime = 0.2f;
+	public float animationSwitchTime = 0.02f;
 
     [SerializeField]
     GameObject model;
@@ -283,7 +283,7 @@ public class Player : MonoBehaviour, IDamageable
             health -= damage < health ? damage : health;
 			AddInvinciblity(invincibiltyDuration);
 		}
-		if (health == 0)
+		if (health <= 0)
         {
 			Die();
         }
@@ -312,13 +312,12 @@ public class Player : MonoBehaviour, IDamageable
 	}
 
 	public void OnRun(InputAction.CallbackContext context) {
-		// read the value for the "move" action each event call
+		// read the value for the "run" action each event call
 		StartRun();
-		Vector2 moveAmount = context.ReadValue<Vector2>();
-		moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
+		//Vector2 moveAmount = context.ReadValue<Vector2>();
+		//moveVelocity = (transform.right * moveAmount.x + transform.forward * moveAmount.y);
 		Invoke("SwitchAnimationBools", animationSwitchTime);
 	}
-
 
 	public void OnPush(float magnitude)
     {
@@ -461,6 +460,14 @@ public class Player : MonoBehaviour, IDamageable
 	}
 
 	private void Run() {
+
+		//if (Keyboard.current.leftShiftKey.wasReleasedThisFrame) {
+		//	state = State.WALKING;
+		//}
+
+		//if (Keyboard.current.leftShiftKey.wasPressedThisFrame) {
+		//	state = State.WALKING;
+		//}
 		velocity = moveVelocity * runSpeed + pull;
 		velocity.y = gravity;
 
