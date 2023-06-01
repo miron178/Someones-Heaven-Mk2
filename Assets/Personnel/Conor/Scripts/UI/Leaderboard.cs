@@ -21,6 +21,9 @@ public class Leaderboard : MonoBehaviour
     [SerializeField] GameObject m_mainMenu;
     [SerializeField] GameObject m_leaderboard;
 
+    //Seed Text
+    [SerializeField] TMPro.TMP_Text m_seedText;
+
     //Input Field
     [SerializeField] TMPro.TMP_InputField m_seedInput;
 
@@ -45,11 +48,10 @@ public class Leaderboard : MonoBehaviour
         }
     }
 
-    
-
     public void OpenCOMXLeaderboard()
     {
         m_seed = m_comxSeed;
+        m_seedText.text = $"Leaderboard for Seed: {m_seed.ToString()}";
 
         m_mainMenu.SetActive(false);
         m_leaderboard.SetActive(true);
@@ -61,6 +63,8 @@ public class Leaderboard : MonoBehaviour
     {
         m_seed = Int32.Parse(m_seedInput.text);
         m_seedInput.text = "";
+
+        m_seedText.text = $"Leaderboard for Seed: {m_seed.ToString()}";
 
         m_mainMenu.SetActive(false);
         m_leaderboard.SetActive(true);

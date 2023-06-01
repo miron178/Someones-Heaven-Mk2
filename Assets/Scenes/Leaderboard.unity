@@ -2055,6 +2055,7 @@ MonoBehaviour:
     rgba: 0
   m_mainMenu: {fileID: 1330142293}
   m_leaderboard: {fileID: 379301066}
+  m_seedText: {fileID: 1777507439}
   m_seedInput: {fileID: 1429031747}
   m_leaderboardGrid: {fileID: 218550856}
   m_playerCardPrefab: {fileID: 5230740644605532990, guid: 01c2ea7340404d64a9e0e4440ab12fa8,

@@ -182,12 +182,20 @@ public class Player : MonoBehaviour, IDamageable
 
     void FixedUpdate()
     {
-		if (Keyboard.current.leftShiftKey.isPressed) {
+		if (health <= 0)
+        {
+			Die();
+        }
+		else 
+		{
+			if (Keyboard.current.leftShiftKey.isPressed) {
 			state = State.RUNNING;
+			}
+			if (Keyboard.current.leftShiftKey.wasReleasedThisFrame) {
+				state = State.WALKING;
+			}
 		}
-		if (Keyboard.current.leftShiftKey.wasReleasedThisFrame) {
-			state = State.WALKING;
-		}
+		
 		switch (state)
         {
 			case State.IDLE:
@@ -256,11 +264,15 @@ public class Player : MonoBehaviour, IDamageable
 	void StartIdle()
 	{
 		state = State.IDLE;
-		
 	}
 
 	void Idle()
 	{
+		if (isDead == true)
+		{
+			Die();
+		}
+
 		if (moveVelocity.sqrMagnitude > 0)
 		{
 			StartWalk();
@@ -269,10 +281,6 @@ public class Player : MonoBehaviour, IDamageable
         {
             controller.Move(pull * Time.deltaTime);
         }
-		if (isDead == true)
-		{
-			Die();
-		}
 	}
 
     public void TakeDamage(int damage)
@@ -283,14 +291,11 @@ public class Player : MonoBehaviour, IDamageable
             health -= damage < health ? damage : health;
 			AddInvinciblity(invincibiltyDuration);
 		}
-		if (health <= 0)
-        {
-			Die();
-        }
 	}
 
     void Die()
 	{
+		isDead = true;
 		GameManager.Instance.StopTimer();
 		state = State.DEAD;
 	}
