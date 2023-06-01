@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.github-glitchenzo.nugetforunity": {
+      "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "03353e7a94bd01ef6daa80e3a5fd85c7f5fa4725"
+    },
     "com.realgames.dear-imgui": {
       "version": "https://github.com/mattmanj17/dear-imgui-unity.git#matthewd",
       "depth": 0,
