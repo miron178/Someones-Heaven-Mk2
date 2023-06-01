@@ -14,6 +14,8 @@ public class DeathField : MonoBehaviour
             other.GetComponent<CharacterController>().enabled = false;
             other.gameObject.transform.position = new Vector3(0, 1, 0);
             other.GetComponent<CharacterController>().enabled = true;
+
+            other.GetComponent<Player>().TakeDamage(1);
         }
         else
         {
