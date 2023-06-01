@@ -21,6 +21,9 @@ public class Leaderboard : MonoBehaviour
     [SerializeField] GameObject m_mainMenu;
     [SerializeField] GameObject m_leaderboard;
 
+    //Input Field
+    [SerializeField] TMPro.TMP_InputField m_seedInput;
+
     //Leaderboard
     [SerializeField] GameObject m_leaderboardGrid;
     [SerializeField] GameObject m_playerCardPrefab;
@@ -28,6 +31,7 @@ public class Leaderboard : MonoBehaviour
     [SerializeField] List<PlayerInfo> m_playerInfos;
 
     int m_comxSeed = 9999;
+    int m_seed = 0;
 
     void Awake()
     {
@@ -41,24 +45,51 @@ public class Leaderboard : MonoBehaviour
         }
     }
 
-    public void OpenLeaderboard()
+    
+
+    public void OpenCOMXLeaderboard()
     {
+        m_seed = m_comxSeed;
+
         m_mainMenu.SetActive(false);
         m_leaderboard.SetActive(true);
 
-        // StartCoroutine(FetchResults());
+        InvokeRepeating("FetchResultsBootstrap", 0f, 10f);
+    }
+
+    public void OpenLeaderboard()
+    {
+        m_seed = Int32.Parse(m_seedInput.text);
+        m_seedInput.text = "";
+
+        m_mainMenu.SetActive(false);
+        m_leaderboard.SetActive(true);
 
         InvokeRepeating("FetchResultsBootstrap", 0f, 10f);
+    }
+
+    public void Back()
+    {
+        m_mainMenu.SetActive(true);
+        m_leaderboard.SetActive(false);
+
+        CancelInvoke("FetchResultsBootstrap");
+
+        for(int i = 0; i < 25; i++)
+        {
+            m_playerCards[i].SetName("");
+            m_playerCards[i].SetTime(0.0f);
+        }
     }
 
     void FetchResultsBootstrap() { StartCoroutine(FetchResults()); }
     IEnumerator FetchResults()
     {
-        UnityWebRequest www = UnityWebRequest.Get($"https://halfempty.conorlewis.com/getTimes?seed={m_comxSeed}");
+        UnityWebRequest www = UnityWebRequest.Get($"https://halfempty.conorlewis.com/getTimes?seed={m_seed}");
 
         yield return www.SendWebRequest();
 
-        Debug.Log("Recieved Request:" + www.downloadHandler.text);
+        Debug.Log("Received Request:" + www.downloadHandler.text);
 
         string rawData = www.downloadHandler.text.Substring(1, www.downloadHandler.text.Length - 2);
         string[] rawDataList = rawData.Split(',');
