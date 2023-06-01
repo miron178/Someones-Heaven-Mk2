@@ -52,6 +52,7 @@ public class PowerUpCore : MonoBehaviour
 
 	public void SpeedUp() {
 		player.speed += effectIncrease;
+		player.runSpeed += effectIncrease;
 		Invoke("ResetStats", effectTimeOut);
 	}
 
